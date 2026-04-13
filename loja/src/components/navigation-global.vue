@@ -191,9 +191,10 @@ async function handleLogout(): Promise<void> {
 					data-test="cart-button"
 				>
 					<img
-						class="h-full hover:opacity-50 active:translate-y-0.5"
+						class="h-full hover:opacity-50 active:translate-y-0.5 origin-center"
+						:class="{ 'animate-bump': cartStore.isBumping }"
 						:src="cartIcon"
-						alt=""
+						alt="Cart Icon"
 					/>
 					<Transition>
 						<div

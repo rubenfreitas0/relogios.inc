@@ -21,7 +21,9 @@ export const products: catalog = {
 				{ count: 1, content: 'Model X Keycaps' },
 				{ count: 1, content: 'USB Type-C Cable' },
 			],
-			price: 599,
+			price: 399,
+			oldPrice: 599,
+			tags: ['Dourado', 'Premium'],
 		},
 		{
 			id: 1,

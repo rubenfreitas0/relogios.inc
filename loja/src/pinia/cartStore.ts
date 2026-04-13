@@ -18,6 +18,12 @@ export const useCartStore = defineStore('cart', {
 		showQuickAdd: true,
 		shipping: 50,
 		freeShippingThreshold: 1000,
+		
+		lastAddedItem: null as product | null,
+		showToast: false,
+		toastTimeout: null as ReturnType<typeof setTimeout> | null,
+		isBumping: false,
+		bumpTimeout: null as ReturnType<typeof setTimeout> | null,
 	}),
 	actions: {
 		cartOn() {
@@ -37,6 +43,20 @@ export const useCartStore = defineStore('cart', {
 			} else {
 				this.cart[itemKey] = { product: item, amount: 1 }
 			}
+
+			this.lastAddedItem = item
+			this.showToast = true
+			this.isBumping = true
+
+			if (this.toastTimeout) clearTimeout(this.toastTimeout)
+			this.toastTimeout = setTimeout(() => {
+				this.showToast = false
+			}, 3000)
+
+			if (this.bumpTimeout) clearTimeout(this.bumpTimeout)
+			this.bumpTimeout = setTimeout(() => {
+				this.isBumping = false
+			}, 300)
 		},
 		addTestItem() {
 			this.addToCart({

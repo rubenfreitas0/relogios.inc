@@ -3,7 +3,7 @@ import Navigation from '../../components/navigation-global.vue'
 import CategoryBoxes from '../../components/Category-Box/category-box-container.vue'
 import Info from '../../components/info-section.vue'
 import Footer from '../../components/footer-global.vue'
-import Showbox from './Components/category-show-box.vue'
+import ProductCard from './Components/product-card.vue'
 import { getProductsOfType } from '../../data/product-utils.ts'
 import { computed } from 'vue'
 
@@ -30,13 +30,15 @@ const products = computed(() => getProductsOfType(props.category))
 	<main
 		class="main-container flex h-full w-screen flex-col items-center bg-white"
 	>
-		<Showbox
-			v-for="(product, index) in products"
-			:item="product"
-			:category="props.category"
-			:data-test="`showbox-${product.category}-${product.id}`"
-			:key="index"
-		/>
+		<div class="my-16 grid w-4/5 max-w-[85rem] grid-cols-1 gap-6 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 lg:gap-8">
+			<ProductCard
+				v-for="(product, index) in products"
+				:item="product"
+				:category="props.category"
+				:data-test="`product-card-${product.category}-${product.id}`"
+				:key="index"
+			/>
+		</div>
 		<CategoryBoxes />
 		<Info />
 		<Footer />

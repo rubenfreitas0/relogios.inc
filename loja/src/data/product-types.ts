@@ -17,6 +17,8 @@ export type product = {
 	features: string
 	inthebox: contents[]
 	price: number
+	oldPrice?: number
+	tags?: string[]
 }
 
 export interface catalog {
