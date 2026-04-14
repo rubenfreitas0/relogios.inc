@@ -48,10 +48,26 @@ class AddressController extends Controller
     }
 
     /**
+     * Display the specified address.
+     */
+    public function show(Request $request, Address $address)
+    {
+        if ($request->user()->id !== $address->user_id) {
+            return response()->json(['message' => 'Acesso negado.'], 403);
+        }
+
+        return new AddressResource($address);
+    }
+
+    /**
      * Update the user's address.
      */
     public function update(UpdateAddressRequest $request, Address $address)
     {
+        if ($request->user()->id !== $address->user_id) {
+            return response()->json(['message' => 'Acesso negado.'], 403);
+        }
+
         $validated = $request->validated();
 
         if (($validated['is_default'] ?? false) === true && !$address->is_default) {
@@ -67,6 +83,24 @@ class AddressController extends Controller
     }
 
     /**
+     * Definir a morada como a principal
+     */
+    public function setDefault(Request $request, Address $address)
+    {
+        if ($request->user()->id !== $address->user_id) {
+            return response()->json(['message' => 'Acesso negado.'], 403);
+        }
+
+        $request->user()->addresses()->update(['is_default' => false]);
+        $address->update(['is_default' => true]);
+
+        return response()->json([
+            'message' => 'Morada definida como principal.',
+            'data' => new AddressResource($address)
+        ]);
+    }
+
+    /**
      * Remove the address.
      */
     public function destroy(Request $request, Address $address)
@@ -75,10 +109,17 @@ class AddressController extends Controller
             return response()->json(['message' => 'Não tens permissão para apagar esta morada.'], 403);
         }
 
+        $wasDefault = $address->is_default;
+
         $address->delete();
 
-        return response()->json([
-            'message' => 'Morada apagada silenciosamente com sucesso.'
-        ]);
+        if ($wasDefault) {
+            $nextAddress = $request->user()->addresses()->latest()->first();
+            if ($nextAddress) {
+                $nextAddress->update(['is_default' => true]);
+            }
+        }
+
+        return response()->noContent();
     }
 }

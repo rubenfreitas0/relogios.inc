@@ -19,7 +19,7 @@ class CategoryController extends Controller
         $categories = Category::query()
             ->when(
                 $request->filled('search'),
-                fn($q) => $q->whereRaw('LOWER(name) LIKE ?', ['%' . strtolower($request->search) . '%'])
+                fn($q) => $q->whereRaw('LOWER(name) LIKE ?', ['%' . strtolower((string) $request->search) . '%'])
             )
             ->when(
                 $request->has('is_active'),

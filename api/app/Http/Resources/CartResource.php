@@ -19,11 +19,13 @@ class CartResource extends JsonResource
                 'slug' => $this->product->slug,
                 'price' => $this->product->price,
                 'stock' => $this->product->stock,
-                // Garantir que devolve o path da imagem e caso não haja, tenta não rebentar
-                'image' => $this->product->primaryImage ? $this->product->primaryImage->image_path : null 
+                // Garantir que devolve a URL completa da imagem
+                'image' => $this->product->primaryImage ? $this->product->primaryImage->full_url : null 
             ],
             // Calcula logo na API o subtotal da linha
             'line_total' => round($this->quantity * $this->product->price, 2),
+            'created_at' => $this->created_at,
+            'updated_at' => $this->updated_at,
         ];
     }
 }

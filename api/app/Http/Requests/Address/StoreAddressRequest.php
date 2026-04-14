@@ -12,6 +12,13 @@ class StoreAddressRequest extends FormRequest
         return true; 
     }
 
+    protected function prepareForValidation()
+    {
+        $this->mergeIfMissing([
+            'country' => 'PT',
+        ]);
+    }
+
     public function rules(): array
     {
         return [

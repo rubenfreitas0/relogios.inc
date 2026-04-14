@@ -14,12 +14,15 @@ use Illuminate\Support\Facades\Storage;
 
 class BrandController extends Controller
 {
+    /**
+     * Filtros, ordenação e paginação
+     */
     public function index(Request $request): AnonymousResourceCollection
     {
         $brands = Brand::query()
             ->when(
                 $request->filled('search'),
-                fn($q) => $q->whereRaw('LOWER(name) LIKE ?', ['%' . strtolower($request->search) . '%'])
+                fn($q) => $q->whereRaw('LOWER(name) LIKE ?', ['%' . strtolower((string) $request->search) . '%'])
             )
             ->when(
                 $request->has('is_active'),

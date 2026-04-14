@@ -24,7 +24,7 @@ class ProductController extends Controller
             ->with(['brand', 'category', 'images'])
             ->when(
                 $request->filled('search'),
-                fn($q) => $q->whereRaw('LOWER(name) LIKE ?', ['%' . strtolower($request->search) . '%'])
+                fn($q) => $q->whereRaw('LOWER(name) LIKE ?', ['%' . strtolower((string) $request->search) . '%'])
             )
             ->when(
                 $request->filled('brand_id'),
@@ -37,6 +37,18 @@ class ProductController extends Controller
             ->when(
                 $request->has('is_active'),
                 fn($q) => $q->where('is_active', $request->boolean('is_active'))
+            )
+            ->when(
+                $request->has('gender'),
+                fn($q) => $q->where('gender', $request->gender)
+            )
+            ->when(
+                $request->has('is_featured'),
+                fn($q) => $q->where('is_featured', $request->boolean('is_featured'))
+            )
+            ->when(
+                $request->has('trashed') && $request->boolean('trashed'),
+                fn($q) => $q->onlyTrashed()
             )
             ->latest()
             ->paginate($request->input('per_page', 10));
@@ -61,7 +73,7 @@ class ProductController extends Controller
 
                     ProductImage::create([
                         'product_id' => $product->id,
-                        'image_path' => $path,
+                        'url' => $path,
                         'is_primary' => $index === 0, // A primeira imagem é a principal por defeito
                         'sort_order' => $index
                     ]);
@@ -113,7 +125,7 @@ class ProductController extends Controller
 
                     ProductImage::create([
                         'product_id' => $product->id,
-                        'image_path' => $path,
+                        'url' => $path,
                         'is_primary' => false,
                         'sort_order' => $startingSortOrder + $index
                     ]);
@@ -143,8 +155,35 @@ class ProductController extends Controller
         // Ao fazer soft delete ao produto, as imagens mantêm-se por histórico.
         $product->delete();
 
+        return response()->noContent();
+    }
+    /**
+     * Atualizar apenas o stock do produto rapidamente
+     */
+    public function updateStock(Request $request, Product $product)
+    {
+        $validated = $request->validate([
+            'stock' => ['required', 'integer', 'min:0']
+        ]);
+
+        $product->update($validated);
+
         return response()->json([
-            'message' => 'Produto apagado com sucesso.'
+            'message' => 'Stock atualizado com sucesso.',
+            'data' => new ProductResource($product)
+        ]);
+    }
+
+    /**
+     * Restaurar um produto apagado (Soft Delete)
+     */
+    public function restore(Product $product)
+    {
+        $product->restore();
+
+        return response()->json([
+            'message' => 'Produto restaurado com sucesso.',
+            'data' => new ProductResource($product)
         ]);
     }
 }

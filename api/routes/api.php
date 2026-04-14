@@ -38,6 +38,7 @@ Route::prefix('catalog')->group(function () {
     Route::get('/categories/{slug}', [CategoryController::class, 'show']);
 
     Route::get('/products',        [ProductController::class, 'index']);
+    Route::get('/products/featured', [ProductController::class, 'featured']);
     Route::get('/products/{slug}', [ProductController::class, 'show']);
 });
 
@@ -51,9 +52,10 @@ Route::middleware('auth:sanctum')->group(function () {
 
     // Carrinho de Compras
     Route::delete('/cart', [\App\Http\Controllers\Api\CartController::class, 'clear']);
-    Route::apiResource('cart', \App\Http\Controllers\Api\CartController::class);
+    Route::apiResource('cart', \App\Http\Controllers\Api\CartController::class)->except(['show']);
 
     // Moradas do Cliente
+    Route::patch('/addresses/{address}/default', [\App\Http\Controllers\Api\AddressController::class, 'setDefault']);
     Route::apiResource('addresses', \App\Http\Controllers\Api\AddressController::class);
 
     // Rotas que exigem email verificado
@@ -69,6 +71,16 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::middleware(['admin', 'verified'])->prefix('admin')->group(function () {
         Route::apiResource('brands', AdminBrandController::class);
         Route::apiResource('categories', AdminCategoryController::class);
+        
+        // Rotas customizadas de produto antes do Route::resource
+        Route::patch('products/{product}/stock', [AdminProductController::class, 'updateStock']);
+        Route::post('products/{product}/restore', [AdminProductController::class, 'restore'])->withTrashed();
+        
+        // Rotas de gestão da galeria de imagens do produto
+        Route::patch('products/{product}/images/reorder', [\App\Http\Controllers\Api\Admin\ProductImageController::class, 'reorder']);
+        Route::patch('products/{product}/images/{image}/primary', [\App\Http\Controllers\Api\Admin\ProductImageController::class, 'setPrimary']);
+        Route::apiResource('products.images', \App\Http\Controllers\Api\Admin\ProductImageController::class)->only(['index', 'store', 'destroy']);
+
         Route::apiResource('products', AdminProductController::class);
     });
 });

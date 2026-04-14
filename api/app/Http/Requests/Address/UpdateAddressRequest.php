@@ -8,9 +8,7 @@ class UpdateAddressRequest extends FormRequest
 {
     public function authorize(): bool
     {
-        // Apenas o verdadeiro dono da morada a pode alterar
-        $address = $this->route('address');
-        return $address && $this->user()->id === $address->user_id;
+        return true;
     }
 
     public function rules(): array

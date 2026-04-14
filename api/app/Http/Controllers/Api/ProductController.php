@@ -21,7 +21,7 @@ class ProductController extends Controller
 
         // Pesquisa de texto livre no nome do relógio
         if ($request->filled('search')) {
-            $query->whereRaw('LOWER(name) LIKE ?', ['%' . strtolower($request->search) . '%']);
+            $query->whereRaw('LOWER(name) LIKE ?', ['%' . strtolower((string) $request->search) . '%']);
         }
 
         // Filtro por slug de categoria (muito útil em e-commerce nas opções de menu)
@@ -47,7 +47,7 @@ class ProductController extends Controller
         if ($request->filled('min_price')) {
             $query->where('price', '>=', $request->min_price);
         }
-        
+
         if ($request->filled('max_price')) {
             $query->where('price', '<=', $request->max_price);
         }
@@ -64,8 +64,14 @@ class ProductController extends Controller
                 case 'newest':
                     $query->latest();
                     break;
+                case 'name_asc':
+                    $query->orderBy('name', 'asc');
+                    break;
+                case 'name_desc':
+                    $query->orderBy('name', 'desc');
+                    break;
                 default:
-                    $query->latest(); // Default
+                    $query->latest(); // Padrão
             }
         } else {
             $query->latest(); // Padrão
@@ -73,6 +79,21 @@ class ProductController extends Controller
 
         // Devolver com uma modesta paginação. 12 ou 16 relógios costuma ser boa prática visual em grid.
         $products = $query->paginate($request->input('per_page', 12));
+
+        return ProductResource::collection($products);
+    }
+
+    /**
+     * Obter produtos em destaque (Featured) - Ideal para a Home Page
+     */
+    public function featured()
+    {
+        $products = Product::where('is_active', true)
+            ->where('is_featured', true)
+            ->with(['brand', 'category', 'primaryImage']) // lazy eager loading essencial
+            ->latest()
+            ->take(8) // Retorna até 8 produtos, ideal para uma section de grelha
+            ->get();
 
         return ProductResource::collection($products);
     }

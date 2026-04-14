@@ -83,6 +83,10 @@ class CartController extends Controller
      */
     public function update(UpdateCartRequest $request, CartItem $cart)
     {
+        if ($request->user()->id !== $cart->user_id) {
+            return response()->json(['message' => 'Acesso negado.'], 403);
+        }
+
         $validated = $request->validated();
         
         // Verifica no momento do update se continua a não ultrapassar o stock
@@ -111,7 +115,7 @@ class CartController extends Controller
 
         $cart->delete();
 
-        return response()->json(['message' => 'Item removido do carrinho.']);
+        return response()->noContent();
     }
 
     /**
@@ -121,6 +125,6 @@ class CartController extends Controller
     {
         $request->user()->cartItems()->delete();
 
-        return response()->json(['message' => 'Carrinho esvaziado com sucesso.']);
+        return response()->noContent();
     }
 }
