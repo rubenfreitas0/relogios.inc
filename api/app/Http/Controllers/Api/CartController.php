@@ -13,14 +13,14 @@ use Illuminate\Http\Request;
 class CartController extends Controller
 {
     /**
-     * Display a listing of the user's cart.
+     * Listar o conteúdo do carrinho do user.
      */
     public function index(Request $request)
     {
         $cartItems = $request->user()->cartItems()->with(['product.primaryImage'])->get();
-        
-        // Formatar o array para devolver também o total geral calculado
-        $total = $cartItems->sum(function($item) {
+
+        // Cálculo do valor total do carrinho
+        $total = $cartItems->sum(function ($item) {
             return $item->quantity * $item->product->price;
         });
 
@@ -31,27 +31,26 @@ class CartController extends Controller
     }
 
     /**
-     * Add product to cart.
+     * Adicionar produto ao carrinho.
      */
     public function store(StoreCartRequest $request)
     {
         $validated = $request->validated();
         $user = $request->user();
-        
+
         $product = Product::findOrFail($validated['product_id']);
 
-        // Bloqueador nº 1: Produto não está ativo
+        // Impedimento: Produto não está ativo / disponivel
         if (!$product->is_active) {
             return response()->json(['message' => 'Este produto de momento não está à venda.'], 403);
         }
 
-        // Tentar ver se o utilizador já tem este produto no carrinho dele
         $cartItem = $user->cartItems()->where('product_id', $product->id)->first();
-        
+
         $requestedQuantity = $validated['quantity'];
         $newTotalQuantity = $cartItem ? ($cartItem->quantity + $requestedQuantity) : $requestedQuantity;
 
-        // Bloqueador nº 2: O utilizador tenta meter no carrinho mais do que a loja tem (Opção que falámos)
+        // Impedimento: O utilizador tenta adicionar ao carrinho mais unidades do que a loja tem
         if ($newTotalQuantity > $product->stock) {
             return response()->json([
                 'message' => 'Stock insuficiente. Apenas existem ' . $product->stock . ' unidades disponíveis.'
@@ -59,17 +58,14 @@ class CartController extends Controller
         }
 
         if ($cartItem) {
-            // Se já existia, soma
             $cartItem->update(['quantity' => $newTotalQuantity]);
         } else {
-            // Se não existia, insere linha nova
             $cartItem = $user->cartItems()->create([
                 'product_id' => $product->id,
                 'quantity' => $requestedQuantity
             ]);
         }
 
-        // Load da relation para devolver o resource completo
         $cartItem->load('product.primaryImage');
 
         return response()->json([
@@ -79,7 +75,7 @@ class CartController extends Controller
     }
 
     /**
-     * Update cart item quantity (e.g. + / - buttons)
+     * Atualiza a quantidade de um item no carrinho
      */
     public function update(UpdateCartRequest $request, CartItem $cart)
     {
@@ -88,8 +84,7 @@ class CartController extends Controller
         }
 
         $validated = $request->validated();
-        
-        // Verifica no momento do update se continua a não ultrapassar o stock
+
         if ($validated['quantity'] > $cart->product->stock) {
             return response()->json([
                 'message' => 'Stock insuficiente para a quantidade desejada.'
@@ -105,7 +100,7 @@ class CartController extends Controller
     }
 
     /**
-     * Remove item from cart.
+     * Remover um item do carrinho.
      */
     public function destroy(Request $request, CartItem $cart)
     {

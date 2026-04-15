@@ -11,7 +11,7 @@ use Illuminate\Http\Request;
 class ProductImageController extends Controller
 {
     /**
-     * Listar todas as imagens do produto
+     * Listar as imagens do produto
      */
     public function index(Product $product)
     {
@@ -31,7 +31,7 @@ class ProductImageController extends Controller
 
         $path = $request->file('image')->store('products', 'public');
 
-        // Se o produto ainda não tiver imagens, a primeira será logo a principal
+        // A primeira imagem inserida será logo a principal
         $isPrimary = $product->images()->count() === 0;
 
         $image = $product->images()->create([
@@ -56,10 +56,7 @@ class ProductImageController extends Controller
             return response()->json(['message' => 'Imagem não pertence a este produto.'], 403);
         }
 
-        // Tira a coroa a todas
         $product->images()->update(['is_primary' => false]);
-
-        // Dá a coroa à nova imagem
         $image->update(['is_primary' => true]);
 
         return response()->json([
@@ -70,7 +67,6 @@ class ProductImageController extends Controller
 
     /**
      * Reordenar as imagens do produto
-     * Espera um json do tipo: { "order": [3, 1, 4] } que são os IDs pela nova ordem
      */
     public function reorder(Request $request, Product $product)
     {
@@ -99,10 +95,9 @@ class ProductImageController extends Controller
 
         $wasPrimary = $image->is_primary;
 
-        // Apagar fisicamente do storage e da BD (método que estava no model)
         $image->deleteImage();
 
-        // Se a imagem apagada era a principal, elegemos automaticamente a próxima na lista
+        // Se a imagem apagada era a principal, elege automaticamente a próxima na lista
         if ($wasPrimary) {
             $nextImage = $product->images()->first();
             if ($nextImage) {

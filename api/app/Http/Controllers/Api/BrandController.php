@@ -10,6 +10,9 @@ use Illuminate\Http\Resources\Json\AnonymousResourceCollection;
 
 class BrandController extends Controller
 {
+    /**
+     * Listar todas as marcas ativas.
+     */
     public function index(): AnonymousResourceCollection
     {
         $brands = Brand::active()
@@ -19,6 +22,9 @@ class BrandController extends Controller
         return BrandResource::collection($brands);
     }
 
+    /**
+     * Detalhe de uma marca (por slug) e seus produtos.
+     */
     public function show(string $slug): BrandResource
     {
         $brand = Brand::active()
@@ -29,8 +35,3 @@ class BrandController extends Controller
         return new BrandResource($brand);
     }
 }
-
-//GET http://localhost:8000/api/catalog/brands
-
-//Headers:
-  //Accept: application/json

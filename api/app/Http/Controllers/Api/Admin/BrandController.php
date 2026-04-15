@@ -15,7 +15,7 @@ use Illuminate\Support\Facades\Storage;
 class BrandController extends Controller
 {
     /**
-     * Filtros, ordenação e paginação
+     * Filtros, ordenação e paginação.
      */
     public function index(Request $request): AnonymousResourceCollection
     {

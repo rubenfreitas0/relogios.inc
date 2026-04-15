@@ -12,6 +12,9 @@ use App\Http\Resources\UserResource;
 
 class AuthController extends Controller
 {
+    /**
+     * Registar um novo user.
+     */
     public function register(Request $request)
     {
         $validated = $request->validate([
@@ -41,6 +44,9 @@ class AuthController extends Controller
         ], 201);
     }
 
+    /**
+     * Autenticar um user e gerar token.
+     */
     public function login(Request $request)
     {
         $validated = $request->validate([
@@ -70,9 +76,11 @@ class AuthController extends Controller
             'user'  => new \App\Http\Resources\UserResource($user),
             'token' => $token,
         ]);
-
     }
 
+    /**
+     * Terminar a sessão do utilizador (revogar token).
+     */
     public function logout(Request $request)
     {
         $request->user()->currentAccessToken()->delete();

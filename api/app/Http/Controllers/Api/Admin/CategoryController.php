@@ -14,6 +14,9 @@ use Illuminate\Http\Resources\Json\AnonymousResourceCollection;
 
 class CategoryController extends Controller
 {
+    /**
+     * Filtros, ordenação e paginação.
+     */
     public function index(Request $request): AnonymousResourceCollection
     {
         $categories = Category::query()
