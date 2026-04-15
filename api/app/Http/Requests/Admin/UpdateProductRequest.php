@@ -45,7 +45,11 @@ class UpdateProductRequest extends FormRequest
             // Imagens
             'images'            => ['sometimes', 'array', 'max:10'],
             'images.*'          => ['image', 'mimes:png,jpg,jpeg', 'max:2048'],
-            'primary_image'     => ['sometimes', 'integer', 'min:0'],
+            'remove_image_ids'  => ['sometimes', 'array'],
+            'remove_image_ids.*'=> ['integer', 'exists:product_images,id'],
+            'image_order'       => ['sometimes', 'array'],
+            'image_order.*'     => ['integer', 'exists:product_images,id'],
+            'primary_image_id'  => ['sometimes', 'integer', 'exists:product_images,id'],
         ];
     }
 
@@ -66,6 +70,11 @@ class UpdateProductRequest extends FormRequest
             'images.*.image'       => 'Cada ficheiro tem de ser uma imagem.',
             'images.*.mimes'       => 'Formatos aceites: PNG, JPG, JPEG.',
             'images.*.max'         => 'Cada imagem não pode ter mais de 2 MB.',
+            'remove_image_ids.array' => 'O campo de remoção deve ser um array.',
+            'remove_image_ids.*.exists' => 'Uma das imagens selecionadas para remover não existe.',
+            'image_order.array'    => 'O campo de ordenação deve ser um array.',
+            'image_order.*.exists' => 'Uma das imagens na ordem selecionada não existe.',
+            'primary_image_id.exists' => 'A imagem selecionada como principal não existe.',
         ];
     }
 }

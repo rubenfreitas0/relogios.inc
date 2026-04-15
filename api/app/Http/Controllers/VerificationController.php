@@ -11,14 +11,10 @@ use Illuminate\Http\Request;
 class VerificationController extends Controller
 {
     /**
-     * Verificar email — rota PÚBLICA com link assinado
-     * Não exige autenticação
+     * Verificar email - rota publica com link assinado - não exige autenticação
      */
     public function verify(Request $request, $id): JsonResponse
     {
-        // O middleware 'signed' já validou a assinatura e expiração
-        // Se chegou aqui, o link é válido
-
         $user = User::findOrFail($id);
 
         if ($user->hasVerifiedEmail()) {
@@ -57,7 +53,7 @@ class VerificationController extends Controller
     }
 
     /**
-     * Verificar estado — para o frontend saber se precisa mostrar aviso
+     * Verificar estado
      */
     public function status(Request $request): JsonResponse
     {

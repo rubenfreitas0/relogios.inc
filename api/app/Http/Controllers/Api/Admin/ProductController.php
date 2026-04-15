@@ -9,14 +9,12 @@ use App\Http\Requests\Admin\StoreProductRequest;
 use App\Http\Requests\Admin\UpdateProductRequest;
 use App\Http\Resources\ProductResource;
 use Illuminate\Http\Request;
-use Illuminate\Support\Facades\Storage;
-use Illuminate\Support\Str;
 use Illuminate\Support\Facades\DB;
 
 class ProductController extends Controller
 {
     /**
-     * Display a listing of the resource.
+     * Filtros, ordenação e paginação.
      */
     public function index(Request $request)
     {
@@ -57,7 +55,7 @@ class ProductController extends Controller
     }
 
     /**
-     * Store a newly created resource in storage.
+     * Criar novo produto.
      */
     public function store(StoreProductRequest $request)
     {
@@ -96,7 +94,7 @@ class ProductController extends Controller
     }
 
     /**
-     * Display the specified resource.
+     * Detalhe de um produto por ID.
      */
     public function show(Product $product)
     {
@@ -104,7 +102,7 @@ class ProductController extends Controller
     }
 
     /**
-     * Update the specified resource in storage.
+     * Atualizar um produto.
      */
     public function update(UpdateProductRequest $request, Product $product)
     {
@@ -114,22 +112,46 @@ class ProductController extends Controller
             $validated = $request->validated();
             $product->update($validated);
 
-            // Nota: Num sistema robusto, adicionaríamos um endpoint separado para gerir 
-            // a remoção de imagens antigas. Aqui, assumimos que se o utilizador envia 'images', 
-            // estamos a adicionar NOVAS imagens à galeria do produto.
+            // Remoção de imagens
+            if ($request->filled('remove_image_ids')) {
+                $imagesToDelete = $product->images()->whereIn('id', $request->remove_image_ids)->get();
+                foreach ($imagesToDelete as $img) {
+                    $img->deleteImage();
+                }
+            }
+
+            // Reordenação de imagen
+            if ($request->filled('image_order')) {
+                foreach ($request->image_order as $index => $imageId) {
+                    $product->images()->where('id', $imageId)->update(['sort_order' => $index + 1]);
+                }
+            }
+
+            // Adição de novas imagens
             if ($request->hasFile('images')) {
-                $startingSortOrder = $product->images()->max('sort_order') + 1;
+                $startingSortOrder = ($product->images()->max('sort_order') ?? 0) + 1;
 
                 foreach ($request->file('images') as $index => $image) {
                     $path = $image->store('products', 'public');
 
                     ProductImage::create([
                         'product_id' => $product->id,
-                        'url' => $path,
+                        'url'        => $path,
                         'is_primary' => false,
                         'sort_order' => $startingSortOrder + $index
                     ]);
                 }
+            }
+
+            // Definição da imagem principal
+            if ($request->filled('primary_image_id')) {
+                $product->images()->update(['is_primary' => false]);
+                $product->images()->where('id', $request->primary_image_id)->update(['is_primary' => true]);
+            }
+
+            // Garantia de que existe sempre uma capa enquanto existir imagens
+            if ($product->images()->count() > 0 && !$product->images()->where('is_primary', true)->exists()) {
+                $product->images()->orderBy('sort_order')->first()->update(['is_primary' => true]);
             }
 
             DB::commit();
@@ -148,17 +170,18 @@ class ProductController extends Controller
     }
 
     /**
-     * Remove the specified resource from storage.
+     * Eliminar produto.
      */
     public function destroy(Product $product)
     {
-        // Ao fazer soft delete ao produto, as imagens mantêm-se por histórico.
+        // Com soft delete no produto, as imagens mantêm-se no histórico.
         $product->delete();
 
         return response()->noContent();
     }
+
     /**
-     * Atualizar apenas o stock do produto rapidamente
+     * Atualizar apenas o stock do produto< 
      */
     public function updateStock(Request $request, Product $product)
     {
@@ -177,8 +200,9 @@ class ProductController extends Controller
     /**
      * Restaurar um produto apagado (Soft Delete)
      */
-    public function restore(Product $product)
+    public function restore($id)
     {
+        $product = Product::withTrashed()->findOrFail($id);
         $product->restore();
 
         return response()->json([

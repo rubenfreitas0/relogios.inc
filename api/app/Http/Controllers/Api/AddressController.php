@@ -12,7 +12,7 @@ use Illuminate\Http\Request;
 class AddressController extends Controller
 {
     /**
-     * Display a listing of the user's addresses.
+     * Listar todas as moradas do utilizador.
      */
     public function index(Request $request)
     {
@@ -21,20 +21,20 @@ class AddressController extends Controller
     }
 
     /**
-     * Store a newly created address.
+     * Criar uma nova morada.
      */
     public function store(StoreAddressRequest $request)
     {
         $validated = $request->validated();
-        
+
         $user = $request->user();
 
-        // Se for a primeira morada do user, forçamos a ser 'is_default'
+        // Se for a primeira morada do user, força a ser 'is_default'
         if ($user->addresses()->count() === 0) {
             $validated['is_default'] = true;
         }
 
-        // Caso o utilizador envie esta para ser default, tiramos o default de todas as outras dele
+        // Caso o utilizador envie esta para ser default, tira o default de todas as outras
         if (($validated['is_default'] ?? false) === true) {
             $user->addresses()->update(['is_default' => false]);
         }
@@ -48,7 +48,7 @@ class AddressController extends Controller
     }
 
     /**
-     * Display the specified address.
+     * Mostrar os detalhes de uma morada específica.
      */
     public function show(Request $request, Address $address)
     {
@@ -60,7 +60,7 @@ class AddressController extends Controller
     }
 
     /**
-     * Update the user's address.
+     * Atualizar os dados de uma morada.
      */
     public function update(UpdateAddressRequest $request, Address $address)
     {
@@ -101,7 +101,7 @@ class AddressController extends Controller
     }
 
     /**
-     * Remove the address.
+     * Eliminar uma morada.
      */
     public function destroy(Request $request, Address $address)
     {

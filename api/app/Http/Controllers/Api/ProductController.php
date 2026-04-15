@@ -14,17 +14,17 @@ class ProductController extends Controller
      */
     public function index(Request $request)
     {
-        // Começamos por garantir que apenas os produtos ativos e com stock (opcional) aparecem no site
+        // Filtro de produtos ativos e com stock
         $query = Product::query()
-            ->with(['brand', 'category', 'primaryImage']) // lazy eager loading de relações essenciais para a listagem
+            ->with(['brand', 'category', 'primaryImage'])
             ->where('is_active', true);
 
-        // Pesquisa de texto livre no nome do relógio
+        // Pesquisa por texto
         if ($request->filled('search')) {
             $query->whereRaw('LOWER(name) LIKE ?', ['%' . strtolower((string) $request->search) . '%']);
         }
 
-        // Filtro por slug de categoria (muito útil em e-commerce nas opções de menu)
+        // Filtro por slug de categoria
         if ($request->filled('category')) {
             $query->whereHas('category', function ($q) use ($request) {
                 $q->where('slug', $request->category);
@@ -43,7 +43,7 @@ class ProductController extends Controller
             $query->where('gender', $request->gender);
         }
 
-        // Filtros avançados por preço (min_price e max_price)
+        // Filtros por preço
         if ($request->filled('min_price')) {
             $query->where('price', '>=', $request->min_price);
         }
@@ -71,28 +71,28 @@ class ProductController extends Controller
                     $query->orderBy('name', 'desc');
                     break;
                 default:
-                    $query->latest(); // Padrão
+                    $query->latest();
             }
         } else {
-            $query->latest(); // Padrão
+            $query->latest();
         }
 
-        // Devolver com uma modesta paginação. 12 ou 16 relógios costuma ser boa prática visual em grid.
+        // Paginação (12)
         $products = $query->paginate($request->input('per_page', 12));
 
         return ProductResource::collection($products);
     }
 
     /**
-     * Obter produtos em destaque (Featured) - Ideal para a Home Page
+     * Pesquisar produtos em destaque (Featured)
      */
     public function featured()
     {
         $products = Product::where('is_active', true)
             ->where('is_featured', true)
-            ->with(['brand', 'category', 'primaryImage']) // lazy eager loading essencial
+            ->with(['brand', 'category', 'primaryImage'])
             ->latest()
-            ->take(8) // Retorna até 8 produtos, ideal para uma section de grelha
+            ->take(8)
             ->get();
 
         return ProductResource::collection($products);
@@ -103,10 +103,9 @@ class ProductController extends Controller
      */
     public function show($slug)
     {
-        // Buscar o produto único por slug, garantindo sempre que está ativo
         $product = Product::where('slug', $slug)
             ->where('is_active', true)
-            ->with(['brand', 'category', 'images']) // Trazer toda a galeria agora!
+            ->with(['brand', 'category', 'images'])
             ->firstOrFail();
 
         return new ProductResource($product);

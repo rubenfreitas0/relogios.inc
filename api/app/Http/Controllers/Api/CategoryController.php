@@ -22,7 +22,7 @@ class CategoryController extends Controller
     }
 
     /**
-     * Detalhe de uma categoria ativa por slug.
+     * Detalhe de uma categoria
      */
     public function show(string $slug): CategoryResource
     {

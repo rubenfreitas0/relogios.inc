@@ -16,6 +16,9 @@ use App\Mail\ResetPasswordMail;
 
 class ResetPasswordController extends Controller
 {
+    /**
+     * Enviar link de recuperação de password por email.
+     */
     public function sendResetLink(Request $request)
     {
         $request->validate([
@@ -47,6 +50,9 @@ class ResetPasswordController extends Controller
         ]);
     }
 
+    /**
+     * Redefinir a password utilizando o token recebido.
+     */
     public function reset(Request $request)
     {
         $request->validate([
@@ -76,7 +82,7 @@ class ResetPasswordController extends Controller
             'password' => $request->password
         ]);
 
-        // Revogar tokens antigos, obrigado a login com a nova password
+        // Revogar tokens antigos, obrigado a fazer login com a nova password
         $user->tokens()->delete();
 
         DB::table('password_reset_tokens')->where('email', $request->email)->delete();
