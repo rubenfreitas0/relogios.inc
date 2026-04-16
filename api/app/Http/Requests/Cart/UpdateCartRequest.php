@@ -8,8 +8,7 @@ class UpdateCartRequest extends FormRequest
 {
     public function authorize(): bool
     {
-        // Uma pessoa só pode alterar as quantidades do seu próprio item no carrinho
-        $cartItem = $this->route('cart'); // O parametro de rota costuma ser chamado '{cart}' nestas resource routes
+        $cartItem = $this->route('cart');
         return $cartItem && $this->user()->id === $cartItem->user_id;
     }
 

@@ -21,12 +21,10 @@ class ProductResource extends JsonResource
             'is_featured'       => $this->is_featured,
             'gender'            => $this->gender,
 
-            // Relações (só aparecem se carregadas)
             'brand'    => new BrandResource($this->whenLoaded('brand')),
             'category' => new CategoryResource($this->whenLoaded('category')),
             'images'   => ProductImageResource::collection($this->whenLoaded('images')),
 
-            // Contagens (só aparecem se pedidas)
             'images_count' => $this->whenCounted('images'),
 
             'created_at' => $this->created_at,

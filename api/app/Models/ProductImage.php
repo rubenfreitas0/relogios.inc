@@ -36,7 +36,9 @@ class ProductImage extends Model
 
     public function getFullUrlAttribute(): string
     {
-        return Storage::disk('public')->url($this->url);
+        /** @var \Illuminate\Filesystem\FilesystemAdapter $disk */
+        $disk = Storage::disk('public');
+        return $disk->url($this->url);
     }
 
     public function deleteImage(): void

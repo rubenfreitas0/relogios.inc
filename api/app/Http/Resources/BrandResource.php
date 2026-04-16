@@ -19,14 +19,11 @@ class BrandResource extends JsonResource
             'id'             => $this->id,
             'name'           => $this->name,
             'slug'           => $this->slug,
-            'logo'           => $this->logo 
-                                ? Storage::disk('public')->url($this->logo) 
-                                : null,
-            'is_active'      => $this->is_active,
+            'logo'           => $this->logo_url,
+            'is_active'      => (bool) $this->is_active,
             'products_count' => $this->whenCounted('products'),
             'created_at'     => $this->created_at,
             'updated_at'     => $this->updated_at,
         ];
     }
 }
-
