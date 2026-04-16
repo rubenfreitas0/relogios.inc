@@ -41,12 +41,10 @@ class UpdateProductRequest extends FormRequest
             'stock'             => ['sometimes', 'required', 'integer', 'min:0'],
             'is_active'         => ['sometimes', 'boolean'],
             'is_featured'       => ['sometimes', 'boolean'],
-
-            // Imagens
             'images'            => ['sometimes', 'array', 'max:10'],
             'images.*'          => ['image', 'mimes:png,jpg,jpeg', 'max:2048'],
             'remove_image_ids'  => ['sometimes', 'array'],
-            'remove_image_ids.*'=> ['integer', 'exists:product_images,id'],
+            'remove_image_ids.*' => ['integer', 'exists:product_images,id'],
             'image_order'       => ['sometimes', 'array'],
             'image_order.*'     => ['integer', 'exists:product_images,id'],
             'primary_image_id'  => ['sometimes', 'integer', 'exists:product_images,id'],

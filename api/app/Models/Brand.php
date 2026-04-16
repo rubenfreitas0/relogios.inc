@@ -5,6 +5,8 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Support\Str;
+use Illuminate\Support\Facades\Storage;
+
 
 class Brand extends Model
 {
@@ -47,5 +49,13 @@ class Brand extends Model
                 $brand->slug = Str::slug($brand->name);
             }
         });
+    }
+
+    /* ----- Helpers ----- */
+    public function getLogoUrlAttribute(): ?string
+    {
+        /** @var \Illuminate\Filesystem\FilesystemAdapter $disk */
+        $disk = Storage::disk('public');
+        return $this->logo ? $disk->url($this->logo) : null;
     }
 }

@@ -8,8 +8,7 @@ class StoreAddressRequest extends FormRequest
 {
     public function authorize(): bool
     {
-        // A autorização baseia-se em estar logado na API
-        return true; 
+        return true;
     }
 
     protected function prepareForValidation()

@@ -25,10 +25,8 @@ class StoreProductRequest extends FormRequest
             'stock'             => ['required', 'integer', 'min:0'],
             'is_active'         => ['sometimes', 'boolean'],
             'is_featured'       => ['sometimes', 'boolean'],
-
-            // Imagens
             'images'            => ['sometimes', 'array', 'max:10'],
-            'images.*'          => ['image', 'mimes:png,jpg,jpeg,webp', 'max:2048'],
+            'images.*'          => ['image', 'mimes:png,jpg,jpeg', 'max:2048'],
             'primary_image'     => ['sometimes', 'integer', 'min:0'],
         ];
     }
