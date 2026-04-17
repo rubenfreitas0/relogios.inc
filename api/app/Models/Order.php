@@ -10,6 +10,7 @@ class Order extends Model
     use HasFactory;
 
     protected $fillable = [
+        'user_id',
         'order_number',
         'status',
         'payment_status',
@@ -21,6 +22,10 @@ class Order extends Model
         'shipping_city',
         'shipping_postal_code',
         'shipping_country',
+        'shipping_method_id',
+        'shipping_carrier',
+        'estimated_days',
+        'weight',
         'nif',
         'subtotal',
         'shipping_cost',
@@ -49,5 +54,10 @@ class Order extends Model
     public function user()
     {
         return $this->belongsTo(User::class);
+    }
+
+    public function shippingMethod()
+    {
+        return $this->belongsTo(ShippingMethod::class);
     }
 }

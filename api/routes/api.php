@@ -24,6 +24,9 @@ use App\Http\Controllers\Api\CartController;
 
 use App\Http\Controllers\Api\AddressController;
 
+use App\Http\Controllers\Api\OrderController;
+use App\Http\Controllers\Api\Admin\OrderController as AdminOrderController;
+
 
 
 Route::post('/register',       [AuthController::class, 'register'])->middleware('throttle:5,1');
@@ -64,6 +67,11 @@ Route::middleware('auth:sanctum')->group(function () {
 
     Route::get('/shipping/calculate', [ShippingController::class, 'calculate']);
 
+    // Encomendas do cliente
+    Route::get('/orders',              [OrderController::class, 'index']);
+    Route::post('/orders',             [OrderController::class, 'store']);
+    Route::get('/orders/{orderNumber}', [OrderController::class, 'show'])->whereAlphaNumeric('orderNumber');
+
     Route::middleware('verified')->group(function () {
         Route::get('/zona-privada', function () {
             return response()->json([
@@ -86,5 +94,10 @@ Route::middleware('auth:sanctum')->group(function () {
         Route::apiResource('products', AdminProductController::class);
 
         Route::apiResource('shipping-methods', AdminShippingMethodController::class);
+
+        // Encomendas — admin
+        Route::patch('orders/{orderNumber}/status', [AdminOrderController::class, 'updateStatus']);
+        Route::get('orders',              [AdminOrderController::class, 'index']);
+        Route::get('orders/{orderNumber}', [AdminOrderController::class, 'show']);
     });
 });

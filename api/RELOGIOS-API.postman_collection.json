@@ -1,0 +1,743 @@
+{
+  "info": {
+    "name": "RELOGIOS.inc — API",
+    "description": "Collection completa da API backend do projeto RELOGIOS.inc.\nCobre Auth, Catálogo, Carrinho, Endereços, Encomendas (cliente + admin).\n\nVariáveis:\n- base_url: http://127.0.0.1:8000/api\n- token: preenchido automaticamente ao fazer Login\n- admin_token: preenchido automaticamente ao fazer Login (Admin)\n- order_number: preenchido automaticamente ao fazer Checkout",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+  },
+  "variable": [
+    { "key": "base_url", "value": "http://127.0.0.1:8000/api" },
+    { "key": "token", "value": "" },
+    { "key": "admin_token", "value": "" },
+    { "key": "order_number", "value": "" }
+  ],
+  "item": [
+    {
+      "name": "🔐 Auth",
+      "item": [
+        {
+          "name": "POST Register",
+          "request": {
+            "method": "POST",
+            "header": [
+              { "key": "Accept", "value": "application/json" },
+              { "key": "Content-Type", "value": "application/json" }
+            ],
+            "url": { "raw": "{{base_url}}/register" },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"firstname\": \"João\",\n  \"lastname\": \"Silva\",\n  \"email\": \"joao@example.com\",\n  \"phone\": \"912345678\",\n  \"password\": \"Password1!\",\n  \"password_confirmation\": \"Password1!\"\n}"
+            }
+          }
+        },
+        {
+          "name": "POST Login (Utilizador)",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "const j = pm.response.json();",
+                  "if (j.token) pm.collectionVariables.set('token', j.token);",
+                  "pm.test('200 OK', () => pm.response.to.have.status(200));",
+                  "pm.test('Tem token', () => pm.expect(j.token).to.be.a('string'));"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              { "key": "Accept", "value": "application/json" },
+              { "key": "Content-Type", "value": "application/json" }
+            ],
+            "url": { "raw": "{{base_url}}/login" },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"email\": \"joao@example.com\",\n  \"password\": \"Password1!\"\n}"
+            }
+          }
+        },
+        {
+          "name": "POST Login (Admin)",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "const j = pm.response.json();",
+                  "if (j.token) pm.collectionVariables.set('admin_token', j.token);",
+                  "pm.test('200 OK', () => pm.response.to.have.status(200));",
+                  "pm.test('Tem token', () => pm.expect(j.token).to.be.a('string'));"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              { "key": "Accept", "value": "application/json" },
+              { "key": "Content-Type", "value": "application/json" }
+            ],
+            "url": { "raw": "{{base_url}}/login" },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"email\": \"admin@relogios.inc\",\n  \"password\": \"Password1!\"\n}"
+            }
+          }
+        },
+        {
+          "name": "POST Logout",
+          "request": {
+            "method": "POST",
+            "header": [
+              { "key": "Accept", "value": "application/json" },
+              { "key": "Authorization", "value": "Bearer {{token}}" }
+            ],
+            "url": { "raw": "{{base_url}}/logout" }
+          }
+        }
+      ]
+    },
+    {
+      "name": "📦 Catálogo (público)",
+      "item": [
+        {
+          "name": "GET Produtos",
+          "request": {
+            "method": "GET",
+            "header": [{ "key": "Accept", "value": "application/json" }],
+            "url": {
+              "raw": "{{base_url}}/catalog/products?per_page=12",
+              "query": [
+                { "key": "per_page", "value": "12" },
+                { "key": "search", "value": "", "disabled": true },
+                { "key": "brand", "value": "", "disabled": true },
+                { "key": "category", "value": "", "disabled": true },
+                { "key": "min_price", "value": "", "disabled": true },
+                { "key": "max_price", "value": "", "disabled": true }
+              ]
+            }
+          }
+        },
+        {
+          "name": "GET Produto em Destaque",
+          "request": {
+            "method": "GET",
+            "header": [{ "key": "Accept", "value": "application/json" }],
+            "url": { "raw": "{{base_url}}/catalog/products/featured" }
+          }
+        },
+        {
+          "name": "GET Produto — Detalhe",
+          "request": {
+            "method": "GET",
+            "header": [{ "key": "Accept", "value": "application/json" }],
+            "url": { "raw": "{{base_url}}/catalog/products/:slug" }
+          }
+        },
+        {
+          "name": "GET Marcas",
+          "request": {
+            "method": "GET",
+            "header": [{ "key": "Accept", "value": "application/json" }],
+            "url": { "raw": "{{base_url}}/catalog/brands" }
+          }
+        },
+        {
+          "name": "GET Categorias",
+          "request": {
+            "method": "GET",
+            "header": [{ "key": "Accept", "value": "application/json" }],
+            "url": { "raw": "{{base_url}}/catalog/categories" }
+          }
+        },
+        {
+          "name": "GET Métodos de Envio (lista pública)",
+          "request": {
+            "method": "GET",
+            "header": [{ "key": "Accept", "value": "application/json" }],
+            "url": { "raw": "{{base_url}}/shipping" }
+          }
+        }
+      ]
+    },
+    {
+      "name": "🛒 Carrinho",
+      "item": [
+        {
+          "name": "GET Ver Carrinho",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test('200 OK', () => pm.response.to.have.status(200));",
+                  "pm.test('Tem items e total', () => {",
+                  "  const j = pm.response.json();",
+                  "  pm.expect(j.items).to.be.an('array');",
+                  "  pm.expect(j.cart_total).to.be.a('number');",
+                  "});"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [
+              { "key": "Accept", "value": "application/json" },
+              { "key": "Authorization", "value": "Bearer {{token}}" }
+            ],
+            "url": { "raw": "{{base_url}}/cart" }
+          }
+        },
+        {
+          "name": "POST Adicionar ao Carrinho",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test('200 OK ou 201', () => pm.expect(pm.response.code).to.be.oneOf([200, 201]));"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              { "key": "Accept", "value": "application/json" },
+              { "key": "Authorization", "value": "Bearer {{token}}" },
+              { "key": "Content-Type", "value": "application/json" }
+            ],
+            "url": { "raw": "{{base_url}}/cart" },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"product_id\": 1,\n  \"quantity\": 1\n}"
+            }
+          }
+        },
+        {
+          "name": "PUT Atualizar Quantidade",
+          "request": {
+            "method": "PUT",
+            "header": [
+              { "key": "Accept", "value": "application/json" },
+              { "key": "Authorization", "value": "Bearer {{token}}" },
+              { "key": "Content-Type", "value": "application/json" }
+            ],
+            "url": { "raw": "{{base_url}}/cart/:cart_id" },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"quantity\": 2\n}"
+            }
+          }
+        },
+        {
+          "name": "DELETE Remover Item",
+          "request": {
+            "method": "DELETE",
+            "header": [
+              { "key": "Accept", "value": "application/json" },
+              { "key": "Authorization", "value": "Bearer {{token}}" }
+            ],
+            "url": { "raw": "{{base_url}}/cart/:cart_id" }
+          }
+        },
+        {
+          "name": "DELETE Esvaziar Carrinho",
+          "request": {
+            "method": "DELETE",
+            "header": [
+              { "key": "Accept", "value": "application/json" },
+              { "key": "Authorization", "value": "Bearer {{token}}" }
+            ],
+            "url": { "raw": "{{base_url}}/cart" }
+          }
+        }
+      ]
+    },
+    {
+      "name": "📍 Endereços",
+      "item": [
+        {
+          "name": "GET Listar Endereços",
+          "request": {
+            "method": "GET",
+            "header": [
+              { "key": "Accept", "value": "application/json" },
+              { "key": "Authorization", "value": "Bearer {{token}}" }
+            ],
+            "url": { "raw": "{{base_url}}/addresses" }
+          }
+        },
+        {
+          "name": "POST Criar Endereço",
+          "request": {
+            "method": "POST",
+            "header": [
+              { "key": "Accept", "value": "application/json" },
+              { "key": "Authorization", "value": "Bearer {{token}}" },
+              { "key": "Content-Type", "value": "application/json" }
+            ],
+            "url": { "raw": "{{base_url}}/addresses" },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"firstname\": \"João\",\n  \"lastname\": \"Silva\",\n  \"phone\": \"912345678\",\n  \"address_line1\": \"Rua das Flores, 123\",\n  \"city\": \"Lisboa\",\n  \"postal_code\": \"1000-001\",\n  \"country\": \"PT\"\n}"
+            }
+          }
+        },
+        {
+          "name": "PATCH Definir como Padrão",
+          "request": {
+            "method": "PATCH",
+            "header": [
+              { "key": "Accept", "value": "application/json" },
+              { "key": "Authorization", "value": "Bearer {{token}}" }
+            ],
+            "url": { "raw": "{{base_url}}/addresses/:address_id/default" }
+          }
+        },
+        {
+          "name": "DELETE Eliminar Endereço",
+          "request": {
+            "method": "DELETE",
+            "header": [
+              { "key": "Accept", "value": "application/json" },
+              { "key": "Authorization", "value": "Bearer {{token}}" }
+            ],
+            "url": { "raw": "{{base_url}}/addresses/:address_id" }
+          }
+        }
+      ]
+    },
+    {
+      "name": "🧾 Encomendas — Cliente",
+      "item": [
+        {
+          "name": "POST Checkout (dados manuais)",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "const j = pm.response.json();",
+                  "if (j.data && j.data.order_number) {",
+                  "  pm.collectionVariables.set('order_number', j.data.order_number);",
+                  "  console.log('✅ order_number guardado:', j.data.order_number);",
+                  "}",
+                  "pm.test('201 Created', () => pm.response.to.have.status(201));",
+                  "pm.test('Tem order_number RL-', () => pm.expect(j.data.order_number).to.match(/^RL-/));",
+                  "pm.test('Tem items', () => pm.expect(j.data.items).to.be.an('array').that.is.not.empty);",
+                  "pm.test('payment_status pending', () => pm.expect(j.data.payment_status).to.eql('pending'));"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              { "key": "Accept", "value": "application/json" },
+              { "key": "Authorization", "value": "Bearer {{token}}" },
+              { "key": "Content-Type", "value": "application/json" }
+            ],
+            "url": { "raw": "{{base_url}}/orders" },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"shipping_method_id\": 1,\n  \"firstname\": \"João\",\n  \"lastname\": \"Silva\",\n  \"phone\": \"912345678\",\n  \"address_line1\": \"Rua das Flores, 123\",\n  \"city\": \"Lisboa\",\n  \"postal_code\": \"1000-001\",\n  \"country\": \"PT\",\n  \"nif\": \"123456789\"\n}"
+            }
+          }
+        },
+        {
+          "name": "POST Checkout (endereço guardado)",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "const j = pm.response.json();",
+                  "if (j.data && j.data.order_number) pm.collectionVariables.set('order_number', j.data.order_number);",
+                  "pm.test('201 Created', () => pm.response.to.have.status(201));"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              { "key": "Accept", "value": "application/json" },
+              { "key": "Authorization", "value": "Bearer {{token}}" },
+              { "key": "Content-Type", "value": "application/json" }
+            ],
+            "url": { "raw": "{{base_url}}/orders" },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"shipping_method_id\": 1,\n  \"address_id\": 1,\n  \"nif\": \"123456789\"\n}"
+            }
+          }
+        },
+        {
+          "name": "GET Listar Minhas Encomendas",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test('200 OK', () => pm.response.to.have.status(200));",
+                  "pm.test('Tem data[]', () => pm.expect(pm.response.json().data).to.be.an('array'));"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [
+              { "key": "Accept", "value": "application/json" },
+              { "key": "Authorization", "value": "Bearer {{token}}" }
+            ],
+            "url": { "raw": "{{base_url}}/orders" }
+          }
+        },
+        {
+          "name": "GET Detalhe da Encomenda",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test('200 OK', () => pm.response.to.have.status(200));",
+                  "const j = pm.response.json().data;",
+                  "pm.test('Tem status', () => pm.expect(j.status).to.be.a('string'));",
+                  "pm.test('Tem tracking_number (pode ser null)', () => pm.expect(j).to.have.property('tracking_number'));",
+                  "pm.test('Tem shipping_address', () => pm.expect(j.shipping_address).to.be.an('object'));",
+                  "pm.test('Tem items', () => pm.expect(j.items).to.be.an('array'));"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [
+              { "key": "Accept", "value": "application/json" },
+              { "key": "Authorization", "value": "Bearer {{token}}" }
+            ],
+            "url": { "raw": "{{base_url}}/orders/{{order_number}}" }
+          }
+        },
+        {
+          "name": "GET Encomenda de Outro User → 404",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test('404 — ownership garantido', () => pm.response.to.have.status(404));"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [
+              { "key": "Accept", "value": "application/json" },
+              { "key": "Authorization", "value": "Bearer {{token}}" }
+            ],
+            "url": { "raw": "{{base_url}}/orders/RL-FAKE-ORDER" }
+          }
+        },
+        {
+          "name": "POST Checkout sem Auth → 401",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test('401 Unauthenticated', () => pm.response.to.have.status(401));"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              { "key": "Accept", "value": "application/json" },
+              { "key": "Content-Type", "value": "application/json" }
+            ],
+            "url": { "raw": "{{base_url}}/orders" },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"shipping_method_id\": 1,\n  \"firstname\": \"João\",\n  \"lastname\": \"Silva\",\n  \"address_line1\": \"Rua X\",\n  \"city\": \"Lisboa\",\n  \"postal_code\": \"1000-001\"\n}"
+            }
+          }
+        },
+        {
+          "name": "POST Checkout com Carrinho Vazio → 422",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test('422 — carrinho vazio', () => pm.response.to.have.status(422));"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              { "key": "Accept", "value": "application/json" },
+              { "key": "Authorization", "value": "Bearer {{token}}" },
+              { "key": "Content-Type", "value": "application/json" }
+            ],
+            "url": { "raw": "{{base_url}}/orders" },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"shipping_method_id\": 1,\n  \"firstname\": \"João\",\n  \"lastname\": \"Silva\",\n  \"address_line1\": \"Rua X\",\n  \"city\": \"Lisboa\",\n  \"postal_code\": \"1000-001\"\n}"
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "🔧 Admin — Encomendas",
+      "item": [
+        {
+          "name": "[ADMIN] GET Lista de Encomendas",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test('200 OK', () => pm.response.to.have.status(200));",
+                  "pm.test('Tem data[]', () => pm.expect(pm.response.json().data).to.be.an('array'));"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [
+              { "key": "Accept", "value": "application/json" },
+              { "key": "Authorization", "value": "Bearer {{admin_token}}" }
+            ],
+            "url": {
+              "raw": "{{base_url}}/admin/orders?per_page=15",
+              "query": [
+                { "key": "per_page", "value": "15" },
+                { "key": "status", "value": "pending", "disabled": true },
+                { "key": "payment_status", "value": "pending", "disabled": true },
+                { "key": "search", "value": "", "disabled": true }
+              ]
+            }
+          }
+        },
+        {
+          "name": "[ADMIN] GET Detalhe de Encomenda",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test('200 OK', () => pm.response.to.have.status(200));",
+                  "const j = pm.response.json().data;",
+                  "pm.test('Tem customer info', () => pm.expect(j.customer).to.be.an('object'));",
+                  "pm.test('Tem items', () => pm.expect(j.items).to.be.an('array'));"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [
+              { "key": "Accept", "value": "application/json" },
+              { "key": "Authorization", "value": "Bearer {{admin_token}}" }
+            ],
+            "url": { "raw": "{{base_url}}/admin/orders/{{order_number}}" }
+          }
+        },
+        {
+          "name": "[ADMIN] PATCH → processing",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test('200 OK', () => pm.response.to.have.status(200));",
+                  "pm.test('status = processing', () => pm.expect(pm.response.json().data.status).to.eql('processing'));"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ],
+          "request": {
+            "method": "PATCH",
+            "header": [
+              { "key": "Accept", "value": "application/json" },
+              { "key": "Authorization", "value": "Bearer {{admin_token}}" },
+              { "key": "Content-Type", "value": "application/json" }
+            ],
+            "url": { "raw": "{{base_url}}/admin/orders/{{order_number}}/status" },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"status\": \"processing\"\n}"
+            }
+          }
+        },
+        {
+          "name": "[ADMIN] PATCH → shipped (com tracking)",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test('200 OK', () => pm.response.to.have.status(200));",
+                  "pm.test('status = shipped', () => pm.expect(pm.response.json().data.status).to.eql('shipped'));",
+                  "pm.test('Tem tracking_number', () => pm.expect(pm.response.json().data.tracking_number).to.eql('CTT123456789PT'));"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ],
+          "request": {
+            "method": "PATCH",
+            "header": [
+              { "key": "Accept", "value": "application/json" },
+              { "key": "Authorization", "value": "Bearer {{admin_token}}" },
+              { "key": "Content-Type", "value": "application/json" }
+            ],
+            "url": { "raw": "{{base_url}}/admin/orders/{{order_number}}/status" },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"status\": \"shipped\",\n  \"tracking_number\": \"CTT123456789PT\"\n}"
+            }
+          }
+        },
+        {
+          "name": "[ADMIN] PATCH → delivered",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test('200 OK', () => pm.response.to.have.status(200));",
+                  "pm.test('status = delivered', () => pm.expect(pm.response.json().data.status).to.eql('delivered'));",
+                  "pm.test('payment_status = paid', () => pm.expect(pm.response.json().data.payment_status).to.eql('paid'));"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ],
+          "request": {
+            "method": "PATCH",
+            "header": [
+              { "key": "Accept", "value": "application/json" },
+              { "key": "Authorization", "value": "Bearer {{admin_token}}" },
+              { "key": "Content-Type", "value": "application/json" }
+            ],
+            "url": { "raw": "{{base_url}}/admin/orders/{{order_number}}/status" },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"status\": \"delivered\"\n}"
+            }
+          }
+        },
+        {
+          "name": "[ADMIN] PATCH shipped SEM tracking → 422",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test('422 — tracking obrigatório ao enviar', () => pm.response.to.have.status(422));",
+                  "pm.test('Erro no campo tracking_number', () => pm.expect(pm.response.json().errors.tracking_number).to.exist);"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ],
+          "request": {
+            "method": "PATCH",
+            "header": [
+              { "key": "Accept", "value": "application/json" },
+              { "key": "Authorization", "value": "Bearer {{admin_token}}" },
+              { "key": "Content-Type", "value": "application/json" }
+            ],
+            "url": { "raw": "{{base_url}}/admin/orders/{{order_number}}/status" },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"status\": \"shipped\"\n}"
+            }
+          }
+        },
+        {
+          "name": "[ADMIN] PATCH transição inválida (shipped→pending) → 422",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test('422 — transição de estado inválida', () => pm.response.to.have.status(422));",
+                  "pm.test('Erro no campo status', () => pm.expect(pm.response.json().errors.status).to.exist);"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ],
+          "request": {
+            "method": "PATCH",
+            "header": [
+              { "key": "Accept", "value": "application/json" },
+              { "key": "Authorization", "value": "Bearer {{admin_token}}" },
+              { "key": "Content-Type", "value": "application/json" }
+            ],
+            "url": { "raw": "{{base_url}}/admin/orders/{{order_number}}/status" },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"status\": \"cancelled\"\n}"
+            }
+          }
+        },
+        {
+          "name": "[ADMIN] PATCH status inválido → 422",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test('422 — status inválido', () => pm.response.to.have.status(422));",
+                  "pm.test('Erro no campo status', () => pm.expect(pm.response.json().errors.status).to.exist);"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ],
+          "request": {
+            "method": "PATCH",
+            "header": [
+              { "key": "Accept", "value": "application/json" },
+              { "key": "Authorization", "value": "Bearer {{admin_token}}" },
+              { "key": "Content-Type", "value": "application/json" }
+            ],
+            "url": { "raw": "{{base_url}}/admin/orders/{{order_number}}/status" },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"status\": \"abracadabra\"\n}"
+            }
+          }
+        }
+      ]
+    }
+  ]
+}
