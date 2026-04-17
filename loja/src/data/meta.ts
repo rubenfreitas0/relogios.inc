@@ -5,29 +5,29 @@ import deskmatsImage from '/products/deskmats/grrr-full.webp'
 import { meta, metaContainer } from './meta-types.ts'
 
 export const landingPageMeta: meta = {
-	title: 'KIIIBS Mechanical Keyboard Store',
+	title: 'RELOGIOS.inc | Loja de Relógios Online',
 	description:
-		'We sell custom mechanical keyboards, keycaps and deskmats for your gaming and office setup, right in the heart of Berlin.',
+		'Explora a nossa coleção exclusiva de relógios de marcas prestigiadas. Precisão, design e confiança no coração de Portugal.',
 	image: bannerImage,
 }
 
 export const categoryPageMeta: metaContainer = {
 	keyboards: {
-		title: 'All Mechanical Keyboards | KIIIBS',
+		title: 'Relógios de Homem | RELOGIOS.inc',
 		description:
-			'Explore our selection of high quality mechanical keyboards that will elevate your typing experience.',
+			'Descobre a nossa seleção de relógios masculinos que combinam robustez, precisão e elegância.',
 		image: keyboardsImage,
 	},
 	keycaps: {
-		title: 'All Custom Keycaps | KIIIBS',
+		title: 'Relógios de Mulher | RELOGIOS.inc',
 		description:
-			'Enjoy typing with style and upgrade your custom mechanical keyboard with our elegant keycaps',
+			'Elegância e sofisticação em cada detalhe. Escolhe o relógio perfeito para o teu estilo.',
 		image: keycapsImage,
 	},
 	deskmats: {
-		title: 'All Deskmats | KIIIBS',
+		title: 'Relógios Unisexo | RELOGIOS.inc',
 		description:
-			'Make yourself comfortable in your work or gaming setup with one of our KIIIBS deskmats. Soft and stylish!',
+			'Design versátil para todos. Explora a nossa gama de relógios casuais e desportivos.',
 		image: deskmatsImage,
 	},
 }

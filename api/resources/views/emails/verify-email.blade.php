@@ -13,7 +13,7 @@
         </h2>
         
         <p style="color: #555;">
-            Bem-vindo à Relógios Inc! Use o código abaixo para verificar o seu email:
+            Bem-vindo à RELOGIOS.inc! Use o código abaixo para verificar o seu email:
         </p>
         
         <div style="background-color: #f8f8f8; border-radius: 8px; padding: 20px; 

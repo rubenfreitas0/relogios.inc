@@ -25,7 +25,7 @@ import watchImage from '/products/keyboards/relogio2.png'
 					COLEÇÃO PREMIUM
 				</h1>
 				<p class="mb-10 mt-5 md:opacity-90">
-					Na RELOGIOS.INC selecionamos apenas o que resiste ao tempo.
+					Na RELOGIOS.inc selecionamos apenas o que resiste ao tempo.
 					<br class="hidden md:inline" />
 					O Casio MTP-1274 combina aço inoxidável, precisão e um
 					<br class="hidden md:inline" />
