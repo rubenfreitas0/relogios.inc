@@ -20,7 +20,7 @@ const formatPrice = (price?: number) => {
 </script>
 
 <template>
-	<div class="group relative flex flex-col overflow-hidden rounded-xl bg-white shadow-[0_4px_20px_-4px_rgba(0,0,0,0.05)] border border-gray-100 transition-all duration-300 hover:shadow-[0_8px_30px_-4px_rgba(0,0,0,0.1)]">
+	<div class="group relative flex flex-col overflow-hidden rounded-xl bg-white border border-zinc-200 shadow-sm transition-all duration-300 hover:shadow-lg">
 		<!-- Image Container -->
 		<router-link
 			:to="{ name: props.category, params: { id: props.item.id } }"
@@ -57,7 +57,7 @@ const formatPrice = (price?: number) => {
 				<h2 class="text-xs font-bold uppercase tracking-widest text-[#FFC700]">
 					{{ props.item.header }}
 				</h2>
-				<h3 class="mt-1 text-[1.1rem] font-bold text-black leading-tight transition-colors duration-300 group-hover:text-gray-700">
+				<h3 class="mt-1 text-[1.1rem] font-bold text-gray-900 leading-tight transition-colors duration-300 group-hover:text-black">
 					{{ props.item.subheader }}
 				</h3>
 			</router-link>
@@ -72,7 +72,7 @@ const formatPrice = (price?: number) => {
 					<span v-if="props.item.oldPrice" class="text-xs font-semibold text-gray-400 line-through decoration-gray-300">
 						{{ formatPrice(props.item.oldPrice) }}
 					</span>
-                	<span class="text-xl font-bold tracking-tight" :class="props.item.oldPrice ? 'text-red-600' : 'text-black'">
+                	<span class="text-xl font-bold tracking-tight" :class="props.item.oldPrice ? 'text-red-600' : 'text-gray-900'">
 						{{ formatPrice(props.item.price) }}
 					</span>
 				</div>

@@ -18,6 +18,12 @@ use App\Http\Controllers\Api\Admin\ProductController as AdminProductController;
 use App\Http\Controllers\Api\ShippingController;
 use App\Http\Controllers\Api\Admin\ShippingMethodController as AdminShippingMethodController;
 
+use App\Http\Controllers\Api\Admin\ProductImageController;
+
+use App\Http\Controllers\Api\CartController;
+
+use App\Http\Controllers\Api\AddressController;
+
 
 
 Route::post('/register',       [AuthController::class, 'register'])->middleware('throttle:5,1');
@@ -50,11 +56,11 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::post('/email/resend', [VerificationController::class, 'resend']);
     Route::get('/email/status',  [VerificationController::class, 'status']);
 
-    Route::delete('/cart', [\App\Http\Controllers\Api\CartController::class, 'clear']);
-    Route::apiResource('cart', \App\Http\Controllers\Api\CartController::class)->except(['show']);
+    Route::delete('/cart', [CartController::class, 'clear']);
+    Route::apiResource('cart', CartController::class)->except(['show']);
 
-    Route::patch('/addresses/{address}/default', [\App\Http\Controllers\Api\AddressController::class, 'setDefault']);
-    Route::apiResource('addresses', \App\Http\Controllers\Api\AddressController::class);
+    Route::patch('/addresses/{address}/default', [AddressController::class, 'setDefault']);
+    Route::apiResource('addresses', AddressController::class);
 
     Route::get('/shipping/calculate', [ShippingController::class, 'calculate']);
 
@@ -73,9 +79,9 @@ Route::middleware('auth:sanctum')->group(function () {
         Route::patch('products/{product}/stock', [AdminProductController::class, 'updateStock']);
         Route::post('products/{product}/restore', [AdminProductController::class, 'restore'])->withTrashed();
 
-        Route::patch('products/{product}/images/reorder', [\App\Http\Controllers\Api\Admin\ProductImageController::class, 'reorder']);
-        Route::patch('products/{product}/images/{image}/primary', [\App\Http\Controllers\Api\Admin\ProductImageController::class, 'setPrimary']);
-        Route::apiResource('products.images', \App\Http\Controllers\Api\Admin\ProductImageController::class)->only(['index', 'store', 'destroy']);
+        Route::patch('products/{product}/images/reorder', [ProductImageController::class, 'reorder']);
+        Route::patch('products/{product}/images/{image}/primary', [ProductImageController::class, 'setPrimary']);
+        Route::apiResource('products.images', ProductImageController::class)->only(['index', 'store', 'destroy']);
 
         Route::apiResource('products', AdminProductController::class);
 
