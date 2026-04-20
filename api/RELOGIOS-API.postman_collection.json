@@ -97,6 +97,36 @@
             ],
             "url": { "raw": "{{base_url}}/logout" }
           }
+        },
+        {
+          "name": "POST Forgot Password",
+          "request": {
+            "method": "POST",
+            "header": [
+              { "key": "Accept", "value": "application/json" },
+              { "key": "Content-Type", "value": "application/json" }
+            ],
+            "url": { "raw": "{{base_url}}/forgot-password" },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"email\": \"joao@example.com\"\n}"
+            }
+          }
+        },
+        {
+          "name": "POST Reset Password",
+          "request": {
+            "method": "POST",
+            "header": [
+              { "key": "Accept", "value": "application/json" },
+              { "key": "Content-Type", "value": "application/json" }
+            ],
+            "url": { "raw": "{{base_url}}/reset-password" },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"email\": \"joao@example.com\",\n  \"password\": \"NovaPassword1!\",\n  \"password_confirmation\": \"NovaPassword1!\",\n  \"token\": \"o-teu-token-recebido-no-email\"\n}"
+            }
+          }
         }
       ]
     },

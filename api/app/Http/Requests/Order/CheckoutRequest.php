@@ -17,6 +17,10 @@ class CheckoutRequest extends FormRequest
             // Método de envio — obrigatório e ativo
             'shipping_method_id' => ['required', 'integer', 'exists:shipping_methods,id'],
 
+            // Pagamento
+            'payment_method' => ['required', 'string', 'in:mbway,multibanco,credit_card,apple_pay,google_pay'],
+            'payment_phone'  => ['required_if:payment_method,mbway', 'nullable', 'string', 'max:20'],
+
             // NIF — opcional
             'nif' => ['nullable', 'string', 'max:20'],
 
@@ -40,6 +44,9 @@ class CheckoutRequest extends FormRequest
         return [
             'shipping_method_id.required' => 'O método de envio é obrigatório.',
             'shipping_method_id.exists'   => 'O método de envio selecionado não existe.',
+            'payment_method.required'     => 'O método de pagamento é obrigatório.',
+            'payment_method.in'           => 'Método de pagamento inválido.',
+            'payment_phone.required_if'   => 'O número de telemóvel é obrigatório para pagamentos via MBWay.',
             'firstname.required_without'  => 'O nome é obrigatório quando não é fornecido um endereço guardado.',
             'lastname.required_without'   => 'O apelido é obrigatório quando não é fornecido um endereço guardado.',
             'address_line1.required_without' => 'A morada é obrigatória quando não é fornecido um endereço guardado.',

@@ -18,6 +18,8 @@ use App\Http\Controllers\Api\Admin\ProductController as AdminProductController;
 use App\Http\Controllers\Api\ShippingController;
 use App\Http\Controllers\Api\Admin\ShippingMethodController as AdminShippingMethodController;
 
+use App\Http\Controllers\Api\PaymentController;
+
 use App\Http\Controllers\Api\Admin\ProductImageController;
 
 use App\Http\Controllers\Api\CartController;
@@ -52,6 +54,8 @@ Route::prefix('catalog')->group(function () {
 });
 
 Route::get('/shipping', [ShippingController::class, 'index']);
+
+Route::post('/payments/webhook', [PaymentController::class, 'webhook']);
 
 Route::middleware('auth:sanctum')->group(function () {
 
