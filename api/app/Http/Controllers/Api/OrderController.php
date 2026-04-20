@@ -35,7 +35,7 @@ class OrderController extends Controller
     {
         $order = $request->user()
             ->orders()
-            ->with(['orderItems', 'shippingMethod'])
+            ->with(['orderItems', 'shippingMethod', 'payments'])
             ->where('order_number', $orderNumber)
             ->first();
 
@@ -126,11 +126,33 @@ class OrderController extends Controller
             $item->product->decrement('stock', $item->quantity);
         }
 
-        // 9. Esvaziar o carrinho
+        // 9. Processar o Pagamento
+        $paymentData = null;
+        if ($validated['payment_method'] === 'multibanco') {
+            $paymentData = [
+                'entity'     => '12345',
+                'reference'  => rand(100000000, 999999999), // Mock
+                'expires_at' => now()->addDays(3)->toDateTimeString(),
+            ];
+        } elseif ($validated['payment_method'] === 'mbway') {
+            $paymentData = [
+                'phone' => $validated['payment_phone'],
+            ];
+        }
+
+        $order->payments()->create([
+            'method'       => $validated['payment_method'],
+            'amount'       => round($total, 2),
+            'currency'     => 'EUR',
+            'status'       => 'pending',
+            'payment_data' => $paymentData,
+        ]);
+
+        // 10. Esvaziar o carrinho
         $user->cartItems()->delete();
 
-        // 10. Carregar relações para a resposta
-        $order->load(['orderItems', 'shippingMethod']);
+        // 11. Carregar relações para a resposta
+        $order->load(['orderItems', 'shippingMethod', 'payments']);
 
         return response()->json([
             'message' => 'Encomenda criada com sucesso.',

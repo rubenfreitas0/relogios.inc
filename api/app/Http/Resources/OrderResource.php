@@ -53,6 +53,18 @@ class OrderResource extends JsonResource
             'created_at'      => $this->created_at->toIso8601String(),
             'updated_at'      => $this->updated_at->toIso8601String(),
 
+            // Pagamentos
+            'payments' => $this->whenLoaded('payments', function() {
+                return $this->payments->map(fn($p) => [
+                    'id'             => $p->id,
+                    'method'         => $p->method,
+                    'status'         => $p->status,
+                    'amount'         => (float) $p->amount,
+                    'payment_data'   => $p->payment_data,
+                    'transaction_id' => $p->transaction_id,
+                ]);
+            }),
+
             // Itens
             'items' => OrderItemResource::collection($this->whenLoaded('orderItems')),
         ];
