@@ -9,11 +9,16 @@ use Illuminate\Http\Request;
 class ShippingController extends Controller
 {
     /**
-     * Calcular opções de envio disponíveis com base no peso do carrinho
+     * Calcular opções de envio disponíveis com base no peso do carrinho e localização
      */
     public function calculate(Request $request)
     {
+        $validated = $request->validate([
+            'country' => 'required|string|size:2',
+        ]);
+
         $user = $request->user();
+        $countryCode = strtoupper($validated['country']);
 
         // Buscar itens do carrinho com o produto
         $cartItems = $user->cartItems()->with('product')->get();
@@ -24,27 +29,50 @@ class ShippingController extends Controller
             ], 422);
         }
 
-        // Calcular peso total do carrinho
-        $totalWeight = $cartItems->sum(function ($item) {
-            return ($item->product->weight ?? 0) * $item->quantity;
-        });
+        // Calcular peso e subtotal do carrinho
+        $totalWeight = 0;
+        $subtotal = 0;
+        foreach ($cartItems as $item) {
+            $totalWeight += ($item->product->weight ?? 0) * $item->quantity;
+            $subtotal += ($item->product->price ?? 0) * $item->quantity;
+        }
 
-        // Buscar métodos de envio disponíveis para este peso
+        // Descobrir a Zona de Envio
+        $zoneCountry = \App\Models\ShippingZoneCountry::where('country_code', $countryCode)->first();
+        $zoneId = $zoneCountry ? $zoneCountry->shipping_zone_id : null;
+
+        // Buscar métodos de envio disponíveis para este peso E zona (ou método global com null)
         $shippingMethods = ShippingMethod::active()
             ->where('min_weight', '<=', $totalWeight)
             ->where('max_weight', '>=', $totalWeight)
+            ->where(function($query) use ($zoneId) {
+                $query->where('shipping_zone_id', $zoneId)
+                      ->orWhereNull('shipping_zone_id'); // Fallback para Global
+            })
             ->orderBy('price')
             ->get();
 
         if ($shippingMethods->isEmpty()) {
             return response()->json([
-                'message' => 'Não existem métodos de envio disponíveis para o peso total do carrinho.',
+                'message' => 'Não existem métodos de envio disponíveis para este país e peso total.',
                 'total_weight' => round($totalWeight, 3),
             ], 422);
         }
 
+        // Buscar a Taxa de IVA para o país destino
+        $taxRateModel = \App\Models\TaxRate::where('country_code', $countryCode)
+            ->where('is_active', true)
+            ->first();
+
+        $taxPercentage = $taxRateModel ? (float) $taxRateModel->rate : 0.0;
+        $taxAmount = round($subtotal * ($taxPercentage / 100), 2);
+
         return response()->json([
+            'subtotal'        => round($subtotal, 2),
             'total_weight'    => round($totalWeight, 3),
+            'tax_rate_name'   => $taxRateModel ? $taxRateModel->name : 'N/A',
+            'tax_rate_percent'=> $taxPercentage,
+            'tax_amount'      => $taxAmount,
             'shipping_methods' => $shippingMethods->map(fn($method) => [
                 'id'             => $method->id,
                 'name'           => $method->name,

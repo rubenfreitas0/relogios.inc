@@ -83,7 +83,17 @@ class OrderController extends Controller
         // 5. Calcular valores
         $subtotal     = $cartItems->sum(fn($item) => $item->quantity * $item->product->price);
         $shippingCost = (float) $shippingMethod->price;
-        $total        = $subtotal + $shippingCost;
+
+        // Calcular IVA sobre subtotal
+        $countryCode = strtoupper($shippingData['country'] ?? 'PT');
+        $taxRateModel = \App\Models\TaxRate::where('country_code', $countryCode)
+            ->where('is_active', true)
+            ->first();
+            
+        $taxPercentage = $taxRateModel ? (float) $taxRateModel->rate : 0.0;
+        $taxAmount = round($subtotal * ($taxPercentage / 100), 2);
+
+        $total        = $subtotal + $shippingCost + $taxAmount;
 
         // 6. Criar a encomenda
         $order = Order::create([
@@ -108,6 +118,8 @@ class OrderController extends Controller
             'nif'          => $validated['nif'] ?? null,
             'subtotal'     => round($subtotal, 2),
             'shipping_cost'=> round($shippingCost, 2),
+            'tax_amount'   => $taxAmount,
+            'tax_rate'     => $taxPercentage,
             'total'        => round($total, 2),
         ]);
 
