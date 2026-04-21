@@ -9,6 +9,7 @@ use Illuminate\Database\Eloquent\Relations\HasMany;
 class ShippingMethod extends Model
 {
     protected $fillable = [
+        'shipping_zone_id',
         'name',
         'carrier',
         'price',
@@ -33,6 +34,11 @@ class ShippingMethod extends Model
     public function orders(): HasMany
     {
         return $this->hasMany(Order::class);
+    }
+
+    public function shippingZone()
+    {
+        return $this->belongsTo(ShippingZone::class);
     }
 
     /* ----- Scopes ----- */
