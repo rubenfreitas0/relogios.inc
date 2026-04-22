@@ -22,7 +22,7 @@ class OrderController extends Controller
             ->when(
                 $request->filled('search'),
                 fn($q) => $q->where('order_number', 'LIKE', '%' . $request->search . '%')
-                            ->orWhereHas('user', fn($u) => $u->where('email', 'LIKE', '%' . $request->search . '%'))
+                    ->orWhereHas('user', fn($u) => $u->where('email', 'LIKE', '%' . $request->search . '%'))
             )
             ->when(
                 $request->filled('status'),

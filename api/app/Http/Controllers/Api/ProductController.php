@@ -19,31 +19,26 @@ class ProductController extends Controller
             ->with(['brand', 'category', 'primaryImage'])
             ->where('is_active', true);
 
-        // Pesquisa por texto
         if ($request->filled('search')) {
             $query->whereRaw('LOWER(name) LIKE ?', ['%' . strtolower((string) $request->search) . '%']);
         }
 
-        // Filtro por slug de categoria
         if ($request->filled('category')) {
             $query->whereHas('category', function ($q) use ($request) {
                 $q->where('slug', $request->category);
             });
         }
 
-        // Filtro por slug de marca
         if ($request->filled('brand')) {
             $query->whereHas('brand', function ($q) use ($request) {
                 $q->where('slug', $request->brand);
             });
         }
 
-        // Filtro por Género (Masculino, Feminino, Unisexo)
         if ($request->filled('gender')) {
             $query->where('gender', $request->gender);
         }
 
-        // Filtros por preço
         if ($request->filled('min_price')) {
             $query->where('price', '>=', $request->min_price);
         }

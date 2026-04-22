@@ -14,7 +14,6 @@ class OrderResource extends JsonResource
             'status'         => $this->status,
             'payment_status' => $this->payment_status,
 
-            // Dados de contacto do cliente
             'customer' => [
                 'firstname' => $this->shipping_firstname,
                 'lastname'  => $this->shipping_lastname,
@@ -23,7 +22,6 @@ class OrderResource extends JsonResource
                 'nif'       => $this->nif,
             ],
 
-            // Dados de envio
             'shipping_address' => [
                 'address_line1' => $this->shipping_address_line1,
                 'address_line2' => $this->shipping_address_line2,
@@ -32,7 +30,6 @@ class OrderResource extends JsonResource
                 'country'       => $this->shipping_country,
             ],
 
-            // Método de envio
             'shipping_method' => $this->whenLoaded(
                 'shippingMethod',
                 fn() => [
@@ -42,19 +39,16 @@ class OrderResource extends JsonResource
                 ]
             ),
 
-            // Valores
             'subtotal'      => (float) $this->subtotal,
             'shipping_cost' => (float) $this->shipping_cost,
             'total'         => (float) $this->total,
 
-            // Rastreio
             'tracking_number' => $this->tracking_number,
             'paid_at'         => $this->paid_at?->toIso8601String(),
             'created_at'      => $this->created_at->toIso8601String(),
             'updated_at'      => $this->updated_at->toIso8601String(),
 
-            // Pagamentos
-            'payments' => $this->whenLoaded('payments', function() {
+            'payments' => $this->whenLoaded('payments', function () {
                 return $this->payments->map(fn($p) => [
                     'id'             => $p->id,
                     'method'         => $p->method,
@@ -65,7 +59,6 @@ class OrderResource extends JsonResource
                 ]);
             }),
 
-            // Itens
             'items' => OrderItemResource::collection($this->whenLoaded('orderItems')),
         ];
     }

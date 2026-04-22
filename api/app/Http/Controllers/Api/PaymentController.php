@@ -12,8 +12,6 @@ class PaymentController extends Controller
 {
     /**
      * Webhook simulado para receção de pagamentos.
-     * Na prática, este ponto receberia um identificador vindo da IFTHENPAY / Stripe
-     * e o estado novo. Aqui assumimos que é sucesso.
      */
     public function webhook(Request $request): JsonResponse
     {
@@ -30,14 +28,12 @@ class PaymentController extends Controller
 
         DB::beginTransaction();
         try {
-            // Atualizar o modelo Payment
             $payment->update([
                 'status'         => 'paid',
                 'paid_at'        => now(),
                 'transaction_id' => $validated['transaction_id'] ?? 'SIM-' . time(),
             ]);
 
-            // Atualizar o modelo Order
             $payment->order->update([
                 'payment_status' => 'paid',
                 'paid_at'        => now(),

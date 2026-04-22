@@ -29,12 +29,10 @@ class AddressController extends Controller
 
         $user = $request->user();
 
-        // Se for a primeira morada do user, força a ser 'is_default'
         if ($user->addresses()->count() === 0) {
             $validated['is_default'] = true;
         }
 
-        // Caso o utilizador envie esta para ser default, tira o default de todas as outras
         if (($validated['is_default'] ?? false) === true) {
             $user->addresses()->update(['is_default' => false]);
         }

@@ -1,8 +1,0 @@
-auth
-users
-brands
-categories
-products
-cart
-orders
-payments

@@ -11,7 +11,7 @@ use Illuminate\Http\Request;
 class VerificationController extends Controller
 {
     /**
-     * Verificar email - rota publica com link assinado - não exige autenticação
+     * Verificar email - rota publica com link verificado
      */
     public function verify(Request $request, $id): JsonResponse
     {

@@ -19,7 +19,6 @@ class CartController extends Controller
     {
         $cartItems = $request->user()->cartItems()->with(['product.primaryImage'])->get();
 
-        // Cálculo do valor total do carrinho
         $total = $cartItems->sum(function ($item) {
             return $item->quantity * $item->product->price;
         });
