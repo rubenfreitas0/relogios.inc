@@ -22,7 +22,7 @@ class ShippingMethodController extends Controller
             ->when(
                 $request->filled('search'),
                 fn($q) => $q->where('name', 'LIKE', '%' . $request->search . '%')
-                           ->orWhere('carrier', 'LIKE', '%' . $request->search . '%')
+                    ->orWhere('carrier', 'LIKE', '%' . $request->search . '%')
             )
             ->when(
                 $request->has('is_active'),

@@ -29,8 +29,6 @@ class ShippingMethod extends Model
         ];
     }
 
-    /* ----- Relationships ----- */
-
     public function orders(): HasMany
     {
         return $this->hasMany(Order::class);

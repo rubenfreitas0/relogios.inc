@@ -7,6 +7,7 @@ use App\Http\Requests\Order\CheckoutRequest;
 use App\Http\Resources\OrderResource;
 use App\Models\Order;
 use App\Models\ShippingMethod;
+use App\Models\TaxRate;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Http\Resources\Json\AnonymousResourceCollection;
@@ -29,7 +30,7 @@ class OrderController extends Controller
     }
 
     /**
-     * Detalhe de uma encomenda do utilizador (verificação de ownership).
+     * Detalhe de uma encomenda do utilizador.
      */
     public function show(Request $request, string $orderNumber): JsonResponse|OrderResource
     {
@@ -54,21 +55,18 @@ class OrderController extends Controller
         $user      = $request->user();
         $validated = $request->validated();
 
-        // 1. Verificar se o carrinho tem items
         $cartItems = $user->cartItems()->with('product')->get();
 
         if ($cartItems->isEmpty()) {
             return response()->json(['message' => 'O carrinho está vazio.'], 422);
         }
 
-        // 2. Obter e validar o método de envio
         $shippingMethod = ShippingMethod::find($validated['shipping_method_id']);
 
         if (! $shippingMethod || ! $shippingMethod->is_active) {
             return response()->json(['message' => 'O método de envio selecionado não está disponível.'], 422);
         }
 
-        // 3. Verificar stock de todos os produtos antes de criar a encomenda
         foreach ($cartItems as $item) {
             if ($item->quantity > $item->product->stock) {
                 return response()->json([
@@ -77,25 +75,22 @@ class OrderController extends Controller
             }
         }
 
-        // 4. Resolver dados de envio (endereço guardado ou manual)
         $shippingData = $this->resolveShippingData($user, $validated);
 
-        // 5. Calcular valores
         $subtotal     = $cartItems->sum(fn($item) => $item->quantity * $item->product->price);
         $shippingCost = (float) $shippingMethod->price;
 
-        // Calcular IVA sobre subtotal
         $countryCode = strtoupper($shippingData['country'] ?? 'PT');
-        $taxRateModel = \App\Models\TaxRate::where('country_code', $countryCode)
+        $taxRateModel = TaxRate::where('country_code', $countryCode)
             ->where('is_active', true)
             ->first();
-            
+
         $taxPercentage = $taxRateModel ? (float) $taxRateModel->rate : 0.0;
         $taxAmount = round($subtotal * ($taxPercentage / 100), 2);
 
         $total        = $subtotal + $shippingCost + $taxAmount;
 
-        // 6. Criar a encomenda
+        // Cria a encomenda
         $order = Order::create([
             'user_id'            => $user->id,
             'order_number'       => $this->generateOrderNumber(),
@@ -117,13 +112,13 @@ class OrderController extends Controller
 
             'nif'          => $validated['nif'] ?? null,
             'subtotal'     => round($subtotal, 2),
-            'shipping_cost'=> round($shippingCost, 2),
+            'shipping_cost' => round($shippingCost, 2),
             'tax_amount'   => $taxAmount,
             'tax_rate'     => $taxPercentage,
             'total'        => round($total, 2),
         ]);
 
-        // 7. Criar os itens da encomenda (snapshot dos dados do produto)
+        // Snapshot dos dados do produto
         foreach ($cartItems as $item) {
             $order->orderItems()->create([
                 'product_id'    => $item->product->id,
@@ -134,16 +129,15 @@ class OrderController extends Controller
                 'item_total'    => round($item->quantity * $item->product->price, 2),
             ]);
 
-            // 8. Decrementar stock
+            // Stock pós compra
             $item->product->decrement('stock', $item->quantity);
         }
 
-        // 9. Processar o Pagamento
         $paymentData = null;
         if ($validated['payment_method'] === 'multibanco') {
             $paymentData = [
                 'entity'     => '12345',
-                'reference'  => rand(100000000, 999999999), // Mock
+                'reference'  => rand(100000000, 999999999),
                 'expires_at' => now()->addDays(3)->toDateTimeString(),
             ];
         } elseif ($validated['payment_method'] === 'mbway') {
@@ -160,10 +154,8 @@ class OrderController extends Controller
             'payment_data' => $paymentData,
         ]);
 
-        // 10. Esvaziar o carrinho
         $user->cartItems()->delete();
 
-        // 11. Carregar relações para a resposta
         $order->load(['orderItems', 'shippingMethod', 'payments']);
 
         return response()->json([
@@ -184,8 +176,8 @@ class OrderController extends Controller
                 'firstname'    => $address->firstname,
                 'lastname'     => $address->lastname,
                 'phone'        => $address->phone,
-                'address_line1'=> $address->address_line1,
-                'address_line2'=> $address->address_line2,
+                'address_line1' => $address->address_line1,
+                'address_line2' => $address->address_line2,
                 'city'         => $address->city,
                 'postal_code'  => $address->postal_code,
                 'country'      => $address->country,
@@ -196,8 +188,8 @@ class OrderController extends Controller
             'firstname'    => $validated['firstname'],
             'lastname'     => $validated['lastname'],
             'phone'        => $validated['phone'] ?? null,
-            'address_line1'=> $validated['address_line1'],
-            'address_line2'=> $validated['address_line2'] ?? null,
+            'address_line1' => $validated['address_line1'],
+            'address_line2' => $validated['address_line2'] ?? null,
             'city'         => $validated['city'],
             'postal_code'  => $validated['postal_code'],
             'country'      => $validated['country'] ?? 'PT',

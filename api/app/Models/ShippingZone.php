@@ -18,8 +18,6 @@ class ShippingZone extends Model
         ];
     }
 
-    /* ----- Relationships ----- */
-
     public function countries()
     {
         return $this->hasMany(ShippingZoneCountry::class);

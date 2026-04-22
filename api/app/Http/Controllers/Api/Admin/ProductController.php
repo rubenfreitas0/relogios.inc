@@ -181,7 +181,7 @@ class ProductController extends Controller
     }
 
     /**
-     * Atualizar apenas o stock do produto< 
+     * Atualizar apenas o stock do produto
      */
     public function updateStock(Request $request, Product $product)
     {

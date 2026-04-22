@@ -51,7 +51,6 @@ class Brand extends Model
         });
     }
 
-    /* ----- Helpers ----- */
     public function getLogoUrlAttribute(): ?string
     {
         /** @var \Illuminate\Filesystem\FilesystemAdapter $disk */

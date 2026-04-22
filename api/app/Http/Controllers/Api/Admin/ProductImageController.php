@@ -31,7 +31,7 @@ class ProductImageController extends Controller
 
         $path = $request->file('image')->store('products', 'public');
 
-        // A primeira imagem inserida será logo a principal
+        // A primeira imagem inserida será logo a principal (default)
         $isPrimary = $product->images()->count() === 0;
 
         $image = $product->images()->create([
@@ -51,7 +51,6 @@ class ProductImageController extends Controller
      */
     public function setPrimary(Product $product, ProductImage $image)
     {
-        // Garantir que a imagem peretence mesmo ao produto indicado na rota
         if ($image->product_id !== $product->id) {
             return response()->json(['message' => 'Imagem não pertence a este produto.'], 403);
         }

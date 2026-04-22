@@ -24,8 +24,7 @@ class UpdateOrderStatusRequest extends FormRequest
     }
 
     /**
-     * Validações de lógica de negócio após a validação base.
-     * Impede transições de estado inválidas.
+     * Validações de lógica de negócio após a validação base que impedem transições de estado inválidas.
      */
     public function withValidator($validator): void
     {
@@ -40,7 +39,6 @@ class UpdateOrderStatusRequest extends FormRequest
             $from = $order->status;
             $to   = $this->input('status');
 
-            // Transições inválidas
             $invalidTransitions = [
                 'delivered'  => ['pending', 'processing'],
                 'cancelled'  => ['shipped', 'delivered'],
@@ -56,7 +54,6 @@ class UpdateOrderStatusRequest extends FormRequest
                 }
             }
 
-            // Tracking obrigatório quando muda para 'shipped'
             if ($to === 'shipped' && empty($this->input('tracking_number')) && empty($order->tracking_number)) {
                 $validator->errors()->add(
                     'tracking_number',
