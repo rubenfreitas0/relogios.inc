@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers\Api;
 
+use App\Enums\PaymentStatus;
 use App\Http\Controllers\Controller;
 use App\Models\Payment;
 use Illuminate\Http\JsonResponse;
@@ -22,20 +23,20 @@ class PaymentController extends Controller
 
         $payment = Payment::with('order')->findOrFail($validated['payment_id']);
 
-        if ($payment->status === 'paid') {
+        if ($payment->status === PaymentStatus::PAID) {
             return response()->json(['message' => 'O pagamento já foi processado anteriormente.'], 200);
         }
 
         DB::beginTransaction();
         try {
             $payment->update([
-                'status'         => 'paid',
+                'status'         => PaymentStatus::PAID,
                 'paid_at'        => now(),
                 'transaction_id' => $validated['transaction_id'] ?? 'SIM-' . time(),
             ]);
 
             $payment->order->update([
-                'payment_status' => 'paid',
+                'payment_status' => PaymentStatus::PAID,
                 'paid_at'        => now(),
             ]);
 
@@ -45,7 +46,7 @@ class PaymentController extends Controller
                 'message' => 'Pagamento confirmado com sucesso.',
                 'order'   => [
                     'order_number' => $payment->order->order_number,
-                    'status'       => 'paid',
+                    'status'       => PaymentStatus::PAID->value,
                 ]
             ]);
         } catch (\Exception $e) {

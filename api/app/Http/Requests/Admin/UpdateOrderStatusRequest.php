@@ -2,6 +2,7 @@
 
 namespace App\Http\Requests\Admin;
 
+use App\Enums\OrderStatus;
 use Illuminate\Foundation\Http\FormRequest;
 use Illuminate\Validation\Rule;
 
@@ -17,7 +18,7 @@ class UpdateOrderStatusRequest extends FormRequest
         return [
             'status' => [
                 'required',
-                Rule::in(['pending', 'processing', 'shipped', 'delivered', 'cancelled', 'refunded']),
+                Rule::enum(OrderStatus::class),
             ],
             'tracking_number' => ['nullable', 'string', 'max:255'],
         ];
@@ -37,24 +38,23 @@ class UpdateOrderStatusRequest extends FormRequest
             }
 
             $from = $order->status;
-            $to   = $this->input('status');
+            $to   = OrderStatus::from($this->input('status'));
 
             $invalidTransitions = [
-                'delivered'  => ['pending', 'processing'],
-                'cancelled'  => ['shipped', 'delivered'],
-                'refunded'   => ['pending', 'processing', 'shipped'],
+                OrderStatus::DELIVERED->value => [OrderStatus::PENDING, OrderStatus::PROCESSING],
+                OrderStatus::CANCELLED->value => [OrderStatus::SHIPPED, OrderStatus::DELIVERED],
             ];
 
             foreach ($invalidTransitions as $targetStatus => $forbiddenOrigins) {
-                if ($to === $targetStatus && in_array($from, $forbiddenOrigins)) {
+                if ($to->value === $targetStatus && in_array($from, $forbiddenOrigins)) {
                     $validator->errors()->add(
                         'status',
-                        "Não é possível mover a encomenda de '{$from}' para '{$to}'."
+                        "Não é possível mover a encomenda de '{$from->value}' para '{$to->value}'."
                     );
                 }
             }
 
-            if ($to === 'shipped' && empty($this->input('tracking_number')) && empty($order->tracking_number)) {
+            if ($to === OrderStatus::SHIPPED && empty($this->input('tracking_number')) && empty($order->tracking_number)) {
                 $validator->errors()->add(
                     'tracking_number',
                     'O número de rastreio é obrigatório ao marcar a encomenda como enviada.'

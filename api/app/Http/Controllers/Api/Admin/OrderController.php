@@ -2,6 +2,8 @@
 
 namespace App\Http\Controllers\Api\Admin;
 
+use App\Enums\OrderStatus;
+use App\Enums\PaymentStatus;
 use App\Http\Controllers\Controller;
 use App\Http\Requests\Admin\UpdateOrderStatusRequest;
 use App\Http\Resources\OrderResource;
@@ -71,8 +73,8 @@ class OrderController extends Controller
         ], fn($v) => $v !== null);
 
         // Marcar como pago automaticamente se o estado mudar para 'delivered'
-        if ($request->validated('status') === 'delivered' && $order->payment_status !== 'paid') {
-            $data['payment_status'] = 'paid';
+        if ($request->validated('status') === OrderStatus::DELIVERED->value && $order->payment_status !== PaymentStatus::PAID) {
+            $data['payment_status'] = PaymentStatus::PAID;
             $data['paid_at']        = now();
         }
 
