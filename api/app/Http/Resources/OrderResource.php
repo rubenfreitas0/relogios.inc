@@ -11,8 +11,14 @@ class OrderResource extends JsonResource
     {
         return [
             'order_number'   => $this->order_number,
-            'status'         => $this->status,
-            'payment_status' => $this->payment_status,
+            'status'         => [
+                'value' => $this->status->value,
+                'label' => $this->status->label(),
+            ],
+            'payment_status' => [
+                'value' => $this->payment_status->value,
+                'label' => $this->payment_status->label(),
+            ],
 
             'customer' => [
                 'firstname' => $this->shipping_firstname,
@@ -44,6 +50,7 @@ class OrderResource extends JsonResource
             'total'         => (float) $this->total,
 
             'tracking_number' => $this->tracking_number,
+            'tracking_url'    => $this->getTrackingUrl(),
             'paid_at'         => $this->paid_at?->toIso8601String(),
             'created_at'      => $this->created_at->toIso8601String(),
             'updated_at'      => $this->updated_at->toIso8601String(),
@@ -51,9 +58,15 @@ class OrderResource extends JsonResource
             'payments' => $this->whenLoaded('payments', function () {
                 return $this->payments->map(fn($p) => [
                     'id'             => $p->id,
-                    'method'         => $p->method,
-                    'status'         => $p->status,
-                    'amount'         => (float) $p->amount,
+                    'method'         => [
+                        'value' => $p->method->value,
+                        'label' => $p->method->label(),
+                    ],
+                    'status'         => [
+                        'value' => $p->status->value,
+                        'label' => $p->status->label(),
+                    ],
+                    'amount'         => $p->amount,
                     'payment_data'   => $p->payment_data,
                     'transaction_id' => $p->transaction_id,
                 ]);

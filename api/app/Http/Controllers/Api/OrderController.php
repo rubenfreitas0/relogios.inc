@@ -2,6 +2,9 @@
 
 namespace App\Http\Controllers\Api;
 
+use App\Enums\OrderStatus;
+use App\Enums\PaymentMethod;
+use App\Enums\PaymentStatus;
 use App\Http\Controllers\Controller;
 use App\Http\Requests\Order\CheckoutRequest;
 use App\Http\Resources\OrderResource;
@@ -11,7 +14,6 @@ use App\Models\TaxRate;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Http\Resources\Json\AnonymousResourceCollection;
-use Illuminate\Support\Str;
 
 class OrderController extends Controller
 {
@@ -93,9 +95,9 @@ class OrderController extends Controller
         // Cria a encomenda
         $order = Order::create([
             'user_id'            => $user->id,
-            'order_number'       => $this->generateOrderNumber(),
-            'status'             => 'pending',
-            'payment_status'     => 'pending',
+            'order_number'       => Order::generateOrderNumber(),
+            'status'             => OrderStatus::PENDING,
+            'payment_status'     => PaymentStatus::PENDING,
 
             'shipping_firstname'   => $shippingData['firstname'],
             'shipping_lastname'    => $shippingData['lastname'],
@@ -134,13 +136,13 @@ class OrderController extends Controller
         }
 
         $paymentData = null;
-        if ($validated['payment_method'] === 'multibanco') {
+        if ($validated['payment_method'] === PaymentMethod::MULTIBANCO->value) {
             $paymentData = [
                 'entity'     => '12345',
                 'reference'  => rand(100000000, 999999999),
                 'expires_at' => now()->addDays(3)->toDateTimeString(),
             ];
-        } elseif ($validated['payment_method'] === 'mbway') {
+        } elseif ($validated['payment_method'] === PaymentMethod::MBWAY->value) {
             $paymentData = [
                 'phone' => $validated['payment_phone'],
             ];
@@ -150,7 +152,7 @@ class OrderController extends Controller
             'method'       => $validated['payment_method'],
             'amount'       => round($total, 2),
             'currency'     => 'EUR',
-            'status'       => 'pending',
+            'status'       => PaymentStatus::PENDING,
             'payment_data' => $paymentData,
         ]);
 
@@ -196,15 +198,4 @@ class OrderController extends Controller
         ];
     }
 
-    /**
-     * Gera um número de encomenda único no formato RL-YYYYMMDD-XXXXX.
-     */
-    private function generateOrderNumber(): string
-    {
-        do {
-            $number = 'RL-' . now()->format('Ymd') . '-' . strtoupper(Str::random(5));
-        } while (Order::where('order_number', $number)->exists());
-
-        return $number;
-    }
 }
