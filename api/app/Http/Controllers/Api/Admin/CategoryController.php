@@ -30,7 +30,7 @@ class CategoryController extends Controller
             )
             ->withCount('products')
             ->orderBy('name')
-            ->paginate($request->integer('per_page', 15));
+            ->paginate(min($request->integer('per_page', 15), 100));
 
         return CategoryResource::collection($categories);
     }

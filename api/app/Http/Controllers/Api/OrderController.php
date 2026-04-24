@@ -14,6 +14,7 @@ use App\Models\TaxRate;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Http\Resources\Json\AnonymousResourceCollection;
+use Illuminate\Support\Facades\DB;
 
 class OrderController extends Controller
 {
@@ -24,9 +25,9 @@ class OrderController extends Controller
     {
         $orders = $request->user()
             ->orders()
-            ->with(['orderItems', 'shippingMethod'])
+            ->with(['user', 'orderItems', 'shippingMethod'])
             ->latest()
-            ->paginate($request->integer('per_page', 10));
+            ->paginate(min($request->integer('per_page', 10), 100));
 
         return OrderResource::collection($orders);
     }
@@ -38,7 +39,7 @@ class OrderController extends Controller
     {
         $order = $request->user()
             ->orders()
-            ->with(['orderItems', 'shippingMethod', 'payments'])
+            ->with(['user', 'orderItems', 'shippingMethod', 'payments'])
             ->where('order_number', $orderNumber)
             ->first();
 
@@ -57,7 +58,7 @@ class OrderController extends Controller
         $user      = $request->user();
         $validated = $request->validated();
 
-        $cartItems = $user->cartItems()->with('product')->get();
+        $cartItems = $user->cartItems()->with('product.primaryImage')->get();
 
         if ($cartItems->isEmpty()) {
             return response()->json(['message' => 'O carrinho está vazio.'], 422);
@@ -67,14 +68,6 @@ class OrderController extends Controller
 
         if (! $shippingMethod || ! $shippingMethod->is_active) {
             return response()->json(['message' => 'O método de envio selecionado não está disponível.'], 422);
-        }
-
-        foreach ($cartItems as $item) {
-            if ($item->quantity > $item->product->stock) {
-                return response()->json([
-                    'message' => "Stock insuficiente para '{$item->product->name}'. Apenas existem {$item->product->stock} unidades disponíveis.",
-                ], 422);
-            }
         }
 
         $shippingData = $this->resolveShippingData($user, $validated);
@@ -92,71 +85,93 @@ class OrderController extends Controller
 
         $total        = $subtotal + $shippingCost + $taxAmount;
 
-        // Cria a encomenda
-        $order = Order::create([
-            'user_id'            => $user->id,
-            'order_number'       => Order::generateOrderNumber(),
-            'status'             => OrderStatus::PENDING,
-            'payment_status'     => PaymentStatus::PENDING,
+        DB::beginTransaction();
+        try {
+            // Decremento atómico do stock com verificação — previne overselling
+            foreach ($cartItems as $item) {
+                $updated = DB::table('products')
+                    ->where('id', $item->product->id)
+                    ->where('stock', '>=', $item->quantity)
+                    ->update(['stock' => DB::raw("stock - {$item->quantity}")]);
 
-            'shipping_firstname'   => $shippingData['firstname'],
-            'shipping_lastname'    => $shippingData['lastname'],
-            'shipping_phone'       => $shippingData['phone'] ?? $user->phone,
-            'shipping_address_line1' => $shippingData['address_line1'],
-            'shipping_address_line2' => $shippingData['address_line2'] ?? null,
-            'shipping_city'        => $shippingData['city'],
-            'shipping_postal_code' => $shippingData['postal_code'],
-            'shipping_country'     => $shippingData['country'] ?? 'PT',
+                if ($updated === 0) {
+                    DB::rollBack();
+                    // Buscar stock atualizado para a mensagem de erro
+                    $currentStock = DB::table('products')->where('id', $item->product->id)->value('stock');
+                    return response()->json([
+                        'message' => "Stock insuficiente para '{$item->product->name}'. Apenas existem {$currentStock} unidades disponíveis.",
+                    ], 422);
+                }
+            }
 
-            'shipping_method_id'   => $shippingMethod->id,
-            'shipping_carrier'     => $shippingMethod->carrier,
-            'estimated_days'       => $shippingMethod->estimated_days,
+            // Cria a encomenda
+            $order = Order::create([
+                'user_id'            => $user->id,
+                'order_number'       => Order::generateOrderNumber(),
+                'status'             => OrderStatus::PENDING,
+                'payment_status'     => PaymentStatus::PENDING,
 
-            'nif'          => $validated['nif'] ?? null,
-            'subtotal'     => round($subtotal, 2),
-            'shipping_cost' => round($shippingCost, 2),
-            'tax_amount'   => $taxAmount,
-            'tax_rate'     => $taxPercentage,
-            'total'        => round($total, 2),
-        ]);
+                'shipping_firstname'   => $shippingData['firstname'],
+                'shipping_lastname'    => $shippingData['lastname'],
+                'shipping_phone'       => $shippingData['phone'] ?? $user->phone,
+                'shipping_address_line1' => $shippingData['address_line1'],
+                'shipping_address_line2' => $shippingData['address_line2'] ?? null,
+                'shipping_city'        => $shippingData['city'],
+                'shipping_postal_code' => $shippingData['postal_code'],
+                'shipping_country'     => $shippingData['country'] ?? 'PT',
 
-        // Snapshot dos dados do produto
-        foreach ($cartItems as $item) {
-            $order->orderItems()->create([
-                'product_id'    => $item->product->id,
-                'product_name'  => $item->product->name,
-                'product_image' => $item->product->primaryImage?->url ?? null,
-                'unit_price'    => $item->product->price,
-                'quantity'      => $item->quantity,
-                'item_total'    => round($item->quantity * $item->product->price, 2),
+                'shipping_method_id'   => $shippingMethod->id,
+                'shipping_carrier'     => $shippingMethod->carrier,
+                'estimated_days'       => $shippingMethod->estimated_days,
+
+                'nif'          => $validated['nif'] ?? null,
+                'subtotal'     => round($subtotal, 2),
+                'shipping_cost' => round($shippingCost, 2),
+                'tax_amount'   => $taxAmount,
+                'tax_rate'     => $taxPercentage,
+                'total'        => round($total, 2),
             ]);
 
-            // Stock pós compra
-            $item->product->decrement('stock', $item->quantity);
+            // Snapshot dos dados do produto
+            foreach ($cartItems as $item) {
+                $order->orderItems()->create([
+                    'product_id'    => $item->product->id,
+                    'product_name'  => $item->product->name,
+                    'product_image' => $item->product->primaryImage?->url ?? null,
+                    'unit_price'    => $item->product->price,
+                    'quantity'      => $item->quantity,
+                    'item_total'    => round($item->quantity * $item->product->price, 2),
+                ]);
+            }
+
+            $paymentData = null;
+            if ($validated['payment_method'] === PaymentMethod::MULTIBANCO->value) {
+                $paymentData = [
+                    'entity'     => '12345',
+                    'reference'  => rand(100000000, 999999999),
+                    'expires_at' => now()->addDays(3)->toDateTimeString(),
+                ];
+            } elseif ($validated['payment_method'] === PaymentMethod::MBWAY->value) {
+                $paymentData = [
+                    'phone' => $validated['payment_phone'],
+                ];
+            }
+
+            $order->payments()->create([
+                'method'       => $validated['payment_method'],
+                'amount'       => round($total, 2),
+                'currency'     => 'EUR',
+                'status'       => PaymentStatus::PENDING,
+                'payment_data' => $paymentData,
+            ]);
+
+            $user->cartItems()->delete();
+
+            DB::commit();
+        } catch (\Exception $e) {
+            DB::rollBack();
+            return response()->json(['message' => 'Erro ao processar a encomenda.'], 500);
         }
-
-        $paymentData = null;
-        if ($validated['payment_method'] === PaymentMethod::MULTIBANCO->value) {
-            $paymentData = [
-                'entity'     => '12345',
-                'reference'  => rand(100000000, 999999999),
-                'expires_at' => now()->addDays(3)->toDateTimeString(),
-            ];
-        } elseif ($validated['payment_method'] === PaymentMethod::MBWAY->value) {
-            $paymentData = [
-                'phone' => $validated['payment_phone'],
-            ];
-        }
-
-        $order->payments()->create([
-            'method'       => $validated['payment_method'],
-            'amount'       => round($total, 2),
-            'currency'     => 'EUR',
-            'status'       => PaymentStatus::PENDING,
-            'payment_data' => $paymentData,
-        ]);
-
-        $user->cartItems()->delete();
 
         $order->load(['orderItems', 'shippingMethod', 'payments']);
 

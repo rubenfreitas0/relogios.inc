@@ -35,7 +35,7 @@ class OrderController extends Controller
                 fn($q) => $q->where('payment_status', $request->payment_status)
             )
             ->latest()
-            ->paginate($request->integer('per_page', 15));
+            ->paginate(min($request->integer('per_page', 15), 100));
 
         return OrderResource::collection($orders);
     }

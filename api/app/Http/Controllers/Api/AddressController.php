@@ -8,6 +8,7 @@ use App\Http\Requests\Address\StoreAddressRequest;
 use App\Http\Requests\Address\UpdateAddressRequest;
 use App\Http\Resources\AddressResource;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\DB;
 
 class AddressController extends Controller
 {
@@ -26,18 +27,19 @@ class AddressController extends Controller
     public function store(StoreAddressRequest $request)
     {
         $validated = $request->validated();
-
         $user = $request->user();
 
-        if ($user->addresses()->count() === 0) {
-            $validated['is_default'] = true;
-        }
+        $address = DB::transaction(function () use ($user, $validated) {
+            if ($user->addresses()->count() === 0) {
+                $validated['is_default'] = true;
+            }
 
-        if (($validated['is_default'] ?? false) === true) {
-            $user->addresses()->update(['is_default' => false]);
-        }
+            if (($validated['is_default'] ?? false) === true) {
+                $user->addresses()->lockForUpdate()->update(['is_default' => false]);
+            }
 
-        $address = $user->addresses()->create($validated);
+            return $user->addresses()->create($validated);
+        });
 
         return response()->json([
             'message' => 'Morada adicionada com sucesso.',
@@ -68,11 +70,13 @@ class AddressController extends Controller
 
         $validated = $request->validated();
 
-        if (($validated['is_default'] ?? false) === true && !$address->is_default) {
-            $request->user()->addresses()->update(['is_default' => false]);
-        }
+        DB::transaction(function () use ($request, $address, $validated) {
+            if (($validated['is_default'] ?? false) === true && !$address->is_default) {
+                $request->user()->addresses()->lockForUpdate()->update(['is_default' => false]);
+            }
 
-        $address->update($validated);
+            $address->update($validated);
+        });
 
         return response()->json([
             'message' => 'Morada atualizada com sucesso.',
@@ -89,8 +93,10 @@ class AddressController extends Controller
             return response()->json(['message' => 'Acesso negado.'], 403);
         }
 
-        $request->user()->addresses()->update(['is_default' => false]);
-        $address->update(['is_default' => true]);
+        DB::transaction(function () use ($request, $address) {
+            $request->user()->addresses()->lockForUpdate()->update(['is_default' => false]);
+            $address->update(['is_default' => true]);
+        });
 
         return response()->json([
             'message' => 'Morada definida como principal.',
@@ -107,16 +113,18 @@ class AddressController extends Controller
             return response()->json(['message' => 'Não tens permissão para apagar esta morada.'], 403);
         }
 
-        $wasDefault = $address->is_default;
+        DB::transaction(function () use ($request, $address) {
+            $wasDefault = $address->is_default;
 
-        $address->delete();
+            $address->delete();
 
-        if ($wasDefault) {
-            $nextAddress = $request->user()->addresses()->latest()->first();
-            if ($nextAddress) {
-                $nextAddress->update(['is_default' => true]);
+            if ($wasDefault) {
+                $nextAddress = $request->user()->addresses()->latest()->first();
+                if ($nextAddress) {
+                    $nextAddress->update(['is_default' => true]);
+                }
             }
-        }
+        });
 
         return response()->noContent();
     }

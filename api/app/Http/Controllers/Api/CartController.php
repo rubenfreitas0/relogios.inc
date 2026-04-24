@@ -9,6 +9,7 @@ use App\Http\Requests\Cart\StoreCartRequest;
 use App\Http\Requests\Cart\UpdateCartRequest;
 use App\Http\Resources\CartResource;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\DB;
 
 class CartController extends Controller
 {
@@ -44,26 +45,33 @@ class CartController extends Controller
             return response()->json(['message' => 'Este produto de momento não está à venda.'], 403);
         }
 
-        $cartItem = $user->cartItems()->where('product_id', $product->id)->first();
-
         $requestedQuantity = $validated['quantity'];
-        $newTotalQuantity = $cartItem ? ($cartItem->quantity + $requestedQuantity) : $requestedQuantity;
 
-        // Impedimento: O utilizador tenta adicionar ao carrinho mais unidades do que a loja tem
-        if ($newTotalQuantity > $product->stock) {
-            return response()->json([
-                'message' => 'Stock insuficiente. Apenas existem ' . $product->stock . ' unidades disponíveis.'
-            ], 422);
-        }
+        $cartItem = DB::transaction(function () use ($user, $product, $requestedQuantity) {
+            // Lock para evitar duplicação por cliques rápidos
+            $cartItem = $user->cartItems()
+                ->where('product_id', $product->id)
+                ->lockForUpdate()
+                ->first();
 
-        if ($cartItem) {
-            $cartItem->update(['quantity' => $newTotalQuantity]);
-        } else {
-            $cartItem = $user->cartItems()->create([
-                'product_id' => $product->id,
-                'quantity' => $requestedQuantity
-            ]);
-        }
+            $newTotalQuantity = $cartItem ? ($cartItem->quantity + $requestedQuantity) : $requestedQuantity;
+
+            // Impedimento: O utilizador tenta adicionar ao carrinho mais unidades do que a loja tem
+            if ($newTotalQuantity > $product->stock) {
+                abort(422, 'Stock insuficiente. Apenas existem ' . $product->stock . ' unidades disponíveis.');
+            }
+
+            if ($cartItem) {
+                $cartItem->update(['quantity' => $newTotalQuantity]);
+            } else {
+                $cartItem = $user->cartItems()->create([
+                    'product_id' => $product->id,
+                    'quantity' => $requestedQuantity
+                ]);
+            }
+
+            return $cartItem;
+        });
 
         $cartItem->load('product.primaryImage');
 
@@ -78,6 +86,9 @@ class CartController extends Controller
      */
     public function update(UpdateCartRequest $request, CartItem $cart)
     {
+        $cart->load('product');
+        $cart->product->refresh(); // Garantir stock atualizado da BD
+
         if ($request->user()->id !== $cart->user_id) {
             return response()->json(['message' => 'Acesso negado.'], 403);
         }

@@ -49,7 +49,7 @@ class ProductController extends Controller
                 fn($q) => $q->onlyTrashed()
             )
             ->latest()
-            ->paginate($request->input('per_page', 10));
+            ->paginate(min($request->integer('per_page', 10), 100));
 
         return ProductResource::collection($products);
     }
@@ -193,7 +193,7 @@ class ProductController extends Controller
 
         return response()->json([
             'message' => 'Stock atualizado com sucesso.',
-            'data' => new ProductResource($product)
+            'data' => new ProductResource($product->load(['brand', 'category', 'images']))
         ]);
     }
 
@@ -207,7 +207,7 @@ class ProductController extends Controller
 
         return response()->json([
             'message' => 'Produto restaurado com sucesso.',
-            'data' => new ProductResource($product)
+            'data' => new ProductResource($product->load(['brand', 'category', 'images']))
         ]);
     }
 }
