@@ -30,7 +30,7 @@ class BrandController extends Controller
             )
             ->withCount('products')
             ->orderBy('name')
-            ->paginate($request->integer('per_page', 15));
+            ->paginate(min($request->integer('per_page', 15), 100));
 
         return BrandResource::collection($brands);
     }

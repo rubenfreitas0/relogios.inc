@@ -86,11 +86,20 @@ class Order extends Model
 
     public static function generateOrderNumber(): string
     {
-        do {
-            $number = 'RL-' . strtoupper(Str::random(8));
-        } while (static::where('order_number', $number)->exists());
+        $maxAttempts = 5;
 
-        return $number;
+        for ($i = 0; $i < $maxAttempts; $i++) {
+            // Componente temporal (últimos 4 dígitos do timestamp) + random para minimizar colisões
+            $timePart = substr((string) now()->getTimestampMs(), -4);
+            $number = 'RL-' . $timePart . strtoupper(Str::random(6));
+
+            if (! static::where('order_number', $number)->exists()) {
+                return $number;
+            }
+        }
+
+        // Fallback extremo — praticamente impossível de atingir
+        throw new \RuntimeException('Não foi possível gerar um número de encomenda único.');
     }
 
     public function isPending(): bool

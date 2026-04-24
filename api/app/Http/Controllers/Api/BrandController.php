@@ -29,7 +29,7 @@ class BrandController extends Controller
     {
         $brand = Brand::active()
             ->where('slug', $slug)
-            ->with(['products' => fn($q) => $q->where('is_active', true)->whereNull('deleted_at')])
+            ->with(['products' => fn($q) => $q->where('is_active', true)->whereNull('deleted_at')->with(['brand', 'category', 'primaryImage'])->latest()->take(20)])
             ->firstOrFail();
 
         return new BrandResource($brand);

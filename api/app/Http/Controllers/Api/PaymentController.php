@@ -21,14 +21,18 @@ class PaymentController extends Controller
             'transaction_id' => ['nullable', 'string'],
         ]);
 
-        $payment = Payment::with('order')->findOrFail($validated['payment_id']);
-
-        if ($payment->status === PaymentStatus::PAID) {
-            return response()->json(['message' => 'O pagamento já foi processado anteriormente.'], 200);
-        }
-
         DB::beginTransaction();
         try {
+            // Lock pessimista — impede processamento duplicado de webhooks concorrentes
+            $payment = Payment::with('order')
+                ->lockForUpdate()
+                ->findOrFail($validated['payment_id']);
+
+            if ($payment->status === PaymentStatus::PAID) {
+                DB::commit();
+                return response()->json(['message' => 'O pagamento já foi processado anteriormente.'], 200);
+            }
+
             $payment->update([
                 'status'         => PaymentStatus::PAID,
                 'paid_at'        => now(),

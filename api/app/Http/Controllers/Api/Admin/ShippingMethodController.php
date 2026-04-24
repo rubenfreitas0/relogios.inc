@@ -29,7 +29,7 @@ class ShippingMethodController extends Controller
                 fn($q) => $q->where('is_active', $request->boolean('is_active'))
             )
             ->orderBy('price')
-            ->paginate($request->integer('per_page', 15));
+            ->paginate(min($request->integer('per_page', 15), 100));
 
         return ShippingMethodResource::collection($methods);
     }

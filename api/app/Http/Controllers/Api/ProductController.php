@@ -73,7 +73,7 @@ class ProductController extends Controller
         }
 
         // Paginação (12)
-        $products = $query->paginate($request->input('per_page', 12));
+        $products = $query->paginate(min($request->integer('per_page', 12), 100));
 
         return ProductResource::collection($products);
     }
