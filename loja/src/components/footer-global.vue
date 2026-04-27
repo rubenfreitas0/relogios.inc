@@ -40,13 +40,18 @@ import instagramIcon from '/icons/instagram.svg'
 					</router-link>
 					<router-link
 						class="font-semibold uppercase tracking-wider text-white transition duration-300 hover:text-k-main"
-						to="/keyboards"
-						>RELÓGIOS
+						to="/homens"
+						>HOMENS
 					</router-link>
 					<router-link
 						class="font-semibold uppercase tracking-wider text-white transition duration-300 hover:text-k-main"
-						to="/keycaps"
-						>BRACELETES
+						to="/mulheres"
+						>MULHERES
+					</router-link>
+					<router-link
+						class="font-semibold uppercase tracking-wider text-white transition duration-300 hover:text-k-main"
+						to="/unisexo"
+						>UNISEXO
 					</router-link>
 					<router-link
 						class="font-semibold uppercase tracking-wider text-white transition duration-300 hover:text-k-main"
@@ -62,8 +67,8 @@ import instagramIcon from '/icons/instagram.svg'
 				<p
 					class="mb-10 text-center tracking-wide opacity-70 md:mb-0 md:w-2/3 md:text-left">
 					
-					A RELOGIOS.inc representa o mais alto padrão em relojoaria. Cada peça <p />
-					da nossa coleção é criteriosamente selecionada para quem exige precisão, <p />
+					A RELOGIOS.inc representa o mais alto padrão em relojoaria. Cada peça <br />
+					da nossa coleção é criteriosamente selecionada para quem exige precisão, <br />
 					sofisticação e durabilidade. O tempo é o teu bem mais precioso — usa-o com estilo.
 				</p>
 				<nav class="flex flex-row gap-4 md:self-end">

@@ -61,7 +61,7 @@ export const useCartStore = defineStore('cart', {
 		addTestItem() {
 			this.addToCart({
 				id: 0,
-				category: 'deskmats',
+				category: 'unisexo',
 				src: '/products/deskmats/mat1-show.webp',
 				topSrc: '/products/deskmats/grrr-full.webp',
 				botSrc: '/products/deskmats/grrr-close-alt.webp',

@@ -23,7 +23,7 @@ import watchBraceletsFlatImage from '/display/watch-bracelets-flat.png'
 					class="group order-1 flex h-full w-full flex-col items-center justify-center md:order-none md:grid md:grid-cols-7"
 				>
 					<router-link
-						:to="{ name: 'keyboards', params: { id: 1 } }"
+						:to="{ name: 'homens', params: { id: 1 } }"
 						class="relative flex h-full w-full flex-col items-center justify-center overflow-hidden md:col-span-4 md:px-10"
 					>
 						<!-- Glow dourado que aparece no hover -->
@@ -59,7 +59,7 @@ import watchBraceletsFlatImage from '/display/watch-bracelets-flat.png'
 							mostrador elegante e resistência para o dia-a-dia.
 						</p>
 						<ButtonSolid
-							:to="{ name: 'keyboards', params: { id: 1 } }"
+							:to="{ name: 'homens', params: { id: 1 } }"
 							content="VER RELÓGIO"
 							add="font-semibold"
 							class="mb-10 self-center md:mb-0 md:self-start"
@@ -81,7 +81,7 @@ import watchBraceletsFlatImage from '/display/watch-bracelets-flat.png'
 				<div class="flex flex-col items-center gap-4 p-6 md:items-start">
 					<h2 class="text-3xl font-semibold uppercase">Braceletes & Pulseiras</h2>
 					<ButtonEmpty
-						:to="{ path: '/keycaps' }"
+						:to="{ path: '/mulheres' }"
 						content="ver coleção"
 					/>
 				</div>
@@ -89,7 +89,7 @@ import watchBraceletsFlatImage from '/display/watch-bracelets-flat.png'
 
 			<!-- Bloco imagem — detalhe do relógio (grayscale estilo editorial) -->
 			<router-link
-				:to="{ path: '/keyboards' }"
+				:to="{ path: '/homens' }"
 				class="order-2 flex h-64 flex-col items-center justify-center overflow-hidden rounded-md bg-k-grey text-black md:order-none md:col-span-4 md:row-span-2 md:block md:h-full"
 			>
 				<img
@@ -115,7 +115,7 @@ import watchBraceletsFlatImage from '/display/watch-bracelets-flat.png'
 				class="order-5 col-span-3 row-span-2 flex w-full flex-col items-center justify-center gap-6 rounded-md bg-k-grey p-6 text-black md:order-none md:h-full md:items-start md:px-16"
 			>
 				<h2 class="text-3xl font-semibold uppercase">Relógios</h2>
-				<ButtonEmpty :to="{ path: '/keyboards' }" content="ver todos" />
+				<ButtonEmpty :to="{ path: '/homens' }" content="ver todos" />
 			</div>
 		</div>
 	</section>

@@ -50,11 +50,4 @@ class Brand extends Model
             }
         });
     }
-
-    public function getLogoUrlAttribute(): ?string
-    {
-        /** @var \Illuminate\Filesystem\FilesystemAdapter $disk */
-        $disk = Storage::disk('public');
-        return $this->logo ? $disk->url($this->logo) : null;
-    }
 }

@@ -12,19 +12,19 @@ const props = defineProps<{
 }>()
 
 const formatPrice = (price?: number) => {
-    if (price !== undefined) {
-	    return `€${price.toFixed(2).replace('.', ',')}`
-    }
-    return '€199,00'
+	if (price !== undefined) {
+		return `€${price.toFixed(2).replace('.', ',')}`
+	}
+	return '€199,00'
 }
 </script>
 
 <template>
-	<div class="group relative flex flex-col overflow-hidden rounded-xl bg-white border border-zinc-200 shadow-sm transition-all duration-300 hover:shadow-lg">
+	<div class="group relative flex flex-col transition-all duration-300">
 		<!-- Image Container -->
 		<router-link
 			:to="{ name: props.category, params: { id: props.item.id } }"
-			class="relative block aspect-[4/5] w-full overflow-hidden bg-[#f9f9f9]"
+			class="relative block aspect-[4/5] w-full overflow-hidden rounded-xl bg-k-dark-grey transition-all duration-500 group-hover:shadow-lg group-hover:shadow-[#FFC700]/10"
 		>
 			<div
 				v-if="props.item.nu"
@@ -34,20 +34,20 @@ const formatPrice = (price?: number) => {
 			</div>
 			<img
 				loading="lazy"
-				class="h-full w-full object-cover"
+				class="h-full w-full object-cover opacity-90 transition-opacity duration-300 group-hover:opacity-100"
 				:src="props.item.src"
 				:alt="props.item.header"
 			/>
 		</router-link>
 
 		<!-- Content Container -->
-		<div class="flex flex-1 flex-col p-6">
+		<div class="flex flex-1 flex-col pt-5">
 			<!-- Tags -->
 			<div v-if="props.item.tags && props.item.tags.length > 0" class="mb-3 flex flex-wrap gap-1.5">
 				<span 
 					v-for="tag in props.item.tags" 
 					:key="tag"
-					class="px-2 py-0.5 rounded-sm bg-gray-100 text-[0.65rem] font-bold uppercase tracking-wider text-gray-500"
+					class="px-2 py-0.5 rounded-sm bg-white/5 text-[0.65rem] font-bold uppercase tracking-wider text-white/50"
 				>
 					{{ tag }}
 				</span>
@@ -57,22 +57,22 @@ const formatPrice = (price?: number) => {
 				<h2 class="text-xs font-bold uppercase tracking-widest text-[#FFC700]">
 					{{ props.item.header }}
 				</h2>
-				<h3 class="mt-1 text-[1.1rem] font-bold text-gray-900 leading-tight transition-colors duration-300 group-hover:text-black">
+				<h3 class="mt-1 text-[1.1rem] font-bold text-white leading-tight transition-colors duration-300 group-hover:text-[#FFC700]">
 					{{ props.item.subheader }}
 				</h3>
 			</router-link>
             
             <!-- Truncated description -->
-            <p class="mt-2 text-[0.9rem] text-gray-500 line-clamp-2 mb-6 flex-1 font-normal leading-relaxed">
+            <p class="mt-2 text-[0.9rem] text-white/50 line-clamp-2 mb-6 flex-1 font-normal leading-relaxed">
                 {{ props.item.text }}
             </p>
 
-            <div class="mt-auto flex items-center justify-between border-t border-gray-100 pt-5">
+            <div class="mt-auto flex items-center justify-between pt-2">
 				<div class="flex flex-col">
-					<span v-if="props.item.oldPrice" class="text-xs font-semibold text-gray-400 line-through decoration-gray-300">
+					<span v-if="props.item.oldPrice" class="text-xs font-semibold text-white/40 line-through decoration-white/20">
 						{{ formatPrice(props.item.oldPrice) }}
 					</span>
-                	<span class="text-xl font-bold tracking-tight" :class="props.item.oldPrice ? 'text-red-600' : 'text-gray-900'">
+                	<span class="text-xl font-bold tracking-tight transition-colors duration-300 group-hover:text-[#FFC700]" :class="props.item.oldPrice ? 'text-red-500' : 'text-white'">
 						{{ formatPrice(props.item.price) }}
 					</span>
 				</div>
@@ -80,7 +80,7 @@ const formatPrice = (price?: number) => {
 				<!-- Add to Cart (Desktop & Mobile) -->
 				<button 
 					@click.prevent="cartStore.addToCart(props.item)"
-					class="flex h-11 w-11 items-center justify-center rounded-full bg-black text-white hover:bg-[#FFC700] hover:text-black hover:scale-105 active:scale-95 transition-all duration-200 shadow-sm"
+					class="flex h-11 w-11 items-center justify-center rounded-full bg-white/5 text-white hover:bg-[#FFC700] hover:text-black hover:scale-110 active:scale-95 transition-all duration-300"
 					title="Adicionar ao carrinho"
 				>
 					<svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" viewBox="0 0 20 20" fill="currentColor">
@@ -93,7 +93,7 @@ const formatPrice = (price?: number) => {
             <div class="mt-4 md:hidden">
                 <ButtonSolid
 					:to="{ name: props.category, params: { id: props.item.id } }"
-					color="light"
+					color="dark"
                     content="VER RELÓGIO"
                     size="small"
                     class="w-full flex justify-center"

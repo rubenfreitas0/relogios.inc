@@ -12,19 +12,19 @@ export const landingPageMeta: meta = {
 }
 
 export const categoryPageMeta: metaContainer = {
-	keyboards: {
+	homens: {
 		title: 'Relógios de Homem | RELOGIOS.inc',
 		description:
 			'Descobre a nossa seleção de relógios masculinos que combinam robustez, precisão e elegância.',
 		image: keyboardsImage,
 	},
-	keycaps: {
+	mulheres: {
 		title: 'Relógios de Mulher | RELOGIOS.inc',
 		description:
 			'Elegância e sofisticação em cada detalhe. Escolhe o relógio perfeito para o teu estilo.',
 		image: keycapsImage,
 	},
-	deskmats: {
+	unisexo: {
 		title: 'Relógios Unisexo | RELOGIOS.inc',
 		description:
 			'Design versátil para todos. Explora a nossa gama de relógios casuais e desportivos.',

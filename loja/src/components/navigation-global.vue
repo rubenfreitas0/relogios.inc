@@ -161,7 +161,7 @@ const megaMenus: Record<string, {
 					@mouseleave="closeMegaDelayed()"
 				>
 					<router-link
-						to="/keyboards?genero=homens"
+						to="/homens"
 						class="uppercase text-white transition duration-300 hover:text-k-main text-sm flex items-center gap-1"
 						:class="activeMega === 'homens' ? 'text-k-main' : ''"
 						@click="activeMega = null"
@@ -180,7 +180,7 @@ const megaMenus: Record<string, {
 					@mouseleave="closeMegaDelayed()"
 				>
 					<router-link
-						to="/keyboards?genero=mulheres"
+						to="/mulheres"
 						class="uppercase text-white transition duration-300 hover:text-k-main text-sm flex items-center gap-1"
 						:class="activeMega === 'mulheres' ? 'text-k-main' : ''"
 						@click="activeMega = null"
@@ -199,7 +199,7 @@ const megaMenus: Record<string, {
 					@mouseleave="closeMegaDelayed()"
 				>
 					<router-link
-						to="/keyboards?genero=unisexo"
+						to="/unisexo"
 						class="uppercase text-white transition duration-300 hover:text-k-main text-sm flex items-center gap-1"
 						:class="activeMega === 'unisexo' ? 'text-k-main' : ''"
 						@click="activeMega = null"
@@ -318,7 +318,7 @@ const megaMenus: Record<string, {
 						<ul class="space-y-2">
 							<li v-for="brand in megaMenus[activeMega!].brands" :key="brand">
 								<router-link
-									:to="`/keyboards?brand=${brand.toLowerCase()}`"
+									:to="`/${activeMega}?brand=${brand.toLowerCase()}`"
 									class="text-sm text-white/60 hover:text-white hover:translate-x-1 transition-all duration-150 block"
 									@click="activeMega = null"
 								>
@@ -327,7 +327,7 @@ const megaMenus: Record<string, {
 							</li>
 						</ul>
 						<router-link
-							to="/keyboards"
+							:to="`/${activeMega}`"
 							class="mt-4 block text-[0.65rem] font-bold uppercase tracking-wider text-[#FFC700] hover:text-yellow-300 transition-colors"
 							@click="activeMega = null"
 						>Ver todas as marcas →</router-link>
@@ -339,7 +339,7 @@ const megaMenus: Record<string, {
 						<ul class="space-y-2">
 							<li v-for="t in megaMenus[activeMega!].types" :key="t">
 								<router-link
-									:to="`/keyboards?tipo=${t.toLowerCase()}`"
+									:to="`/${activeMega}?tipo=${t.toLowerCase()}`"
 									class="text-sm text-white/60 hover:text-white hover:translate-x-1 transition-all duration-150 block"
 									@click="activeMega = null"
 								>
@@ -355,7 +355,7 @@ const megaMenus: Record<string, {
 						<ul class="space-y-2">
 							<li v-for="k in megaMenus[activeMega!].kind" :key="k">
 								<router-link
-									:to="`/keyboards?mecanismo=${k.toLowerCase()}`"
+									:to="`/${activeMega}?mecanismo=${k.toLowerCase()}`"
 									class="text-sm text-white/60 hover:text-white hover:translate-x-1 transition-all duration-150 block"
 									@click="activeMega = null"
 								>
@@ -371,7 +371,7 @@ const megaMenus: Record<string, {
 						<ul class="space-y-2">
 							<li v-for="p in megaMenus[activeMega!].prices" :key="p">
 								<router-link
-									:to="`/keyboards?preco=${encodeURIComponent(p)}`"
+									:to="`/${activeMega}?preco=${encodeURIComponent(p)}`"
 									class="text-sm text-white/60 hover:text-white hover:translate-x-1 transition-all duration-150 block"
 									@click="activeMega = null"
 								>
@@ -419,9 +419,9 @@ const megaMenus: Record<string, {
 					Fechar ✕
 				</button>
 				<router-link to="/" class="uppercase text-white transition duration-300 hover:text-k-main active:translate-y-0.5" :class="$route.path === '/' && 'hidden'" @click="hideHamburger()" data-test="mobile-nav-home">Home</router-link>
-				<router-link to="/keyboards" class="uppercase text-white transition duration-300 hover:text-k-main active:translate-y-0.5" @click="hideHamburger()">Homens</router-link>
-				<router-link to="/keyboards" class="uppercase text-white transition duration-300 hover:text-k-main active:translate-y-0.5" @click="hideHamburger()">Mulheres</router-link>
-				<router-link to="/keyboards" class="uppercase text-white transition duration-300 hover:text-k-main active:translate-y-0.5" @click="hideHamburger()">Unisexo</router-link>
+				<router-link to="/homens" class="uppercase text-white transition duration-300 hover:text-k-main active:translate-y-0.5" @click="hideHamburger()">Homens</router-link>
+				<router-link to="/mulheres" class="uppercase text-white transition duration-300 hover:text-k-main active:translate-y-0.5" @click="hideHamburger()">Mulheres</router-link>
+				<router-link to="/unisexo" class="uppercase text-white transition duration-300 hover:text-k-main active:translate-y-0.5" @click="hideHamburger()">Unisexo</router-link>
 				<router-link to="/sobre-nos" class="uppercase text-white transition duration-300 hover:text-k-main active:translate-y-0.5" :class="$route.path === '/sobre-nos' && 'hidden'" @click="hideHamburger()" data-test="mobile-nav-deskmats">Sobre Nós</router-link>
 
 				<!-- Divisor -->
