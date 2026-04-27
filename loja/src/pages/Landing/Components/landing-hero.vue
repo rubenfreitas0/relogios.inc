@@ -32,7 +32,7 @@ import watchImage from '/products/keyboards/relogio2.png'
 					design atemporal que se adapta a qualquer ocasião.
 				</p>
 				<ButtonSolid
-					:to="{ name: 'keyboards', params: { id: 2 } }"
+					:to="{ name: 'homens', params: { id: 2 } }"
 					content="ver relógio"
 					color="light"
 					add="font-bold mb-20"

@@ -20,7 +20,7 @@ const filterData: Record<
 		colors: { name: string; hex: string }[]
 	}
 > = {
-	keyboards: {
+	homens: {
 		label: 'Homens',
 		subtitle: 'Elegância e precisão para ele.',
 		brands: [
@@ -58,7 +58,7 @@ const filterData: Record<
 			{ name: 'Branco', hex: '#f0f0f0' },
 		],
 	},
-	keycaps: {
+	mulheres: {
 		label: 'Mulheres',
 		subtitle: 'Sofisticação em cada detalhe.',
 		brands: [
@@ -95,7 +95,7 @@ const filterData: Record<
 			{ name: 'Rose', hex: '#e8a0a0' },
 		],
 	},
-	deskmats: {
+	unisexo: {
 		label: 'Unisexo',
 		subtitle: 'Para quem não segue regras.',
 		brands: [
@@ -134,7 +134,7 @@ const filterData: Record<
 	},
 }
 
-const meta = computed(() => filterData[props.category] ?? filterData.keyboards)
+const meta = computed(() => filterData[props.category] ?? filterData.homens)
 
 // ── Active filters ────────────────────────────────────────────────
 const selectedBrands = ref<string[]>([])
@@ -211,27 +211,30 @@ const hasActiveFilters = computed(
 </script>
 
 <template>
-	<div class="flex min-h-screen flex-col" style="background:#f0ede8">
+	<div class="flex min-h-screen flex-col bg-k-black">
 		<Navigation color="k-black" />
 
 		<!-- ── Hero Banner ─────────────────────────────────────────── -->
-		<header style="background:#1a1a1a">
-			<div class="mx-auto flex max-w-6xl items-end gap-6 px-6 py-12">
-				<div>
-					<p
-						class="mb-2 text-[0.6rem] font-bold uppercase tracking-[0.22em] text-[#FFC700]"
-					>
-						Coleção
-					</p>
-					<h1
-						class="text-5xl font-black uppercase leading-none tracking-tight text-white"
-					>
-						{{ meta.label }}
-					</h1>
-					<p class="mt-3 text-sm text-white/40">{{ meta.subtitle }}</p>
+		<header class="bg-k-black border-b border-white/5">
+			<div class="mx-auto flex max-w-6xl items-end gap-6 px-6 py-14">
+				<div class="flex items-start gap-5">
+					<div class="mt-1.5 h-14 w-[3px] flex-shrink-0 rounded-full bg-[#FFC700]"></div>
+					<div>
+						<p
+							class="mb-2 text-[0.6rem] font-bold uppercase tracking-[0.22em] text-[#FFC700]"
+						>
+							Coleção
+						</p>
+						<h1
+							class="text-5xl font-black uppercase leading-none tracking-tight text-white"
+						>
+							{{ meta.label }}
+						</h1>
+						<p class="mt-3 text-sm text-white/50">{{ meta.subtitle }}</p>
+					</div>
 				</div>
 				<div
-					class="ml-auto hidden items-center gap-2 text-xs text-zinc-500 md:flex"
+					class="ml-auto hidden items-center gap-2 text-xs text-white/40 md:flex"
 				>
 					<span
 						>{{ filteredProducts.length }} relógio{{
@@ -249,7 +252,7 @@ const hasActiveFilters = computed(
 				<!-- Clear filters -->
 				<div class="flex items-center justify-between">
 					<p
-						class="text-[0.6rem] font-bold uppercase tracking-[0.2em] text-zinc-500"
+						class="text-[0.6rem] font-bold uppercase tracking-[0.2em] text-white/40"
 					>
 						Filtros
 					</p>
@@ -263,9 +266,9 @@ const hasActiveFilters = computed(
 				</div>
 
 				<!-- Marca -->
-				<div class="border-zinc-300/50 border-t pt-5">
+				<div class="border-white/10 border-t pt-5">
 					<p
-						class="mb-3 text-[0.6rem] font-bold uppercase tracking-[0.18em] text-zinc-700"
+						class="mb-3 text-[0.6rem] font-bold uppercase tracking-[0.18em] text-[#FFC700]"
 					>
 						Marca
 					</p>
@@ -279,11 +282,11 @@ const hasActiveFilters = computed(
 									class="hidden"
 								/>
 								<span
-									class="flex h-4 w-4 flex-shrink-0 items-center justify-center rounded border transition-all duration-150"
+									class="flex h-4 w-4 flex-shrink-0 items-center justify-center rounded border transition-all duration-300"
 									:class="
 										selectedBrands.includes(brand)
 											? 'border-[#FFC700] bg-[#FFC700]'
-											: 'border-zinc-400 group-hover:border-zinc-700'
+											: 'border-white/20 group-hover:border-[#FFC700]'
 									"
 								>
 									<svg
@@ -302,11 +305,11 @@ const hasActiveFilters = computed(
 									</svg>
 								</span>
 								<span
-									class="text-sm transition-colors"
+									class="text-sm transition-colors duration-300"
 									:class="
 										selectedBrands.includes(brand)
-											? 'font-semibold text-zinc-900'
-											: 'text-zinc-500 group-hover:text-zinc-800'
+											? 'font-semibold text-white'
+											: 'text-white/60 group-hover:text-[#FFC700]'
 									"
 								>
 									{{ brand }}
@@ -317,9 +320,9 @@ const hasActiveFilters = computed(
 				</div>
 
 				<!-- Gama de Preço -->
-				<div class="border-zinc-300/50 border-t pt-5">
+				<div class="border-white/10 border-t pt-5">
 					<p
-						class="mb-3 text-[0.6rem] font-bold uppercase tracking-[0.18em] text-zinc-700"
+						class="mb-3 text-[0.6rem] font-bold uppercase tracking-[0.18em] text-[#FFC700]"
 					>
 						Gama de Preço
 					</p>
@@ -334,19 +337,19 @@ const hasActiveFilters = computed(
 								class="group flex w-full items-center gap-2.5 text-left"
 							>
 								<span
-									class="h-4 w-4 flex-shrink-0 rounded-full border transition-all duration-150"
+									class="h-4 w-4 flex-shrink-0 rounded-full border transition-all duration-300"
 									:class="
 										selectedPriceRange?.min === range.min
 											? 'border-[#FFC700] bg-[#FFC700]'
-											: 'border-zinc-400 group-hover:border-zinc-700'
+											: 'border-white/20 group-hover:border-[#FFC700]'
 									"
 								></span>
 								<span
-									class="text-sm transition-colors"
+									class="text-sm transition-colors duration-300"
 									:class="
 										selectedPriceRange?.min === range.min
-											? 'font-semibold text-zinc-900'
-											: 'text-zinc-500 group-hover:text-zinc-800'
+											? 'font-semibold text-white'
+											: 'text-white/60 group-hover:text-[#FFC700]'
 									"
 								>
 									{{ range.label }}
@@ -357,9 +360,9 @@ const hasActiveFilters = computed(
 				</div>
 
 				<!-- Cores -->
-				<div class="border-zinc-300/50 border-t pt-5">
+				<div class="border-white/10 border-t pt-5">
 					<p
-						class="mb-3 text-[0.6rem] font-bold uppercase tracking-[0.18em] text-zinc-700"
+						class="mb-3 text-[0.6rem] font-bold uppercase tracking-[0.18em] text-[#FFC700]"
 					>
 						Cores
 					</p>
@@ -369,26 +372,26 @@ const hasActiveFilters = computed(
 							:key="color.name"
 							:title="color.name"
 							@click="toggleColor(color.name)"
-							class="relative h-7 w-7 rounded-full border-2 transition-all duration-150 hover:scale-110"
+							class="relative h-7 w-7 rounded-full border-2 transition-all duration-300 hover:scale-110"
 							:class="
 								selectedColors.includes(color.name)
 									? 'scale-110 border-[#FFC700]'
-									: 'border-zinc-300 hover:border-zinc-500'
+									: 'border-white/15 hover:border-[#FFC700]'
 							"
 							:style="{ backgroundColor: color.hex }"
 						>
 							<span
 								v-if="selectedColors.includes(color.name)"
-								class="absolute inset-0 rounded-full ring-2 ring-[#FFC700] ring-offset-1 ring-offset-[#f0ede8]"
+								class="absolute inset-0 rounded-full ring-2 ring-[#FFC700] ring-offset-1 ring-offset-k-black"
 							></span>
 						</button>
 					</div>
 				</div>
 
 				<!-- Tipo de Relógio -->
-				<div class="border-zinc-300/50 border-t pt-5">
+				<div class="border-white/10 border-t pt-5">
 					<p
-						class="mb-3 text-[0.6rem] font-bold uppercase tracking-[0.18em] text-zinc-700"
+						class="mb-3 text-[0.6rem] font-bold uppercase tracking-[0.18em] text-[#FFC700]"
 					>
 						Tipo de Relógio
 					</p>
@@ -402,11 +405,11 @@ const hasActiveFilters = computed(
 									class="hidden"
 								/>
 								<span
-									class="flex h-4 w-4 flex-shrink-0 items-center justify-center rounded border transition-all duration-150"
+									class="flex h-4 w-4 flex-shrink-0 items-center justify-center rounded border transition-all duration-300"
 									:class="
 										selectedTypes.includes(type)
 											? 'border-[#FFC700] bg-[#FFC700]'
-											: 'border-zinc-400 group-hover:border-zinc-700'
+											: 'border-white/20 group-hover:border-[#FFC700]'
 									"
 								>
 									<svg
@@ -425,11 +428,11 @@ const hasActiveFilters = computed(
 									</svg>
 								</span>
 								<span
-									class="text-sm transition-colors"
+									class="text-sm transition-colors duration-300"
 									:class="
 										selectedTypes.includes(type)
-											? 'font-semibold text-zinc-900'
-											: 'text-zinc-500 group-hover:text-zinc-800'
+											? 'font-semibold text-white'
+											: 'text-white/60 group-hover:text-[#FFC700]'
 									"
 								>
 									{{ type }}
@@ -440,9 +443,9 @@ const hasActiveFilters = computed(
 				</div>
 
 				<!-- Mecanismo -->
-				<div class="border-zinc-300/50 border-t pt-5">
+				<div class="border-white/10 border-t pt-5">
 					<p
-						class="mb-3 text-[0.6rem] font-bold uppercase tracking-[0.18em] text-zinc-700"
+						class="mb-3 text-[0.6rem] font-bold uppercase tracking-[0.18em] text-[#FFC700]"
 					>
 						Mecanismo
 					</p>
@@ -456,11 +459,11 @@ const hasActiveFilters = computed(
 									class="hidden"
 								/>
 								<span
-									class="flex h-4 w-4 flex-shrink-0 items-center justify-center rounded border transition-all duration-150"
+									class="flex h-4 w-4 flex-shrink-0 items-center justify-center rounded border transition-all duration-300"
 									:class="
 										selectedKinds.includes(kind)
 											? 'border-[#FFC700] bg-[#FFC700]'
-											: 'border-zinc-400 group-hover:border-zinc-700'
+											: 'border-white/20 group-hover:border-[#FFC700]'
 									"
 								>
 									<svg
@@ -479,11 +482,11 @@ const hasActiveFilters = computed(
 									</svg>
 								</span>
 								<span
-									class="text-sm transition-colors"
+									class="text-sm transition-colors duration-300"
 									:class="
 										selectedKinds.includes(kind)
-											? 'font-semibold text-zinc-900'
-											: 'text-zinc-500 group-hover:text-zinc-800'
+											? 'font-semibold text-white'
+											: 'text-white/60 group-hover:text-[#FFC700]'
 									"
 								>
 									{{ kind }}
@@ -516,12 +519,12 @@ const hasActiveFilters = computed(
 							<span
 								v-for="type in selectedTypes"
 								:key="'t-' + type"
-								class="flex items-center gap-1.5 rounded-full border border-zinc-300 bg-white px-3 py-1 text-xs font-semibold text-zinc-700"
+								class="flex items-center gap-1.5 rounded-full border border-white/15 bg-white/5 px-3 py-1 text-xs font-semibold text-white/70"
 							>
 								{{ type }}
 								<button
 									@click="toggleType(type)"
-									class="transition-colors hover:text-white"
+									class="transition-colors hover:text-[#FFC700]"
 								>
 									×
 								</button>
@@ -529,24 +532,24 @@ const hasActiveFilters = computed(
 							<span
 								v-for="kind in selectedKinds"
 								:key="'k-' + kind"
-								class="flex items-center gap-1.5 rounded-full border border-zinc-300 bg-white px-3 py-1 text-xs font-semibold text-zinc-700"
+								class="flex items-center gap-1.5 rounded-full border border-white/15 bg-white/5 px-3 py-1 text-xs font-semibold text-white/70"
 							>
 								{{ kind }}
 								<button
 									@click="toggleKind(kind)"
-									class="transition-colors hover:text-white"
+									class="transition-colors hover:text-[#FFC700]"
 								>
 									×
 								</button>
 							</span>
 							<span
 								v-if="selectedPriceRange"
-								class="flex items-center gap-1.5 rounded-full border border-zinc-300 bg-white px-3 py-1 text-xs font-semibold text-zinc-700"
+								class="flex items-center gap-1.5 rounded-full border border-white/15 bg-white/5 px-3 py-1 text-xs font-semibold text-white/70"
 							>
 								{{ selectedPriceRange.label }}
 								<button
 									@click="setPriceRange(null)"
-									class="transition-colors hover:text-white"
+									class="transition-colors hover:text-[#FFC700]"
 								>
 									×
 								</button>
@@ -554,20 +557,20 @@ const hasActiveFilters = computed(
 							<span
 								v-for="color in selectedColors"
 								:key="'c-' + color"
-								class="flex items-center gap-1.5 rounded-full border border-zinc-300 bg-white px-3 py-1 text-xs font-semibold text-zinc-700"
+								class="flex items-center gap-1.5 rounded-full border border-white/15 bg-white/5 px-3 py-1 text-xs font-semibold text-white/70"
 							>
 								{{ color }}
 								<button
 									@click="toggleColor(color)"
-									class="transition-colors hover:text-white"
+									class="transition-colors hover:text-[#FFC700]"
 								>
 									×
 								</button>
 							</span>
 						</template>
-						<span v-else class="text-xs text-zinc-400">Sem filtros ativos</span>
+						<span v-else class="text-xs text-white/25">Sem filtros ativos</span>
 					</div>
-					<span class="flex-shrink-0 text-xs text-zinc-400">
+					<span class="flex-shrink-0 text-xs text-white/40">
 						{{ filteredProducts.length }} resultado{{
 							filteredProducts.length !== 1 ? 's' : ''
 						}}
@@ -594,7 +597,7 @@ const hasActiveFilters = computed(
 					class="flex flex-col items-center justify-center py-32 text-center"
 				>
 					<svg
-						class="text-zinc-300 mb-4 h-12 w-12"
+						class="text-white/15 mb-4 h-12 w-12"
 						fill="none"
 						viewBox="0 0 24 24"
 						stroke="currentColor"
@@ -607,11 +610,11 @@ const hasActiveFilters = computed(
 						/>
 					</svg>
 					<p
-						class="text-sm font-semibold uppercase tracking-wider text-zinc-500"
+						class="text-sm font-semibold uppercase tracking-wider text-white/40"
 					>
 						Sem resultados
 					</p>
-					<p class="mt-1 text-xs text-zinc-400">
+					<p class="mt-1 text-xs text-white/30">
 						Experimenta ajustar os filtros
 					</p>
 					<button
@@ -622,7 +625,6 @@ const hasActiveFilters = computed(
 					</button>
 				</div>
 
-				<!-- Pagination -->
 				<div
 					v-if="totalPages > 1"
 					class="mt-12 flex items-center justify-center gap-2"
@@ -630,7 +632,7 @@ const hasActiveFilters = computed(
 					<button
 						@click="currentPage--"
 						:disabled="currentPage === 1"
-						class="flex h-9 w-9 items-center justify-center rounded-lg border border-zinc-300 bg-white text-zinc-400 transition-all duration-150 hover:border-zinc-700 hover:text-zinc-700 disabled:cursor-not-allowed disabled:opacity-25"
+						class="flex h-9 w-9 items-center justify-center rounded-lg border border-white/15 text-white/40 transition-all duration-300 hover:border-[#FFC700] hover:text-[#FFC700] disabled:cursor-not-allowed disabled:opacity-25 disabled:hover:border-white/15 disabled:hover:text-white/40"
 					>
 						<svg
 							class="h-4 w-4"
@@ -651,11 +653,11 @@ const hasActiveFilters = computed(
 						v-for="page in totalPages"
 						:key="page"
 						@click="currentPage = page"
-						class="h-9 w-9 rounded-lg text-sm font-bold transition-all duration-150"
+						class="h-9 w-9 rounded-lg text-sm font-bold transition-all duration-300"
 						:class="
 							currentPage === page
-								? 'bg-zinc-900 text-white'
-								: 'border border-zinc-300 bg-white text-zinc-400 hover:border-zinc-700 hover:text-zinc-700'
+								? 'bg-[#FFC700] text-black'
+								: 'border border-white/15 text-white/40 hover:border-[#FFC700] hover:text-[#FFC700]'
 						"
 					>
 						{{ page }}
@@ -664,7 +666,7 @@ const hasActiveFilters = computed(
 					<button
 						@click="currentPage++"
 						:disabled="currentPage === totalPages"
-						class="flex h-9 w-9 items-center justify-center rounded-lg border border-zinc-300 bg-white text-zinc-400 transition-all duration-150 hover:border-zinc-700 hover:text-zinc-700 disabled:cursor-not-allowed disabled:opacity-25"
+						class="flex h-9 w-9 items-center justify-center rounded-lg border border-white/15 text-white/40 transition-all duration-300 hover:border-[#FFC700] hover:text-[#FFC700] disabled:cursor-not-allowed disabled:opacity-25 disabled:hover:border-white/15 disabled:hover:text-white/40"
 					>
 						<svg
 							class="h-4 w-4"

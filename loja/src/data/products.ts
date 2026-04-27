@@ -1,10 +1,10 @@
 import { catalog } from './product-types'
 
 export const products: catalog = {
-	keyboards: [
+	homens: [
 		{
 			id: 0,
-			category: 'keyboards',
+			category: 'homens',
 			src: '/products/keyboards/pulsar-show.webp',
 			topSrc: '/products/keyboards/pulsar-left.webp',
 			botSrc: '/products/keyboards/pulsar-right.webp',
@@ -27,7 +27,7 @@ export const products: catalog = {
 		},
 		{
 			id: 1,
-			category: 'keyboards',
+			category: 'homens',
 			src: '/products/keyboards/keeb4-show.webp',
 			topSrc: '/products/keyboards/cow-buttons.webp',
 			botSrc: '/products/keyboards/cow-back.webp',
@@ -48,7 +48,7 @@ export const products: catalog = {
 		},
 		{
 			id: 2,
-			category: 'keyboards',
+			category: 'homens',
 			src: '/products/keyboards/keeb1-show.webp',
 			topSrc: '/products/keyboards/mx-detail.webp',
 			botSrc: '/products/keyboards/mx-button.webp',
@@ -68,10 +68,10 @@ export const products: catalog = {
 			price: 599,
 		},
 	],
-	keycaps: [
+	mulheres: [
 		{
 			id: 0,
-			category: 'keycaps',
+			category: 'mulheres',
 			src: '/products/keycaps/cap2-2.webp',
 			topSrc: '/products/keycaps/cap2-3.webp',
 			botSrc: '/products/keycaps/cap2.webp',
@@ -87,7 +87,7 @@ export const products: catalog = {
 		},
 		{
 			id: 1,
-			category: 'keycaps',
+			category: 'mulheres',
 			src: '/products/keycaps/cap1-2.webp',
 			topSrc: '/products/keycaps/cap1-3.webp',
 			botSrc: '/products/keycaps/cap1.webp',
@@ -102,10 +102,10 @@ export const products: catalog = {
 			price: 599,
 		},
 	],
-	deskmats: [
+	unisexo: [
 		{
 			id: 0,
-			category: 'deskmats',
+			category: 'unisexo',
 			src: '/products/deskmats/mat1-show.webp',
 			topSrc: '/products/deskmats/grrr-full.webp',
 			botSrc: '/products/deskmats/grrr-close-alt.webp',
@@ -124,7 +124,7 @@ export const products: catalog = {
 		},
 		{
 			id: 1,
-			category: 'deskmats',
+			category: 'unisexo',
 			src: '/products/deskmats/mat2-show.webp',
 			topSrc: '/products/deskmats/deskmat-chicken.webp',
 			botSrc: '/products/deskmats/deskmat-ox.webp',
