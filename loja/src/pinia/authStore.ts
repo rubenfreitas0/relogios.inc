@@ -1,5 +1,6 @@
 import { defineStore } from 'pinia'
 import { ref } from 'vue'
+import { useCartStore } from './cartStore'
 
 const API_BASE = '/api'
 
@@ -52,6 +53,11 @@ export const useAuthStore = defineStore('auth', () => {
 			}
 			setToken(data.token)
 			user.value = data.user
+			
+			// Sync cart when user logs in
+			const cartStore = useCartStore()
+			await cartStore.syncLocalCartToApi()
+
 			return true
 		} catch {
 			error.value = 'Sem ligação ao servidor. Tenta novamente.'
@@ -91,6 +97,11 @@ export const useAuthStore = defineStore('auth', () => {
 			setToken(data.token)
 			user.value = data.user
 			successMessage.value = data.message ?? 'Conta criada com sucesso!'
+
+			// Sync cart when user registers
+			const cartStore = useCartStore()
+			await cartStore.syncLocalCartToApi()
+
 			return true
 		} catch {
 			error.value = 'Sem ligação ao servidor. Tenta novamente.'
@@ -171,6 +182,11 @@ export const useAuthStore = defineStore('auth', () => {
 			})
 		} finally {
 			clearAuth()
+			
+			// Opcional: Limpar o carrinho local ao fazer logout? 
+			// A maioria das lojas mantém o carrinho anonimo ou limpa-o.
+			const cartStore = useCartStore()
+			cartStore.cart = {}
 		}
 	}
 
@@ -185,6 +201,9 @@ export const useAuthStore = defineStore('auth', () => {
 			})
 			if (res.ok) {
 				user.value = await res.json()
+				// Sincronizar carrinho se viemos de um refresh e já temos token
+				const cartStore = useCartStore()
+				await cartStore.fetchCart()
 			} else {
 				clearAuth()
 			}
