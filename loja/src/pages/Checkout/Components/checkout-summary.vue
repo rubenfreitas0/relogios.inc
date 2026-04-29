@@ -36,30 +36,28 @@ const formStore = useFormStore()
 			</p>
 			<p
 				class="text-lg font-bold text-black"
-				:class="
-					cartStore.cartValue > cartStore.freeShippingThreshold &&
-					'line-through'
-				"
 			>
-				${{ cartStore.shipping }}
+				${{ formStore.selectedShippingPrice }}
 			</p>
 		</div>
 		<div class="flex flex-row justify-between">
 			<p class="font-semibold tracking-wide text-black text-opacity-60">
 				VAT (INCLUDED)
 			</p>
-			<p class="text-lg font-bold text-black">${{ cartStore.getVat }}</p>
+			<p class="text-lg font-bold text-black">${{ ( (cartStore.cartValue + formStore.selectedShippingPrice) * 0.23).toFixed(2) }}</p>
 		</div>
 		<div class="mt-4 flex flex-row justify-between">
 			<p class="font-black tracking-wide text-black">GRAND TOTAL</p>
-			<p class="text-lg font-bold text-black">${{ cartStore.getGrandTotal }}</p>
+			<p class="text-lg font-bold text-black">${{ (cartStore.cartValue + formStore.selectedShippingPrice).toFixed(2) }}</p>
 		</div>
 		<ButtonSolid
 			content="continue & pay"
 			color="light"
 			class="mt-8 self-center font-bold"
+			:disabled="formStore.isSubmitting"
 			@click="formStore.submit()"
 			data-test="checkout-button"
 		/>
 	</div>
 </template>
+

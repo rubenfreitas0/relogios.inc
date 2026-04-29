@@ -1,16 +1,16 @@
 <script setup lang="ts">
 import ButtonSolid from '../../../components/Buttons/button-solid.vue'
-import { useCartStore } from '../../../pinia/cartStore.ts'
 import { useFormStore } from '../../../pinia/formStore'
-import { onBeforeMount, onBeforeUnmount } from 'vue'
+import { onBeforeMount, onBeforeUnmount, computed } from 'vue'
 
-const cartStore = useCartStore()
 const formStore = useFormStore()
 
 const handleClose = () => {
-	cartStore.clearCart()
 	formStore.bannerOff()
 }
+
+const order = computed(() => formStore.lastOrder)
+const firstItem = computed(() => order.value?.items?.[0])
 
 onBeforeMount(() => {
 	if (formStore.showBanner) {
@@ -25,6 +25,7 @@ onBeforeUnmount(() => {
 <template>
 	<Transition>
 		<div
+			v-if="order"
 			class="fixed z-40 flex h-full w-full flex-col items-center backdrop-blur-sm"
 			data-test="checkout-success-modal"
 		>
@@ -60,8 +61,9 @@ onBeforeUnmount(() => {
 					thank you <br />
 					for your order
 				</h2>
+				<p class="mt-2 text-sm font-bold text-k-main uppercase">Order #{{ order.order_number }}</p>
 				<p
-					class="text-md mt-4 font-semibold text-black opacity-60 lg:mt-6 lg:text-lg"
+					class="text-md mt-4 font-semibold text-black opacity-60 lg:mt-4 lg:text-lg"
 				>
 					You will receive an email confirmation shortly.
 				</p>
@@ -71,34 +73,34 @@ onBeforeUnmount(() => {
 					<div
 						class="flex h-full w-full flex-col justify-center bg-k-grey px-4 py-6 lg:basis-4/6"
 					>
-						<div class="flex h-full w-full flex-row items-center">
+						<div v-if="firstItem" class="flex h-full w-full flex-row items-center">
 							<img
 								class="aspect-square h-24"
-								:src="cartStore.getFirstItem.product.src"
+								:src="firstItem.product_image"
 								alt=""
 								loading="lazy"
 							/>
 							<div class="ml-3 flex flex-col items-start justify-center">
 								<p class="text-lg font-bold text-black">
-									{{ cartStore.getFirstItem.product.header }}
+									{{ firstItem.product_name }}
 								</p>
 								<p class="text-lg font-bold text-black opacity-60">
-									${{ cartStore.getFirstItem.product.price }}
+									${{ firstItem.unit_price }}
 								</p>
 							</div>
 							<p
 								class="ml-auto place-self-center text-lg font-bold text-black opacity-60"
 							>
-								x{{ cartStore.getFirstItem.amount }}
+								x{{ firstItem.quantity }}
 							</p>
 						</div>
-						<hr v-if="cartStore.getUniqueItems > 1" />
+						<hr v-if="order.items.length > 1" />
 						<p
-							v-if="cartStore.getUniqueItems > 1"
+							v-if="order.items.length > 1"
 							class="mt-2 text-center font-semibold text-black opacity-70"
 						>
-							and {{ cartStore.getUniqueItems - 1 }} other item<span
-								v-show="cartStore.getUniqueItems > 2"
+							and {{ order.items.length - 1 }} other item<span
+								v-show="order.items.length > 2"
 								>s</span
 							>
 						</p>
@@ -108,12 +110,12 @@ onBeforeUnmount(() => {
 					>
 						<div>
 							<p
-								class="text-md font-semibold uppercase tracking-wide opacity-90"
+								class="text-md font-semibold uppercase tracking-wide opacity-90 text-white"
 							>
 								Grand Total
 							</p>
-							<p class="text-md font-semibold lg:text-lg">
-								$ {{ cartStore.getGrandTotal }}
+							<p class="text-md font-semibold lg:text-lg text-white">
+								$ {{ order.total }}
 							</p>
 						</div>
 					</div>
@@ -130,3 +132,4 @@ onBeforeUnmount(() => {
 		</div>
 	</Transition>
 </template>
+

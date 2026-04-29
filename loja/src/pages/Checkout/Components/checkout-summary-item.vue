@@ -1,8 +1,13 @@
 <script setup lang="ts">
-import { product } from '../../../data/product-types.ts'
+interface CartItemProduct {
+	id: number
+	src?: string
+	header?: string
+	price: number
+}
 
 const props = defineProps<{
-	cartItem: product
+	cartItem: CartItemProduct
 	itemCount: number
 }>()
 </script>
