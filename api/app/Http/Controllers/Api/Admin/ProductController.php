@@ -120,10 +120,21 @@ class ProductController extends Controller
                 }
             }
 
-            // Reordenação de imagen
+            // Reordenação de imagens em bulk (evita N+1 updates)
             if ($request->filled('image_order')) {
+                $cases = [];
+                $ids = [];
                 foreach ($request->image_order as $index => $imageId) {
-                    $product->images()->where('id', $imageId)->update(['sort_order' => $index + 1]);
+                    $id = (int) $imageId;
+                    $sort = $index + 1;
+                    $cases[] = "WHEN {$id} THEN {$sort}";
+                    $ids[] = $id;
+                }
+                
+                if (count($ids) > 0) {
+                    $idsStr = implode(',', $ids);
+                    $casesStr = implode(' ', $cases);
+                    \Illuminate\Support\Facades\DB::update("UPDATE product_images SET sort_order = CASE id {$casesStr} END WHERE id IN ({$idsStr}) AND product_id = ?", [$product->id]);
                 }
             }
 

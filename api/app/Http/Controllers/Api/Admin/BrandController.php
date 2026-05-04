@@ -79,20 +79,14 @@ class BrandController extends Controller
     }
 
     /**
-     * Eliminar marca.
+     * Eliminar (Desativar) marca.
      */
     public function destroy(Brand $brand): JsonResponse
     {
-        if ($brand->products()->exists()) {
-            return response()->json([
-                'message' => 'Não é possível eliminar esta marca porque tem produtos associados.',
-            ], 409);
-        }
+        $brand->update(['is_active' => false]);
 
-        Storage::disk('public')->delete($brand->logo);
-
-        $brand->delete();
-
-        return response()->json(null, 204);
+        return response()->json([
+            'message' => 'Marca desativada com sucesso.'
+        ], 200);
     }
 }

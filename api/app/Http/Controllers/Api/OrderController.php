@@ -132,17 +132,22 @@ class OrderController extends Controller
                 'total'        => round($total, 2),
             ]);
 
-            // Snapshot dos dados do produto
+            // Snapshot dos dados do produto em bulk (evita N+1 inserts)
+            $orderItemsData = [];
             foreach ($cartItems as $item) {
-                $order->orderItems()->create([
+                $orderItemsData[] = [
+                    'order_id'      => $order->id,
                     'product_id'    => $item->product->id,
                     'product_name'  => $item->product->name,
                     'product_image' => $item->product->primaryImage?->url ?? null,
                     'unit_price'    => $item->product->price,
                     'quantity'      => $item->quantity,
                     'item_total'    => round($item->quantity * $item->product->price, 2),
-                ]);
+                    'created_at'    => now(),
+                    'updated_at'    => now(),
+                ];
             }
+            $order->orderItems()->insert($orderItemsData);
 
             $paymentData = null;
             if ($validated['payment_method'] === PaymentMethod::MULTIBANCO->value) {

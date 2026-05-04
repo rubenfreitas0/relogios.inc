@@ -38,16 +38,17 @@ class CartController extends Controller
         $validated = $request->validated();
         $user = $request->user();
 
-        $product = Product::findOrFail($validated['product_id']);
-
-        // Impedimento: Produto não está ativo / disponivel
-        if (!$product->is_active) {
-            return response()->json(['message' => 'Este produto de momento não está à venda.'], 403);
-        }
-
         $requestedQuantity = $validated['quantity'];
 
-        $cartItem = DB::transaction(function () use ($user, $product, $requestedQuantity) {
+        $cartItem = DB::transaction(function () use ($user, $validated, $requestedQuantity) {
+            // Lock no produto para evitar overselling (Race Condition resolvido)
+            $product = Product::lockForUpdate()->findOrFail($validated['product_id']);
+
+            // Impedimento: Produto não está ativo / disponivel
+            if (!$product->is_active) {
+                abort(403, 'Este produto de momento não está à venda.');
+            }
+
             // Lock para evitar duplicação por cliques rápidos
             $cartItem = $user->cartItems()
                 ->where('product_id', $product->id)
@@ -70,6 +71,8 @@ class CartController extends Controller
                 ]);
             }
 
+            $cartItem->setRelation('product', $product);
+
             return $cartItem;
         });
 
@@ -86,22 +89,26 @@ class CartController extends Controller
      */
     public function update(UpdateCartRequest $request, CartItem $cart)
     {
-        $cart->load('product');
-        $cart->product->refresh(); // Garantir stock atualizado da BD
-
         if ($request->user()->id !== $cart->user_id) {
             return response()->json(['message' => 'Acesso negado.'], 403);
         }
 
         $validated = $request->validated();
 
-        if ($validated['quantity'] > $cart->product->stock) {
-            return response()->json([
-                'message' => 'Stock insuficiente para a quantidade desejada.'
-            ], 422);
-        }
+        $cart = DB::transaction(function () use ($cart, $validated) {
+            // Lock no carrinho e no produto para evitar Race Conditions
+            $cart = CartItem::lockForUpdate()->findOrFail($cart->id);
+            $product = Product::lockForUpdate()->findOrFail($cart->product_id);
 
-        $cart->update(['quantity' => $validated['quantity']]);
+            if ($validated['quantity'] > $product->stock) {
+                abort(422, 'Stock insuficiente para a quantidade desejada.');
+            }
+
+            $cart->update(['quantity' => $validated['quantity']]);
+            $cart->setRelation('product', $product);
+
+            return $cart;
+        });
 
         return response()->json([
             'message' => 'Quantidade atualizada no carrinho.',

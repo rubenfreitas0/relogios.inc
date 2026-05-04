@@ -16,7 +16,7 @@ class CategoryController extends Controller
     {
         $categories = Category::active()
             ->orderBy('name')
-            ->get();
+            ->paginate(min(request()->integer('per_page', 15), 100));
 
         return CategoryResource::collection($categories);
     }

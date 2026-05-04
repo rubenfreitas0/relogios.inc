@@ -72,6 +72,14 @@ class CategoryController extends Controller
      */
     public function destroy(Category $category): JsonResponse
     {
+        $protectedSlugs = ['gama-de-preco', 'cor', 'sexo', 'genero'];
+        
+        if (in_array($category->slug, $protectedSlugs)) {
+            return response()->json([
+                'message' => 'Não é possível eliminar categorias de sistema (Gama de preço, Cor, Género, etc).',
+            ], 403);
+        }
+
         if ($category->products()->exists()) {
             return response()->json([
                 'message' => 'Não é possível eliminar esta categoria porque tem produtos associados.',

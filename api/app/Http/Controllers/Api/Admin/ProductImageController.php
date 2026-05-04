@@ -74,8 +74,19 @@ class ProductImageController extends Controller
             'order.*' => 'integer|exists:product_images,id',
         ]);
 
+        $cases = [];
+        $ids = [];
         foreach ($request->order as $index => $imageId) {
-            $product->images()->where('id', $imageId)->update(['sort_order' => $index + 1]);
+            $id = (int) $imageId;
+            $sort = $index + 1;
+            $cases[] = "WHEN {$id} THEN {$sort}";
+            $ids[] = $id;
+        }
+
+        if (count($ids) > 0) {
+            $idsStr = implode(',', $ids);
+            $casesStr = implode(' ', $cases);
+            \Illuminate\Support\Facades\DB::update("UPDATE product_images SET sort_order = CASE id {$casesStr} END WHERE id IN ({$idsStr}) AND product_id = ?", [$product->id]);
         }
 
         return response()->json(['message' => 'Ordem das imagens atualizada.', 'data' => ProductImageResource::collection(

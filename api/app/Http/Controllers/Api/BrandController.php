@@ -17,7 +17,7 @@ class BrandController extends Controller
     {
         $brands = Brand::active()
             ->orderBy('name')
-            ->get();
+            ->paginate(min(request()->integer('per_page', 15), 100));
 
         return BrandResource::collection($brands);
     }

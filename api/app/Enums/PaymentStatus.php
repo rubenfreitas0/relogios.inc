@@ -12,9 +12,9 @@ enum PaymentStatus: string
     public function label(): string
     {
         return match($this) {
-            self::PENDING => 'Aguardando Pagamento',
+            self::PENDING => 'A Aguardar Pagamento',
             self::PAID => 'Pago',
-            self::FAILED => 'Falhou',
+            self::FAILED => 'Falhado',
             self::REFUNDED => 'Reembolsado',
         };
     }
