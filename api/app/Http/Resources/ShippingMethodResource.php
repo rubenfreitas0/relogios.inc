@@ -22,7 +22,12 @@ class ShippingMethodResource extends JsonResource
             'min_weight'     => (float) $this->min_weight,
             'max_weight'     => (float) $this->max_weight,
             'estimated_days' => $this->estimated_days,
-            'is_active'      => (bool) $this->is_active,
+            'is_active'        => (bool) $this->is_active,
+            'shipping_zone_id' => $this->shipping_zone_id,
+            'shipping_zone'    => $this->whenLoaded('shippingZone', fn() => [
+                'id'   => $this->shippingZone->id,
+                'name' => $this->shippingZone->name,
+            ]),
             'created_at'     => $this->created_at,
             'updated_at'     => $this->updated_at,
         ];

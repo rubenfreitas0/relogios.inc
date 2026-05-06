@@ -25,8 +25,6 @@ interface CartState {
 	cart: cart
 	showCart: boolean
 	showQuickAdd: boolean
-	shipping: number
-	freeShippingThreshold: number
 	lastAddedItem: CartProduct | null
 	showToast: boolean
 	toastTimeout: ReturnType<typeof setTimeout> | null
@@ -39,8 +37,6 @@ export const useCartStore = defineStore('cart', {
 		cart: useStorage('cart', {} as cart).value,
 		showCart: false,
 		showQuickAdd: true,
-		shipping: 50,
-		freeShippingThreshold: 1000,
 		
 		lastAddedItem: null,
 		showToast: false,
@@ -263,14 +259,6 @@ export const useCartStore = defineStore('cart', {
 		},
 		getUniqueItems(state: CartState) {
 			return Object.keys(state.cart).length || 0
-		},
-		getGrandTotal(): number {
-			return this.cartValue > this.freeShippingThreshold
-				? this.cartValue
-				: this.cartValue + this.shipping
-		},
-		getVat(): string {
-			return (this.getGrandTotal * 0.2).toFixed(2)
 		},
 		isCartShown(state: CartState) {
 			return state.showCart === true ? true : false

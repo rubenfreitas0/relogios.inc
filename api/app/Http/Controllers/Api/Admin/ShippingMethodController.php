@@ -18,7 +18,7 @@ class ShippingMethodController extends Controller
      */
     public function index(Request $request): AnonymousResourceCollection
     {
-        $methods = ShippingMethod::query()
+        $methods = ShippingMethod::with('shippingZone')
             ->when(
                 $request->filled('search'),
                 fn($q) => $q->where('name', 'LIKE', '%' . $request->search . '%')
@@ -69,6 +69,14 @@ class ShippingMethodController extends Controller
      */
     public function destroy(ShippingMethod $shippingMethod): JsonResponse
     {
+        if ($shippingMethod->orders()->exists()) {
+            $shippingMethod->update(['is_active' => false]);
+
+            return response()->json([
+                'message' => 'Método de envio desativado (tem encomendas associadas e não pode ser eliminado).',
+            ]);
+        }
+
         $shippingMethod->delete();
 
         return response()->json(null, 204);

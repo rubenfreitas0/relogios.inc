@@ -31,7 +31,7 @@ const props = defineProps<{
 		</label>
 		<div class="relative h-full w-full">
 			<input
-				v-model="formStore[props.id]"
+				v-model="(formStore as any)[props.id]"
 				:autocomplete="props.autocomplete"
 				:class="[
 					props.validator === 'false' && 'border-red-500',

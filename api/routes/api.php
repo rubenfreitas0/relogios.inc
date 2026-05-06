@@ -17,6 +17,7 @@ use App\Http\Controllers\Api\Admin\ProductController as AdminProductController;
 
 use App\Http\Controllers\Api\ShippingController;
 use App\Http\Controllers\Api\Admin\ShippingMethodController as AdminShippingMethodController;
+use App\Http\Controllers\Api\Admin\ShippingZoneController as AdminShippingZoneController;
 
 use App\Http\Controllers\Api\PaymentController;
 
@@ -98,6 +99,7 @@ Route::middleware('auth:sanctum')->group(function () {
         Route::apiResource('products', AdminProductController::class);
 
         Route::apiResource('shipping-methods', AdminShippingMethodController::class);
+        Route::apiResource('shipping-zones', AdminShippingZoneController::class);
 
         // Encomendas — admin
         Route::patch('orders/{orderNumber}/status', [AdminOrderController::class, 'updateStatus']);

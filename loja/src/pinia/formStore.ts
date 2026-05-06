@@ -9,6 +9,15 @@ interface ShippingMethod {
 	estimated_days: string | null
 }
 
+interface ShippingData {
+	subtotal: number
+	total_weight: number
+	tax_rate_name: string
+	tax_rate_percent: number
+	tax_amount: number
+	shipping_methods: ShippingMethod[]
+}
+
 interface Order {
 	order_number: string
 	total: number
@@ -36,6 +45,8 @@ interface FormState {
 	apiError: string | null
 	shippingMethods: ShippingMethod[]
 	shipping_method_id: number | null
+	shippingData: ShippingData | null
+	shippingLoading: boolean
 	lastOrder: Order | null
 }
 
@@ -48,7 +59,7 @@ export const useFormStore = defineStore('form', {
 		address: '',
 		zip: '',
 		city: '',
-		country: '',
+		country: 'PT',
 		payment: 'electronic',
 		comment: '',
 		showErrors: false,
@@ -56,6 +67,8 @@ export const useFormStore = defineStore('form', {
 		apiError: null,
 		shippingMethods: [],
 		shipping_method_id: null,
+		shippingData: null,
+		shippingLoading: false,
 		lastOrder: null,
 	}),
 	actions: {
@@ -73,29 +86,76 @@ export const useFormStore = defineStore('form', {
 			e.preventDefault()
 			this.payment = 'electronic'
 		},
-		async fetchShippingMethods() {
+
+		/**
+		 * Busca métodos de envio disponíveis com base no país e código postal.
+		 * Usa o endpoint /api/shipping/calculate que filtra por zona + peso.
+		 */
+		async fetchShippingForCountry(countryCode?: string, postalCode?: string) {
+			const token = localStorage.getItem('auth_token')
+			if (!token) return
+
+			const country = (countryCode || this.country || 'PT').substring(0, 2).toUpperCase()
+			if (country.length !== 2) return
+
+			this.shippingLoading = true
+
 			try {
-				const res = await fetch('/api/shipping')
+				const params = new URLSearchParams({ country })
+				const postal = postalCode || this.zip
+				if (postal) params.append('postal_code', postal)
+
+				const res = await fetch(`/api/shipping/calculate?${params}`, {
+					headers: {
+						Accept: 'application/json',
+						Authorization: `Bearer ${token}`,
+					},
+				})
+
 				if (res.ok) {
-					this.shippingMethods = await res.json()
-					if (this.shippingMethods.length > 0 && !this.shipping_method_id) {
+					const data: ShippingData = await res.json()
+					this.shippingData = data
+					this.shippingMethods = data.shipping_methods
+
+					// Auto-selecionar o mais barato se nenhum está selecionado
+					// ou se o selecionado já não existe nos novos métodos
+					const currentExists = this.shippingMethods.some(m => m.id === this.shipping_method_id)
+					if (this.shippingMethods.length > 0 && (!this.shipping_method_id || !currentExists)) {
 						this.shipping_method_id = this.shippingMethods[0].id
+					} else if (this.shippingMethods.length === 0) {
+						this.shipping_method_id = null
 					}
+				} else {
+					// Carrinho vazio ou país sem métodos
+					this.shippingData = null
+					this.shippingMethods = []
+					this.shipping_method_id = null
 				}
 			} catch (e) {
 				console.error('Erro ao buscar métodos de envio:', e)
+			} finally {
+				this.shippingLoading = false
 			}
 		},
+
+		/**
+		 * @deprecated Usar fetchShippingForCountry() em vez disto.
+		 * Mantido temporariamente para compatibilidade.
+		 */
+		async fetchShippingMethods() {
+			await this.fetchShippingForCountry()
+		},
+
 		async submit() {
 			const cartStore = useCartStore()
 
 			if (cartStore.cartLength === 0) {
-				alert('Shopping cart is empty!')
+				alert('O carrinho está vazio!')
 				return
 			}
 
 			if (!this.shipping_method_id) {
-				alert('Please select a shipping method.')
+				alert('Por favor selecione um método de envio.')
 				return
 			}
 
@@ -132,14 +192,14 @@ export const useFormStore = defineStore('form', {
 				address_line1: this.address,
 				city: this.city,
 				postal_code: this.zip,
-				country: this.country.substring(0, 2).toUpperCase() || 'PT', // country deve ser 2 chars max segundo validação
+				country: this.country.substring(0, 2).toUpperCase() || 'PT',
 				notes: this.comment
 			}
 
 			try {
 				const token = localStorage.getItem('auth_token')
 				if (!token) {
-					alert('Please login to complete the checkout.')
+					alert('Por favor faça login para completar a compra.')
 					this.isSubmitting = false
 					return
 				}
@@ -163,12 +223,12 @@ export const useFormStore = defineStore('form', {
 					cartStore.clearCart() // limpar o carrinho localmente pois já foi limpo no backend na order
 				} else {
 					console.error('Validation errors:', data)
-					this.apiError = data.message || 'Error processing your order.'
+					this.apiError = data.message || 'Erro ao processar a encomenda.'
 					alert(this.apiError)
 				}
 			} catch (error) {
 				console.error('Network error:', error)
-				this.apiError = 'Could not connect to the server.'
+				this.apiError = 'Não foi possível conectar ao servidor.'
 				alert(this.apiError)
 			} finally {
 				this.isSubmitting = false
@@ -200,7 +260,7 @@ export const useFormStore = defineStore('form', {
 		},
 		isValidAddress(state: FormState) {
 			if (state.address === '') return 'empty'
-			return /[\w',-\\/.\s]/.test(state.address) === true ? 'true' : 'false'
+			return /[\w',-\\/.\\s]/.test(state.address) === true ? 'true' : 'false'
 		},
 		isValidZip(state: FormState) {
 			if (state.zip === '') return 'empty'
@@ -214,11 +274,20 @@ export const useFormStore = defineStore('form', {
 		},
 		isValidCountry(state: FormState) {
 			if (state.country === '') return 'empty'
-			return /[a-zA-Z\s]+/.test(state.country) === true ? 'true' : 'false'
+			return /^[a-zA-Z]{2}$/.test(state.country) === true ? 'true' : 'false'
 		},
 		selectedShippingPrice(state: FormState): number {
 			const method = state.shippingMethods.find((m) => m.id === state.shipping_method_id)
 			return method ? Number(method.price) : 0
+		},
+		taxAmount(state: FormState): number {
+			return state.shippingData?.tax_amount ?? 0
+		},
+		taxRatePercent(state: FormState): number {
+			return state.shippingData?.tax_rate_percent ?? 0
+		},
+		taxRateName(state: FormState): string {
+			return state.shippingData?.tax_rate_name ?? 'IVA'
 		},
 	},
 })

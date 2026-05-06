@@ -10,6 +10,8 @@ use App\Http\Requests\Order\CheckoutRequest;
 use App\Http\Resources\OrderResource;
 use App\Models\Order;
 use App\Models\ShippingMethod;
+use App\Models\ShippingZone;
+use App\Models\ShippingZoneCountry;
 use App\Models\TaxRate;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
@@ -72,10 +74,35 @@ class OrderController extends Controller
 
         $shippingData = $this->resolveShippingData($user, $validated);
 
-        $subtotal     = $cartItems->sum(fn($item) => $item->quantity * $item->product->price);
+        $subtotal     = 0;
+        $totalWeight  = 0;
+        foreach ($cartItems as $item) {
+            $subtotal    += $item->quantity * $item->product->price;
+            $totalWeight += ($item->product->weight ?? 0) * $item->quantity;
+        }
+
         $shippingCost = (float) $shippingMethod->price;
 
+        // Validar que o método pertence à zona do país de destino (com distinção Ilhas para PT)
         $countryCode = strtoupper($shippingData['country'] ?? 'PT');
+        $postalCode  = $shippingData['postal_code'] ?? null;
+        $expectedZoneId = $this->resolveZoneId($countryCode, $postalCode);
+
+        if ($shippingMethod->shipping_zone_id !== null
+            && $expectedZoneId !== null
+            && $shippingMethod->shipping_zone_id !== $expectedZoneId) {
+            return response()->json([
+                'message' => 'O método de envio selecionado não está disponível para o país de destino.',
+            ], 422);
+        }
+
+        // Validar que o peso total está dentro dos limites do método
+        if (! $shippingMethod->supportsWeight($totalWeight)) {
+            return response()->json([
+                'message' => 'O peso total da encomenda não é compatível com o método de envio selecionado.',
+            ], 422);
+        }
+
         $taxRateModel = TaxRate::where('country_code', $countryCode)
             ->where('is_active', true)
             ->first();
@@ -123,6 +150,7 @@ class OrderController extends Controller
                 'shipping_method_id'   => $shippingMethod->id,
                 'shipping_carrier'     => $shippingMethod->carrier,
                 'estimated_days'       => $shippingMethod->estimated_days,
+                'weight'               => round($totalWeight, 3),
 
                 'nif'          => $validated['nif'] ?? null,
                 'subtotal'     => round($subtotal, 2),
@@ -216,6 +244,27 @@ class OrderController extends Controller
             'postal_code'  => $validated['postal_code'],
             'country'      => $validated['country'] ?? 'PT',
         ];
+    }
+
+    /**
+     * Resolve a zona de envio com base no país e código postal.
+     * Para PT, distingue Continente vs Ilhas (Açores/Madeira) pelo prefixo do código postal (9xxx).
+     */
+    private function resolveZoneId(string $countryCode, ?string $postalCode): ?int
+    {
+        if ($countryCode === 'PT' && $postalCode && str_starts_with(trim($postalCode), '9')) {
+            $islandsZone = ShippingZone::where('name', 'Ilhas (Açores e Madeira)')
+                ->where('is_active', true)
+                ->first();
+
+            if ($islandsZone) {
+                return $islandsZone->id;
+            }
+        }
+
+        $zoneCountry = ShippingZoneCountry::where('country_code', $countryCode)->first();
+
+        return $zoneCountry?->shipping_zone_id;
     }
 
 }

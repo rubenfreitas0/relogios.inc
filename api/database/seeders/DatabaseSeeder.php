@@ -28,6 +28,9 @@ class DatabaseSeeder extends Seeder
             OrderItemsSeeder::class,
             PaymentsSeeder::class,
             CartItemsSeeder::class,
+            ShippingZoneSeeder::class,
+            TaxRateSeeder::class,
+            ShippingMethodSeeder::class,
         ]);
     }
 }

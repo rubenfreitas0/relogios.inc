@@ -1,13 +1,30 @@
 <script setup lang="ts">
-import { onMounted } from 'vue'
+import { onMounted, watch } from 'vue'
 import TextInputField from './text-input-field.vue'
 import { useFormStore } from '../../../pinia/formStore.ts'
 
 const formStore = useFormStore()
 
+// Buscar métodos de envio ao montar (com o país default PT)
 onMounted(() => {
-	formStore.fetchShippingMethods()
+	formStore.fetchShippingForCountry()
 })
+
+// Recalcular shipping quando o país ou código postal mudam
+let debounceTimer: ReturnType<typeof setTimeout> | null = null
+
+watch(
+	() => [formStore.country, formStore.zip],
+	() => {
+		if (debounceTimer) clearTimeout(debounceTimer)
+		debounceTimer = setTimeout(() => {
+			const country = formStore.country.substring(0, 2).toUpperCase()
+			if (country.length === 2) {
+				formStore.fetchShippingForCountry(country, formStore.zip)
+			}
+		}, 500)
+	}
+)
 </script>
 <template>
 	<form
@@ -17,13 +34,13 @@ onMounted(() => {
 		<h1 class="text-3xl font-bold uppercase text-black">Checkout</h1>
 		
 		<div v-if="formStore.apiError" class="mt-4 p-4 bg-red-100 border border-red-400 text-red-700 rounded relative" role="alert">
-			<strong class="font-bold">Error: </strong>
+			<strong class="font-bold">Erro: </strong>
 			<span class="block sm:inline">{{ formStore.apiError }}</span>
 		</div>
 
 		<div class="mt-10">
 			<p class="mb-2 font-bold uppercase tracking-wider text-k-main">
-				Billing details
+				Dados de Faturação
 			</p>
 			<div
 				class="flex w-full flex-col items-center gap-4 lg:grid lg:grid-cols-2"
@@ -32,9 +49,9 @@ onMounted(() => {
 					type="text"
 					:validator="formStore.isValidName"
 					id="name"
-					label="Name"
-					placeholder="Alex Keebs"
-					error-message="Characters only."
+					label="Nome"
+					placeholder="João Silva"
+					error-message="Apenas caracteres."
 					autocomplete="off"
 					:required="true"
 				/>
@@ -43,9 +60,9 @@ onMounted(() => {
 					type="email"
 					:validator="formStore.isValidEmail"
 					id="email"
-					label="Email Address"
-					placeholder="alex@mail.com"
-					error-message="Must be a valid email address."
+					label="Email"
+					placeholder="joao@email.com"
+					error-message="Email inválido."
 					autocomplete="off"
 					:required="true"
 				/>
@@ -54,9 +71,9 @@ onMounted(() => {
 					type="tel"
 					:validator="formStore.isValidPhone"
 					id="phone"
-					label="Phone Number"
-					placeholder="+1000-555-0136"
-					error-message="Numbers and '+-' only."
+					label="Telefone"
+					placeholder="+351 912 345 678"
+					error-message="Apenas números e '+-'."
 					autocomplete="off"
 				/>
 			</div>
@@ -64,7 +81,7 @@ onMounted(() => {
 
 		<div class="mt-10">
 			<p class="mb-2 font-bold uppercase tracking-wider text-k-main">
-				Shipping Info
+				Dados de Envio
 			</p>
 			<div
 				class="flex w-full flex-col items-center gap-4 lg:grid lg:grid-cols-2"
@@ -73,10 +90,10 @@ onMounted(() => {
 					type="text"
 					:validator="formStore.isValidAddress"
 					id="address"
-					label="Address"
+					label="Morada"
 					container-class="col-span-2"
-					placeholder="1134 Willams Avenue"
-					error-message="Only characters and ',-/. allowed."
+					placeholder="Rua das Flores, 123"
+					error-message="Apenas caracteres e ',-/.' permitidos."
 					autocomplete="off"
 					:required="true"
 				/>
@@ -85,11 +102,11 @@ onMounted(() => {
 					type="text"
 					:validator="formStore.isValidZip"
 					id="zip"
-					label="Zip Code"
-					placeholder="10001"
-					error-message="Only 5 digit numbers allowed."
+					label="Código Postal"
+					placeholder="1000-001"
+					error-message="Código postal inválido."
 					autocomplete="off"
-					max-length="5"
+					max-length="8"
 					:required="true"
 				/>
 
@@ -97,9 +114,9 @@ onMounted(() => {
 					type="text"
 					:validator="formStore.isValidCity"
 					id="city"
-					label="City"
-					placeholder="New York"
-					error-message="Must contain non-special characters."
+					label="Cidade"
+					placeholder="Lisboa"
+					error-message="Apenas caracteres."
 					autocomplete="off"
 					:required="true"
 				/>
@@ -108,9 +125,9 @@ onMounted(() => {
 					type="text"
 					:validator="formStore.isValidCountry"
 					id="country"
-					label="Country (ISO 2-chars, e.g. PT)"
+					label="País (código ISO, ex: PT)"
 					placeholder="PT"
-					error-message="Must be a 2-character country code."
+					error-message="Código de 2 letras (ex: PT, ES, DE)."
 					autocomplete="off"
 					max-length="2"
 					:required="true"
@@ -120,11 +137,14 @@ onMounted(() => {
 
 		<div class="mt-10">
 			<p class="mb-2 font-bold uppercase tracking-wider text-k-main">
-				Shipping Method
+				Método de Envio
 			</p>
 			<div class="flex w-full flex-col gap-4 lg:grid lg:grid-cols-2">
-				<div v-if="formStore.shippingMethods.length === 0" class="col-span-2 text-gray-500 italic">
-					Loading shipping methods...
+				<div v-if="formStore.shippingLoading" class="col-span-2 text-gray-500 italic">
+					A carregar métodos de envio...
+				</div>
+				<div v-else-if="formStore.shippingMethods.length === 0" class="col-span-2 text-gray-500 italic">
+					Nenhum método de envio disponível para este destino.
 				</div>
 				<button
 					v-for="method in formStore.shippingMethods"
@@ -140,7 +160,8 @@ onMounted(() => {
 					></div>
 					<div class="flex flex-col items-start">
 						<span class="font-semibold text-black">{{ method.name }}</span>
-						<span class="text-xs text-gray-600">{{ method.carrier }} - ${{ method.price }}</span>
+						<span class="text-xs text-gray-600">{{ method.carrier }} — €{{ Number(method.price).toFixed(2) }}</span>
+						<span v-if="method.estimated_days" class="text-xs text-gray-400">{{ method.estimated_days }}</span>
 					</div>
 				</button>
 			</div>
@@ -148,9 +169,9 @@ onMounted(() => {
 
 		<div class="mt-10">
 			<p class="mb-2 font-bold uppercase tracking-wider text-k-main">
-				Payment Details
+				Pagamento
 			</p>
-			<p class="mb-1 font-bold text-black">Payment Method</p>
+			<p class="mb-1 font-bold text-black">Método de Pagamento</p>
 			<div class="flex w-full flex-col gap-4 lg:grid lg:grid-cols-2">
 				<button
 					type="button"
@@ -163,7 +184,7 @@ onMounted(() => {
 						class="aspect-square h-3 rounded-full border border-black border-opacity-60"
 						:class="{ 'bg-black': !formStore.choseCash }"
 					></div>
-					<span class="font-semibold text-black"> e-Money </span>
+					<span class="font-semibold text-black"> Cartão de Crédito </span>
 				</button>
 				<button
 					type="button"
@@ -176,17 +197,17 @@ onMounted(() => {
 						class="aspect-square h-3 rounded-full border border-black border-opacity-60"
 						:class="{ 'bg-black': formStore.choseCash }"
 					></div>
-					<span class="font-semibold text-black"> Cash on Delivery </span>
+					<span class="font-semibold text-black"> Multibanco </span>
 				</button>
 
 				<div class="col-span-2 flex h-40 flex-col">
 					<label class="mb-1 mt-4 font-bold text-black" for="comment"
-						>Add a comment</label
+						>Comentário</label
 					>
 					<textarea
 						class="h-full rounded border border-black border-opacity-60 bg-white p-3 font-Manrope font-semibold text-black outline-none hover:border-k-main"
 						id="comment"
-						placeholder="Your request"
+						placeholder="A sua mensagem"
 						v-model="formStore.comment"
 						data-test="form-text-area"
 					/>
@@ -195,4 +216,3 @@ onMounted(() => {
 		</div>
 	</form>
 </template>
-

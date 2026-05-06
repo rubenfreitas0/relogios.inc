@@ -13,7 +13,7 @@ const formStore = useFormStore()
 		class="col-span-1 flex h-fit max-h-full w-full flex-col rounded bg-white px-6 py-12 lg:self-start lg:px-10"
 		data-test="checkout-summary"
 	>
-		<h1 class="text-2xl font-bold uppercase text-black">Summary</h1>
+		<h1 class="text-2xl font-bold uppercase text-black">Resumo</h1>
 		<div
 			class="my-10 flex h-full w-full flex-col gap-5 overflow-x-hidden overflow-y-scroll"
 		>
@@ -26,32 +26,30 @@ const formStore = useFormStore()
 		</div>
 		<div class="flex flex-row justify-between">
 			<p class="font-semibold tracking-wide text-black text-opacity-60">
-				TOTAL
+				SUBTOTAL
 			</p>
-			<p class="text-lg font-bold text-black">${{ cartStore.cartValue }}</p>
+			<p class="text-lg font-bold text-black">€{{ cartStore.cartValue.toFixed(2) }}</p>
 		</div>
 		<div class="flex flex-row justify-between">
 			<p class="font-semibold tracking-wide text-black text-opacity-60">
-				SHIPPING
+				ENVIO
 			</p>
-			<p
-				class="text-lg font-bold text-black"
-			>
-				${{ formStore.selectedShippingPrice }}
+			<p class="text-lg font-bold text-black">
+				€{{ formStore.selectedShippingPrice.toFixed(2) }}
 			</p>
 		</div>
 		<div class="flex flex-row justify-between">
 			<p class="font-semibold tracking-wide text-black text-opacity-60">
-				VAT (INCLUDED)
+				{{ formStore.taxRateName }} ({{ formStore.taxRatePercent }}%)
 			</p>
-			<p class="text-lg font-bold text-black">${{ ( (cartStore.cartValue + formStore.selectedShippingPrice) * 0.23).toFixed(2) }}</p>
+			<p class="text-lg font-bold text-black">€{{ formStore.taxAmount.toFixed(2) }}</p>
 		</div>
 		<div class="mt-4 flex flex-row justify-between">
-			<p class="font-black tracking-wide text-black">GRAND TOTAL</p>
-			<p class="text-lg font-bold text-black">${{ (cartStore.cartValue + formStore.selectedShippingPrice).toFixed(2) }}</p>
+			<p class="font-black tracking-wide text-black">TOTAL</p>
+			<p class="text-lg font-bold text-black">€{{ (cartStore.cartValue + formStore.selectedShippingPrice + formStore.taxAmount).toFixed(2) }}</p>
 		</div>
 		<ButtonSolid
-			content="continue & pay"
+			content="Confirmar e Pagar"
 			color="light"
 			class="mt-8 self-center font-bold"
 			:disabled="formStore.isSubmitting"
@@ -60,4 +58,3 @@ const formStore = useFormStore()
 		/>
 	</div>
 </template>
-

@@ -23,6 +23,7 @@ class StoreShippingMethodRequest extends FormRequest
     public function rules(): array
     {
         return [
+            'shipping_zone_id' => ['nullable', 'integer', 'exists:shipping_zones,id'],
             'name'           => ['required', 'string', 'max:100'],
             'carrier'        => ['required', 'string', 'max:50'],
             'price'          => ['required', 'numeric', 'min:0'],
