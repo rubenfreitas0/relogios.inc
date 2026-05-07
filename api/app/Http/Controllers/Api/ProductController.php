@@ -105,4 +105,24 @@ class ProductController extends Controller
 
         return new ProductResource($product);
     }
+
+    /**
+     * Obter Produtos Relacionados (mesma categoria)
+     */
+    public function related($slug)
+    {
+        $product = Product::where('slug', $slug)
+            ->where('is_active', true)
+            ->firstOrFail();
+
+        $related = Product::where('is_active', true)
+            ->where('category_id', $product->category_id)
+            ->where('id', '!=', $product->id)
+            ->with(['brand', 'category', 'primaryImage'])
+            ->inRandomOrder()
+            ->take(4)
+            ->get();
+
+        return ProductResource::collection($related);
+    }
 }

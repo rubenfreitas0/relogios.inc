@@ -15,6 +15,16 @@ class CategoriesSeeder extends Seeder
      */
     public function run(): void
     {
-        Category::factory()->count(5)->create();
+        $categories = [
+            ['name' => 'Automáticos', 'slug' => 'automaticos', 'is_active' => true],
+            ['name' => 'Cronógrafos', 'slug' => 'cronografos', 'is_active' => true],
+            ['name' => 'Mergulho', 'slug' => 'mergulho', 'is_active' => true],
+            ['name' => 'Desporto', 'slug' => 'desporto', 'is_active' => true],
+            ['name' => 'Clássicos', 'slug' => 'classicos', 'is_active' => true],
+        ];
+
+        foreach ($categories as $category) {
+            Category::create($category);
+        }
     }
 }

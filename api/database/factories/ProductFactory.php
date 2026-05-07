@@ -20,8 +20,8 @@ class ProductFactory extends Factory
     public function definition(): array
     {
         return [
-            'brand_id' => Brand::factory(),
-            'category_id' => Category::factory(),
+            'brand_id' => Brand::inRandomOrder()->first()->id ?? 1,
+            'category_id' => Category::inRandomOrder()->first()->id ?? 1,
             'gender' => fake()->randomElement(['masculino', 'feminino', 'unisexo']),
             'name' => fake()->words(3, true),
             'slug' => fake()->slug(),
@@ -29,6 +29,7 @@ class ProductFactory extends Factory
             'description' => fake()->paragraph(),
             'price' => fake()->numberBetween(100, 10000),
             'stock' => fake()->numberBetween(1, 100),
+            'weight' => fake()->randomFloat(3, 0.1, 5),
             'is_active' => true,
             'is_featured' => false,
         ];
