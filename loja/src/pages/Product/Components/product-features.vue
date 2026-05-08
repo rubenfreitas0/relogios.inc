@@ -1,9 +1,7 @@
 <script setup lang="ts">
-import { contents } from '../../../data/product-types.ts'
-
 const props = defineProps<{
 	features: string
-	inthebox: contents[]
+	inthebox: any[]
 }>()
 </script>
 <template>

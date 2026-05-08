@@ -1,9 +1,9 @@
 <script setup lang="ts">
 interface CartItemProduct {
 	id: number
-	src?: string
-	header?: string
-	price: number
+	name?: string
+	primary_image?: { url: string }
+	price: number | string
 }
 
 const props = defineProps<{
@@ -20,16 +20,16 @@ const props = defineProps<{
 		<div class="basis-1/4 justify-self-start overflow-hidden rounded-lg">
 			<img
 				class="aspect-square h-fit w-fit object-cover shadow-md"
-				:src="props.cartItem.src"
-				alt=""
+				:src="props.cartItem.primary_image?.url || '/images/placeholder.png'"
+				:alt="props.cartItem.name"
 			/>
 		</div>
 		<div class="flex basis-2/4 flex-col items-start">
 			<p class="text-start text-lg font-bold text-k-black">
-				{{ props.cartItem.header }}
+				{{ props.cartItem.name }}
 			</p>
 			<p class="text-md text-start font-bold text-k-black opacity-80">
-				$ {{ props.cartItem.price }}
+				€ {{ Number(props.cartItem.price).toFixed(2).replace('.', ',') }}
 			</p>
 		</div>
 

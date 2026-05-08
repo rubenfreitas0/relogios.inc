@@ -1,13 +1,13 @@
 <script setup lang="ts">
 import ButtonSolid from '../../../components/Buttons/button-solid.vue'
 import ButtonGoBack from '../../../components/Buttons/button-go-back.vue'
-import { product } from '../../../data/product-types.ts'
+import type { Product } from '../../../data/product-types.ts'
 import { useCartStore } from '../../../pinia/cartStore.ts'
 
 const cartStore = useCartStore()
 
 const props = defineProps<{
-	item: product
+	item: Product
 }>()
 </script>
 
@@ -20,21 +20,21 @@ const props = defineProps<{
 			class="flex flex-col items-center pb-6 lg:col-span-1 lg:col-start-2 lg:row-span-full lg:ml-24 lg:items-start lg:justify-center"
 		>
 			<p
-				v-if="props.item.nu"
+				v-if="props.item.is_featured"
 				class="lg:text-md text-sm uppercase tracking-broad text-black"
 			>
-				new product
+				hot product
 			</p>
 			<h1
 				class="mt-4 text-center text-4xl font-semibold uppercase text-black lg:text-start lg:text-6xl"
 			>
-				{{ props.item.header }} <br class="hidden lg:inline" />
-				{{ props.item.subheader }}
+				{{ props.item.brand?.name || 'Marca' }} <br class="hidden lg:inline" />
+				{{ props.item.name }}
 			</h1>
-			<p class="mt-6 text-center text-black opacity-60 lg:pr-20 lg:text-start">
-				{{ props.item.text }}
+			<p class="mt-6 text-center text-black opacity-60 lg:pr-20 lg:text-start whitespace-pre-line">
+				{{ props.item.description || props.item.short_description }}
 			</p>
-			<p class="my-8 text-xl font-bold text-black">$ {{ props.item.price }}</p>
+			<p class="my-8 text-xl font-bold text-black">€ {{ Number(props.item.price).toFixed(2).replace('.', ',') }}</p>
 			<ButtonSolid
 				@click="cartStore.addToCart(props.item)"
 				color="light"
@@ -48,8 +48,8 @@ const props = defineProps<{
 			<img
 				loading="lazy"
 				class="relative aspect-square object-cover"
-				:src="props.item.src"
-				alt=""
+				:src="props.item.primary_image?.url || '/images/placeholder.png'"
+				:alt="props.item.name"
 			/>
 		</div>
 	</section>

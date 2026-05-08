@@ -10,8 +10,7 @@ import {
 	resetPasswordPageMeta,
 } from './meta'
 import { meta } from './meta-types'
-import { capitalize } from '../utils/utilities'
-import { product } from './product-types.ts'
+import type { Product } from './product-types.ts'
 
 export function getLandingPageMeta(): meta {
 	return landingPageMeta
@@ -21,16 +20,15 @@ export function getCategoryPageMeta(category: string): meta {
 	return categoryPageMeta[category]
 }
 
-export function getProductPageMeta(product: product): meta {
+export function getProductPageMeta(product: Product): meta {
 	return {
 		title:
-			product.header +
+			(product.brand?.name || 'Relógio') +
 			' ' +
-			capitalize(product.category.slice(0, -1)) +
-			' ' +
-			'| RELOGIOS.inc',
-		description: product.text,
-		image: product.src,
+			product.name +
+			' | RELOGIOS.inc',
+		description: product.short_description || product.description || '',
+		image: product.primary_image?.url || '',
 	}
 }
 

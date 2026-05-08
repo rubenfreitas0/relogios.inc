@@ -1,12 +1,12 @@
 <script setup lang="ts">
 import ButtonCount from '../Buttons/button-count.vue'
-import { product } from '../../data/product-types.ts'
+import type { Product } from '../../data/product-types.ts'
 import { useCartStore } from '../../pinia/cartStore.ts'
 
 const cartStore = useCartStore()
 
 const props = defineProps<{
-	cartItem: product
+	cartItem: Product
 	itemCount: number
 }>()
 </script>
@@ -19,15 +19,15 @@ const props = defineProps<{
 		<div class="flex h-full w-full flex-row gap-6">
 			<img
 				class="aspect-square w-20 rounded-lg object-cover shadow-md lg:w-24"
-				:src="props.cartItem.src"
-				alt=""
+				:src="props.cartItem.primary_image?.url || '/images/placeholder.png'"
+				:alt="props.cartItem.name"
 			/>
 			<div class="flex flex-col justify-center">
 				<p class="text-lg font-bold text-k-black lg:text-xl">
-					{{ props.cartItem.header }}
+					{{ props.cartItem.name }}
 				</p>
 				<p class="lg:text-md text-sm font-bold text-k-black opacity-80">
-					$ {{ props.cartItem.price }}
+					€ {{ Number(props.cartItem.price).toFixed(2).replace('.', ',') }}
 				</p>
 			</div>
 		</div>

@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { product } from '../../../data/product-types.ts'
+import type { Product } from '../../../data/product-types.ts'
 import { useCartStore } from '../../../pinia/cartStore.ts'
 
 import ButtonSolid from '../../../components/Buttons/button-solid.vue'
@@ -8,7 +8,7 @@ const cartStore = useCartStore()
 
 const props = defineProps<{
 	category: string
-	item: product
+	item: Product
 }>()
 
 const formatPrice = (price?: number) => {
@@ -23,57 +23,53 @@ const formatPrice = (price?: number) => {
 	<div class="group relative flex flex-col transition-all duration-300">
 		<!-- Image Container -->
 		<router-link
-			:to="{ name: props.category, params: { id: props.item.id } }"
+			:to="`/${props.category}/${props.item.slug}`"
 			class="relative block aspect-[4/5] w-full overflow-hidden rounded-xl bg-k-dark-grey transition-all duration-500 group-hover:shadow-lg group-hover:shadow-[#FFC700]/10"
 		>
 			<div
-				v-if="props.item.nu"
+				v-if="props.item.is_featured"
 				class="absolute left-3 top-3 z-10 rounded bg-[#FFC700] px-3 py-1.5 text-xs font-bold uppercase tracking-widest text-black shadow-sm"
 			>
-				New
+				Hot
 			</div>
 			<img
 				loading="lazy"
 				class="h-full w-full object-cover opacity-90 transition-opacity duration-300 group-hover:opacity-100"
-				:src="props.item.src"
-				:alt="props.item.header"
+				:src="props.item.primary_image?.url || '/images/placeholder.png'"
+				:alt="props.item.name"
 			/>
 		</router-link>
 
 		<!-- Content Container -->
 		<div class="flex flex-1 flex-col pt-5">
 			<!-- Tags -->
-			<div v-if="props.item.tags && props.item.tags.length > 0" class="mb-3 flex flex-wrap gap-1.5">
+			<div v-if="props.item.is_active" class="mb-3 flex flex-wrap gap-1.5">
 				<span 
-					v-for="tag in props.item.tags" 
-					:key="tag"
 					class="px-2 py-0.5 rounded-sm bg-white/5 text-[0.65rem] font-bold uppercase tracking-wider text-white/50"
 				>
-					{{ tag }}
+					{{ props.item.gender }}
 				</span>
 			</div>
             
-			<router-link :to="{ name: props.category, params: { id: props.item.id } }" class="mb-2 block">
+			<router-link :to="`/${props.category}/${props.item.slug}`" class="mb-2 block">
 				<h2 class="text-xs font-bold uppercase tracking-widest text-[#FFC700]">
-					{{ props.item.header }}
+					{{ props.item.brand?.name || 'Marca' }}
 				</h2>
 				<h3 class="mt-1 text-[1.1rem] font-bold text-white leading-tight transition-colors duration-300 group-hover:text-[#FFC700]">
-					{{ props.item.subheader }}
+					{{ props.item.name }}
 				</h3>
 			</router-link>
             
             <!-- Truncated description -->
             <p class="mt-2 text-[0.9rem] text-white/50 line-clamp-2 mb-6 flex-1 font-normal leading-relaxed">
-                {{ props.item.text }}
+                {{ props.item.short_description || props.item.description || 'Sem descrição' }}
             </p>
 
             <div class="mt-auto flex items-center justify-between pt-2">
 				<div class="flex flex-col">
-					<span v-if="props.item.oldPrice" class="text-xs font-semibold text-white/40 line-through decoration-white/20">
-						{{ formatPrice(props.item.oldPrice) }}
-					</span>
-                	<span class="text-xl font-bold tracking-tight transition-colors duration-300 group-hover:text-[#FFC700]" :class="props.item.oldPrice ? 'text-red-500' : 'text-white'">
-						{{ formatPrice(props.item.price) }}
+					<!-- Removido o oldPrice por agora já que a API ainda não suporta -->
+                	<span class="text-xl font-bold tracking-tight text-white transition-colors duration-300 group-hover:text-[#FFC700]">
+						{{ formatPrice(Number(props.item.price)) }}
 					</span>
 				</div>
 				
@@ -92,7 +88,7 @@ const formatPrice = (price?: number) => {
             <!-- Mobile View Product -->
             <div class="mt-4 md:hidden">
                 <ButtonSolid
-					:to="{ name: props.category, params: { id: props.item.id } }"
+					:to="`/${props.category}/${props.item.slug}`"
 					color="dark"
                     content="VER RELÓGIO"
                     size="small"

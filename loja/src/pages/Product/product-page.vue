@@ -7,31 +7,47 @@ import Info from '../../components/info-section.vue'
 import Footer from '../../components/footer-global.vue'
 import Features from './Components/product-features.vue'
 
-import { getProduct } from '../../data/product-utils.ts'
-import { computed } from 'vue'
+import { useCatalogStore } from '../../pinia/catalogStore'
+import type { Product } from '../../data/product-types'
+import { ref, onMounted, watch } from 'vue'
 
 const props = defineProps<{
 	category: string
-	productId: number
+	productSlug: string
 }>()
 
-let item = computed(() => {
-	return getProduct(props.category, props.productId)
+const catalogStore = useCatalogStore()
+const item = ref<Product | null>(null)
+
+const loadProduct = async () => {
+	item.value = await catalogStore.fetchProductDetail(props.productSlug)
+}
+
+onMounted(() => {
+	loadProduct()
+})
+
+watch(() => props.productSlug, () => {
+	loadProduct()
 })
 </script>
 
 <template>
-	<main class="flex h-full w-screen flex-col items-center bg-white">
+	<main v-if="item" class="flex h-full w-screen flex-col items-center bg-white">
 		<Navigation color="black" />
-		<Core :item="item!" />
-		<Features :features="item!.features" :inthebox="item!.inthebox" />
+		<Core :item="item" />
+		<!-- Funcionalidades ainda não suportadas na API, passando default values ou nulos -->
+		<Features :features="item.features || 'Design premium com acabamentos em aço inoxidável.'" :inthebox="item.inthebox || []" />
 		<Grid
-			:topSrc="item!.topSrc"
-			:botSrc="item!.botSrc"
-			:rightSrc="item!.rightSrc"
+			:topSrc="item.images?.[1]?.url || item.primary_image?.url || ''"
+			:botSrc="item.images?.[2]?.url || item.primary_image?.url || ''"
+			:rightSrc="item.images?.[3]?.url || item.primary_image?.url || ''"
 		/>
-		<Ymal :productCategory="category" :productId="productId" />
+		<Ymal :productSlug="item.slug" />
 		<Info />
 		<Footer />
 	</main>
+	<div v-else class="flex h-screen w-screen items-center justify-center bg-white text-black">
+		<p>A carregar produto...</p>
+	</div>
 </template>

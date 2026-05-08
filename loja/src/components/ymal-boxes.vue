@@ -1,18 +1,26 @@
 <script setup lang="ts">
-import { product } from '../data/product-types.ts'
-import { getSelection } from '../data/product-utils.ts'
-import { onBeforeMount } from 'vue'
+import type { Product } from '../data/product-types.ts'
+import { useCatalogStore } from '../pinia/catalogStore.ts'
+import { onMounted, ref, watch } from 'vue'
 import ButtonSolid from '../components/Buttons/button-solid.vue'
 
 const props = defineProps<{
-	productCategory: string
-	productId: number
+	productSlug: string
 }>()
 
-let items: product[] = []
+const items = ref<Product[]>([])
+const catalogStore = useCatalogStore()
 
-onBeforeMount(() => {
-	items = getSelection(props.productCategory, props.productId)
+const loadRelated = async () => {
+	items.value = await catalogStore.fetchRelatedProducts(props.productSlug)
+}
+
+onMounted(() => {
+	loadRelated()
+})
+
+watch(() => props.productSlug, () => {
+	loadRelated()
 })
 </script>
 
@@ -22,7 +30,8 @@ onBeforeMount(() => {
 			You may also like
 		</h2>
 		<div
-			class="flex flex-col items-center gap-12 lg:grid lg:grid-cols-3 lg:grid-rows-1 lg:gap-6"
+			v-if="items.length > 0"
+			class="flex flex-col items-center gap-12 lg:grid lg:grid-cols-4 lg:grid-rows-1 lg:gap-6 w-full"
 		>
 			<div
 				class="flex flex-col items-center justify-between gap-8 lg:gap-10"
@@ -30,22 +39,25 @@ onBeforeMount(() => {
 				:key="index"
 			>
 				<router-link
-					:to="{ name: item.category, params: { id: item.id } }"
-					class="overflow-hidden rounded"
+					:to="`/${item.category?.slug || 'homens'}/${item.slug}`"
+					class="overflow-hidden rounded aspect-[4/5] w-full"
 				>
-					<img class="object-center" :src="item.src" alt="" loading="lazy" />
+					<img class="object-cover w-full h-full" :src="item.primary_image?.url || '/images/placeholder.png'" :alt="item.name" loading="lazy" />
 				</router-link>
 				<h3 class="text-center font-Manrope text-2xl font-semibold text-black">
-					{{ item.header }} <br class="hidden lg:inline" />
-					<span class="capitalize"> {{ item.subheader }}</span>
+					{{ item.brand?.name || 'Marca' }} <br class="hidden lg:inline" />
+					<span class="capitalize"> {{ item.name }}</span>
 				</h3>
 				<ButtonSolid
-					:to="{ name: item.category, params: { id: item.id } }"
+					:to="`/${item.category?.slug || 'homens'}/${item.slug}`"
 					color="light"
 					content="see product"
 					size="small"
 				/>
 			</div>
+		</div>
+		<div v-else class="text-black/50">
+			A procurar produtos semelhantes...
 		</div>
 	</section>
 </template>

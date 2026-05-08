@@ -1,14 +1,12 @@
 import { defineStore } from 'pinia'
-import type { product } from '../data/product-types.ts'
+import type { Product } from '../data/product-types.ts'
 import { useStorage } from '@vueuse/core'
 
-interface CartProduct extends Partial<product> {
+interface CartProduct extends Omit<Partial<Product>, 'primary_image'> {
 	id: number
-	category?: string
-	src?: string
-	header?: string
-	subheader?: string
-	price: number
+	name?: string
+	primary_image?: { url: string } | any
+	price: number | string
 }
 
 interface cartItem {
@@ -77,10 +75,8 @@ export const useCartStore = defineStore('cart', {
 							amount: item.quantity,
 							product: {
 								id: item.product.id,
-								category: 'api',
-								src: item.product.image || '',
-								header: item.product.name,
-								subheader: item.product.slug,
+								name: item.product.name,
+								primary_image: { url: item.product.image || '' },
 								price: item.product.price,
 							},
 						}
@@ -118,7 +114,7 @@ export const useCartStore = defineStore('cart', {
 		},
 
 		async addToCart(item: CartProduct) {
-			const itemKey = item.category && item.category !== 'api' ? (item.category + item.id + '') : ('api_' + item.id)
+			const itemKey = 'api_' + item.id
 			const token = localStorage.getItem('auth_token')
 
 			if (itemKey in this.cart) {
@@ -162,7 +158,7 @@ export const useCartStore = defineStore('cart', {
 		},
 
 		async removeFromCart(item: CartProduct) {
-			const itemKey = item.category && item.category !== 'api' ? (item.category + item.id + '') : ('api_' + item.id)
+			const itemKey = 'api_' + item.id
 			const cartItem = this.cart[itemKey]
 			const token = localStorage.getItem('auth_token')
 
@@ -230,7 +226,7 @@ export const useCartStore = defineStore('cart', {
 		cartValue(state: CartState) {
 			let total = 0
 			for (const id of Object.keys(state.cart)) {
-				total += state.cart[id].amount * state.cart[id].product.price
+				total += state.cart[id].amount * Number(state.cart[id].product.price)
 			}
 			return total
 		},

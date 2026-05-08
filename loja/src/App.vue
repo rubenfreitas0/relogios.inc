@@ -15,14 +15,14 @@ const cartStore = useCartStore()
             >
                 <div class="h-12 w-12 flex-shrink-0 overflow-hidden rounded-md bg-gray-50">
                     <img 
-                        :src="cartStore.lastAddedItem.src" 
-                        :alt="cartStore.lastAddedItem.header"
+                        :src="cartStore.lastAddedItem.primary_image?.url || '/images/placeholder.png'" 
+                        :alt="cartStore.lastAddedItem.name"
                         class="h-full w-full object-cover"
                     />
                 </div>
                 <div class="flex flex-col pr-4">
                     <p class="text-xs font-bold uppercase tracking-widest text-green-500">Adicionado</p>
-                    <p class="text-sm font-semibold text-black">{{ cartStore.lastAddedItem.header }} {{ cartStore.lastAddedItem.subheader }}</p>
+                    <p class="text-sm font-semibold text-black">{{ cartStore.lastAddedItem.name }}</p>
                 </div>
                 <button @click="cartStore.showToast = false" class="absolute top-2 right-2 text-gray-400 hover:text-black">
                     <svg class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">

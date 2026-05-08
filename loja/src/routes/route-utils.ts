@@ -1,13 +1,7 @@
 import { RouteLocationNormalized, NavigationGuardNext } from 'vue-router'
 import { useSeoMeta } from '@unhead/vue'
-import { getProduct } from '../data/product-utils.ts'
 import { meta } from '../data/meta-types'
-import { getCategoryPageMeta, getProductPageMeta } from '../data/meta-utils'
-
-function parseRouteId(id: string | string[]): number {
-	if (Array.isArray(id)) return parseInt(id[0])
-	return parseInt(id)
-}
+import { getCategoryPageMeta } from '../data/meta-utils'
 
 export function handleRouteMeta(metaFunc: () => meta): void {
 	const metaData = metaFunc()
@@ -40,33 +34,20 @@ export function categoryRoute(category: string) {
 
 export function productRoute(category: string) {
 	return {
-		path: `/${category}/:id`,
+		path: `/${category}/:slug`,
 		name: category,
 		component: () => import('../pages/Product/product-page.vue'),
-		// eslint-disable-next-line
 		props: (route: any) => ({
 			category: category,
-			productId: parseInt(route.params.id),
+			productSlug: route.params.slug,
 		}),
 		beforeEnter: (
-			to: RouteLocationNormalized,
-			_: RouteLocationNormalized,
+			_to: RouteLocationNormalized,
+			_from: RouteLocationNormalized,
 			next: NavigationGuardNext,
 		) => {
-			const product = getProduct(category, parseRouteId(to.params.id))
-			if (!product) {
-				next('/404')
-			} else {
-				const meta = getProductPageMeta(product)
-				useSeoMeta({
-					title: meta.title,
-					description: meta.description,
-					ogTitle: meta.title,
-					ogDescription: meta.description,
-					ogImage: meta.image,
-				})
-				next()
-			}
+			// A validação e metadados serão geridos pelo componente product-page.vue após carregar da API
+			next()
 		},
 	}
 }
