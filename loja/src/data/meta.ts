@@ -74,3 +74,9 @@ export const resetPasswordPageMeta: meta = {
 	description: 'Define uma nova password para a tua conta RELOGIOS.inc.',
 	image: bannerImage,
 }
+
+export const accountPageMeta: meta = {
+	title: 'A Minha Conta | RELOGIOS.inc',
+	description: 'Gere o teu perfil, consulta as tuas encomendas e administra as tuas moradas de envio.',
+	image: bannerImage,
+}

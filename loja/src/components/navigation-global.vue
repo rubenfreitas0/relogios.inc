@@ -242,6 +242,17 @@ const megaMenus: Record<string, {
 								<p class="text-white/40 text-xs mt-0.5 truncate">{{ authStore.user.email }}</p>
 							</div>
 							<div class="p-1.5">
+								<router-link
+									to="/conta"
+									@click="userMenuOpen = false"
+									class="w-full flex items-center gap-2.5 px-3 py-2 text-sm text-white/60 hover:text-[#FFC700] hover:bg-[#FFC700]/5 rounded-lg transition duration-200"
+									data-test="nav-account"
+								>
+									<svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+										<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" />
+									</svg>
+									A Minha Conta
+								</router-link>
 								<button
 									@click="handleLogout"
 									class="w-full flex items-center gap-2.5 px-3 py-2 text-sm text-white/60 hover:text-red-400 hover:bg-red-500/10 rounded-lg transition duration-200"
@@ -435,6 +446,7 @@ const megaMenus: Record<string, {
 						</div>
 						<p class="text-white/60 text-xs">{{ authStore.user.firstname }} {{ authStore.user.lastname }}</p>
 					</div>
+					<router-link to="/conta" class="uppercase text-[#FFC700]/80 hover:text-[#FFC700] transition duration-300" @click="hideHamburger()" data-test="mobile-nav-account">A Minha Conta</router-link>
 					<button @click="handleLogout(); hideHamburger()" class="uppercase text-red-400/80 hover:text-red-400 transition duration-300" data-test="mobile-nav-logout">Terminar Sessão</button>
 				</template>
 				<template v-else>

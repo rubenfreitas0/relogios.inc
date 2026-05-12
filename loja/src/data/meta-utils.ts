@@ -8,6 +8,7 @@ import {
 	registerPageMeta,
 	forgotPasswordPageMeta,
 	resetPasswordPageMeta,
+	accountPageMeta,
 } from './meta'
 import { meta } from './meta-types'
 import type { Product } from './product-types.ts'
@@ -58,4 +59,8 @@ export function getForgotPasswordPageMeta(): meta {
 
 export function getResetPasswordPageMeta(): meta {
 	return resetPasswordPageMeta
+}
+
+export function getAccountPageMeta(): meta {
+	return accountPageMeta
 }

@@ -10,6 +10,7 @@ import {
 	getRegisterPageMeta,
 	getForgotPasswordPageMeta,
 	getResetPasswordPageMeta,
+	getAccountPageMeta,
 } from '../data/meta-utils'
 
 const routes = [
@@ -25,16 +26,6 @@ const routes = [
 		beforeEnter: () => handleRouteMeta(getCheckoutPageMeta),
 	},
 	{
-		path: '/404',
-		component: () => import('../pages/404/404-page.vue'),
-		beforeEnter: () => handleRouteMeta(get404PageMeta),
-	},
-	{
-		path: '/:pathMatch(.*)',
-		component: () => import('../pages/404/404-page.vue'),
-		beforeEnter: () => handleRouteMeta(get404PageMeta),
-	},
-	{
 		path: '/sobre-nos',
 		name: 'About',
 		component: () => import('../pages/About/about-page.vue'),
@@ -46,6 +37,45 @@ const routes = [
 	productRoute('homens'),
 	productRoute('mulheres'),
 	productRoute('unisexo'),
+	{
+		path: '/conta',
+		component: () => import('../pages/Account/account-page.vue'),
+		beforeEnter: (_to: any, _from: any, next: any) => {
+			handleRouteMeta(getAccountPageMeta)
+			const token = localStorage.getItem('auth_token')
+			if (!token) {
+				next('/login')
+			} else {
+				next()
+			}
+		},
+		children: [
+			{
+				path: '',
+				redirect: '/conta/perfil',
+			},
+			{
+				path: 'perfil',
+				name: 'AccountProfile',
+				component: () => import('../pages/Account/Components/AccountProfileTab.vue'),
+			},
+			{
+				path: 'encomendas',
+				name: 'AccountOrders',
+				component: () => import('../pages/Account/Components/AccountOrdersTab.vue'),
+			},
+			{
+				path: 'encomendas/:orderNumber',
+				name: 'AccountOrderDetail',
+				component: () => import('../pages/Account/Components/AccountOrderDetailTab.vue'),
+			},
+			{
+				path: 'moradas',
+				name: 'AccountAddresses',
+				component: () => import('../pages/Account/Components/AccountAddressesTab.vue'),
+			},
+		],
+	},
 	{
 		path: '/login',
 		name: 'Login',
@@ -69,6 +99,16 @@ const routes = [
 		name: 'ResetPassword',
 		component: () => import('../pages/Auth/reset-password-page.vue'),
 		beforeEnter: () => handleRouteMeta(getResetPasswordPageMeta),
+	},
+	{
+		path: '/404',
+		component: () => import('../pages/404/404-page.vue'),
+		beforeEnter: () => handleRouteMeta(get404PageMeta),
+	},
+	{
+		path: '/:pathMatch(.*)',
+		component: () => import('../pages/404/404-page.vue'),
+		beforeEnter: () => handleRouteMeta(get404PageMeta),
 	},
 ]
 
