@@ -1,14 +1,61 @@
 <script setup lang="ts">
-import { onMounted, watch } from 'vue'
+import { onMounted, watch, ref } from 'vue'
 import TextInputField from './text-input-field.vue'
 import { useFormStore } from '../../../pinia/formStore.ts'
+import { useAccountStore, type Address } from '../../../pinia/accountStore.ts'
 
 const formStore = useFormStore()
+const accountStore = useAccountStore()
 
-// Buscar métodos de envio ao montar (com o país default PT)
-onMounted(() => {
+const selectedAddressId = ref<number | null>(null)
+const isLoggedIn = ref(false)
+
+onMounted(async () => {
 	formStore.fetchShippingForCountry()
+
+	// Se o user está autenticado, buscar moradas guardadas
+	const token = localStorage.getItem('auth_token')
+	if (token) {
+		isLoggedIn.value = true
+		await accountStore.fetchAddresses()
+
+		// Auto-selecionar a morada default se existir
+		const defaultAddr = accountStore.addresses.find(a => a.is_default)
+		if (defaultAddr) {
+			applyAddress(defaultAddr)
+		}
+	}
 })
+
+function applyAddress(addr: Address) {
+	selectedAddressId.value = addr.id
+	formStore.name = `${addr.firstname} ${addr.lastname}`
+	formStore.phone = addr.phone || ''
+	formStore.address = addr.address_line1 + (addr.address_line2 ? `, ${addr.address_line2}` : '')
+	formStore.zip = addr.postal_code
+	formStore.city = addr.city
+	formStore.country = addr.country
+}
+
+function clearSelection() {
+	selectedAddressId.value = null
+	formStore.name = ''
+	formStore.phone = ''
+	formStore.address = ''
+	formStore.zip = ''
+	formStore.city = ''
+	formStore.country = 'PT'
+}
+
+function onSelectAddress(event: Event) {
+	const id = Number((event.target as HTMLSelectElement).value)
+	if (id === 0) {
+		clearSelection()
+		return
+	}
+	const addr = accountStore.addresses.find(a => a.id === id)
+	if (addr) applyAddress(addr)
+}
 
 // Recalcular shipping quando o país ou código postal mudam
 let debounceTimer: ReturnType<typeof setTimeout> | null = null
@@ -80,9 +127,40 @@ watch(
 		</div>
 
 		<div class="mt-10">
-			<p class="mb-2 font-bold uppercase tracking-wider text-k-main">
-				Dados de Envio
-			</p>
+			<div class="mb-4 flex items-center justify-between">
+				<p class="font-bold uppercase tracking-wider text-k-main">
+					Dados de Envio
+				</p>
+			</div>
+
+			<!-- Seletor de moradas guardadas -->
+			<div
+				v-if="isLoggedIn && accountStore.addresses.length > 0"
+				class="mb-5 rounded-lg border-2 border-dashed border-k-main/30 bg-k-main/5 p-4"
+			>
+				<div class="flex items-center gap-2 mb-3">
+					<svg class="h-4 w-4 text-k-main" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+						<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z" />
+						<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 11a3 3 0 11-6 0 3 3 0 016 0z" />
+					</svg>
+					<span class="text-xs font-bold uppercase tracking-wider text-k-main">Moradas Guardadas</span>
+				</div>
+				<select
+					:value="selectedAddressId || 0"
+					@change="onSelectAddress"
+					class="w-full rounded-lg border border-black/20 bg-white px-4 py-3 font-Manrope text-sm font-semibold text-black outline-none transition-colors hover:border-k-main focus:border-k-main cursor-pointer"
+				>
+					<option :value="0">✏️ Introduzir morada manualmente</option>
+					<option
+						v-for="addr in accountStore.addresses"
+						:key="addr.id"
+						:value="addr.id"
+					>
+						{{ addr.is_default ? '⭐ ' : '' }}{{ addr.firstname }} {{ addr.lastname }} — {{ addr.address_line1 }}, {{ addr.postal_code }} {{ addr.city }}
+					</option>
+				</select>
+			</div>
+
 			<div
 				class="flex w-full flex-col items-center gap-4 lg:grid lg:grid-cols-2"
 			>
@@ -216,3 +294,4 @@ watch(
 		</div>
 	</form>
 </template>
+

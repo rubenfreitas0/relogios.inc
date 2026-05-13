@@ -1,17 +1,11 @@
 <!-- setup language -->
 <script setup lang="ts">
-type namedLocation = {
-	name?: string
-	path?: string
-	params?: {
-		id: number | string
-	}
-}
+import type { RouteLocationRaw } from 'vue-router'
 
 interface Props {
 	content?: string
 	add?: string
-	to?: namedLocation | string
+	to?: RouteLocationRaw
 }
 
 const props = withDefaults(defineProps<Props>(), {

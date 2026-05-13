@@ -1,17 +1,11 @@
 <script setup lang="ts">
-type namedLocation = {
-	name?: string
-	path?: string
-	params?: {
-		id: number | string
-	}
-}
+import type { RouteLocationRaw } from 'vue-router'
 
 interface Props {
 	content?: string
 	color?: 'light' | 'dark'
 	add?: string
-	to?: namedLocation | string
+	to?: RouteLocationRaw
 	size?: 'small' | 'big'
 }
 
