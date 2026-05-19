@@ -27,6 +27,13 @@ class ProductFactory extends Factory
             'slug' => fake()->slug(),
             'short_description' => fake()->sentence(),
             'description' => fake()->paragraph(),
+            'features' => fake()->paragraphs(2, true),
+            'in_the_box' => [
+                'Relógio ' . fake()->word(),
+                'Caixa de apresentação premium',
+                'Manual de instruções',
+                'Certificado de garantia'
+            ],
             'price' => fake()->numberBetween(100, 10000),
             'stock' => fake()->numberBetween(1, 100),
             'weight' => fake()->randomFloat(3, 0.1, 5),

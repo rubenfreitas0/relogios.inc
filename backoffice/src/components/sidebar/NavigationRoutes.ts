@@ -8,100 +8,60 @@ export interface INavigationRoute {
 export default {
   root: {
     name: '/',
-    displayName: 'navigationRoutes.home',
+    displayName: 'Início',
   },
   routes: [
     {
       name: 'dashboard',
-      displayName: 'menu.dashboard',
+      displayName: 'Dashboard',
       meta: {
         icon: 'vuestic-iconset-dashboard',
       },
     },
     {
-      name: 'users',
-      displayName: 'menu.users',
+      name: 'products',
+      displayName: 'Produtos',
       meta: {
-        icon: 'group',
+        icon: 'watch',
       },
     },
     {
-      name: 'projects',
-      displayName: 'menu.projects',
+      name: 'orders',
+      displayName: 'Encomendas',
       meta: {
-        icon: 'folder_shared',
+        icon: 'shopping_cart',
       },
     },
     {
-      name: 'payments',
-      displayName: 'menu.payments',
+      name: 'brands',
+      displayName: 'Marcas',
       meta: {
-        icon: 'credit_card',
+        icon: 'sell',
+      },
+    },
+    {
+      name: 'categories',
+      displayName: 'Categorias',
+      meta: {
+        icon: 'category',
+      },
+    },
+    {
+      name: 'shipping',
+      displayName: 'Envios',
+      meta: {
+        icon: 'local_shipping',
       },
       children: [
         {
-          name: 'payment-methods',
-          displayName: 'menu.payment-methods',
+          name: 'shipping-methods',
+          displayName: 'Métodos',
         },
         {
-          name: 'pricing-plans',
-          displayName: 'menu.pricing-plans',
-        },
-        {
-          name: 'billing',
-          displayName: 'menu.billing',
+          name: 'shipping-zones',
+          displayName: 'Zonas',
         },
       ],
-    },
-    {
-      name: 'auth',
-      displayName: 'menu.auth',
-      meta: {
-        icon: 'login',
-      },
-      children: [
-        {
-          name: 'login',
-          displayName: 'menu.login',
-        },
-        {
-          name: 'signup',
-          displayName: 'menu.signup',
-        },
-        {
-          name: 'recover-password',
-          displayName: 'menu.recover-password',
-        },
-      ],
-    },
-
-    {
-      name: 'faq',
-      displayName: 'menu.faq',
-      meta: {
-        icon: 'quiz',
-      },
-    },
-    {
-      name: '404',
-      displayName: 'menu.404',
-      meta: {
-        icon: 'vuestic-iconset-files',
-      },
-    },
-    {
-      name: 'preferences',
-      displayName: 'menu.preferences',
-      meta: {
-        icon: 'manage_accounts',
-      },
-    },
-    {
-      name: 'settings',
-      displayName: 'menu.settings',
-      meta: {
-        icon: 'settings',
-      },
     },
   ] as INavigationRoute[],
 }

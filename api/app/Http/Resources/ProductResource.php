@@ -20,6 +20,8 @@ class ProductResource extends JsonResource
             'is_active'         => $this->is_active,
             'is_featured'       => $this->is_featured,
             'gender'            => $this->gender,
+            'features'          => $this->features,
+            'inthebox'          => $this->in_the_box,
 
             'brand'    => new BrandResource($this->whenLoaded('brand')),
             'category' => new CategoryResource($this->whenLoaded('category')),

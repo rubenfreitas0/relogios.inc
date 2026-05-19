@@ -1,0 +1,122 @@
+import { defineStore } from 'pinia'
+import { ref, computed } from 'vue'
+import { authApi } from '../services/api'
+
+export interface AuthUser {
+  id: number
+  firstname: string
+  lastname: string
+  email: string
+  role: string
+  phone?: string
+  email_verified_at?: string
+}
+
+export const useAuthStore = defineStore('auth', () => {
+  // — State —
+  const user = ref<AuthUser | null>(null)
+  const token = ref<string | null>(null)
+  const loading = ref(false)
+  const error = ref<string | null>(null)
+
+  // — Getters —
+  const isAuthenticated = computed(() => !!token.value)
+  const fullName = computed(() => (user.value ? `${user.value.firstname} ${user.value.lastname}` : ''))
+  const initials = computed(() => {
+    if (!user.value) return ''
+    return (user.value.firstname[0] + user.value.lastname[0]).toUpperCase()
+  })
+
+  // — Actions —
+
+  /**
+   * Inicializar a store com dados persistidos no localStorage.
+   */
+  function init() {
+    const storedToken = localStorage.getItem('auth_token')
+    const storedUser = localStorage.getItem('auth_user')
+
+    if (storedToken && storedUser) {
+      token.value = storedToken
+      try {
+        user.value = JSON.parse(storedUser)
+      } catch {
+        logout()
+      }
+    }
+  }
+
+  /**
+   * Login com email e password.
+   * Verifica que o utilizador é admin.
+   */
+  async function login(email: string, password: string): Promise<boolean> {
+    loading.value = true
+    error.value = null
+
+    try {
+      const response = await authApi.login({ email, password })
+      const data = response.data
+
+      // Verificar que é admin
+      if (data.user.role !== 'admin') {
+        error.value = 'Acesso restrito a administradores.'
+        return false
+      }
+
+      // Guardar dados
+      token.value = data.token
+      user.value = data.user
+
+      localStorage.setItem('auth_token', data.token)
+      localStorage.setItem('auth_user', JSON.stringify(data.user))
+
+      return true
+    } catch (err: any) {
+      if (err.response?.status === 401) {
+        error.value = 'Email ou password incorretos.'
+      } else if (err.response?.status === 403) {
+        error.value = 'Conta desativada.'
+      } else {
+        error.value = 'Erro ao iniciar sessão. Tenta novamente.'
+      }
+      return false
+    } finally {
+      loading.value = false
+    }
+  }
+
+  /**
+   * Logout — revogar token no servidor e limpar estado local.
+   */
+  async function logout() {
+    try {
+      if (token.value) {
+        await authApi.logout()
+      }
+    } catch {
+      // Se falhar, limpar na mesma (token pode já ter expirado)
+    } finally {
+      token.value = null
+      user.value = null
+      localStorage.removeItem('auth_token')
+      localStorage.removeItem('auth_user')
+    }
+  }
+
+  return {
+    // State
+    user,
+    token,
+    loading,
+    error,
+    // Getters
+    isAuthenticated,
+    fullName,
+    initials,
+    // Actions
+    init,
+    login,
+    logout,
+  }
+})

@@ -29,6 +29,7 @@ use App\Http\Controllers\Api\AddressController;
 
 use App\Http\Controllers\Api\OrderController;
 use App\Http\Controllers\Api\Admin\OrderController as AdminOrderController;
+use App\Http\Controllers\Api\Admin\DashboardController as AdminDashboardController;
 
 
 
@@ -87,6 +88,8 @@ Route::middleware('auth:sanctum')->group(function () {
     });
 
     Route::middleware(['admin', 'verified'])->prefix('admin')->group(function () {
+        Route::get('dashboard/stats', [AdminDashboardController::class, 'stats']);
+
         Route::apiResource('brands', AdminBrandController::class);
         Route::apiResource('categories', AdminCategoryController::class);
 

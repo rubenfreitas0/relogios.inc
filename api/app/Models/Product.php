@@ -22,6 +22,8 @@ class Product extends Model
         'slug',
         'short_description',
         'description',
+        'features',
+        'in_the_box',
         'price',
         'stock',
         'weight',
@@ -37,6 +39,7 @@ class Product extends Model
             'stock'       => 'integer',
             'is_active'   => 'boolean',
             'is_featured' => 'boolean',
+            'in_the_box'  => 'array',
         ];
     }
 

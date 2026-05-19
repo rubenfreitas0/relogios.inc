@@ -36,8 +36,7 @@ watch(() => props.productSlug, () => {
 	<main v-if="item" class="flex h-full w-screen flex-col items-center bg-white">
 		<Navigation color="black" />
 		<Core :item="item" />
-		<!-- Funcionalidades ainda não suportadas na API, passando default values ou nulos -->
-		<Features :features="item.features || 'Design premium com acabamentos em aço inoxidável.'" :inthebox="item.inthebox || []" />
+		<Features :features="item.features || ''" :inthebox="item.inthebox || []" />
 		<Grid
 			:topSrc="item.images?.[1]?.url || item.primary_image?.url || ''"
 			:botSrc="item.images?.[2]?.url || item.primary_image?.url || ''"
