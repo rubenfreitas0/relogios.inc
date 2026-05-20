@@ -1,3 +1,11 @@
 N+1
 Race Condition (Property-based test)
 Memory Leak
+
+mesmo url ou mesmo login do backoffice e da loja
+fazer algumas perguntas
+cotninuar, acabar endpoints
+
+
+
+rever
