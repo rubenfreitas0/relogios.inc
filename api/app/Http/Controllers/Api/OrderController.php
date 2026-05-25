@@ -2,24 +2,21 @@
 
 namespace App\Http\Controllers\Api;
 
-use App\Enums\OrderStatus;
-use App\Enums\PaymentMethod;
-use App\Enums\PaymentStatus;
+use App\Exceptions\CheckoutException;
 use App\Http\Controllers\Controller;
 use App\Http\Requests\Order\CheckoutRequest;
 use App\Http\Resources\OrderResource;
-use App\Models\Order;
-use App\Models\ShippingMethod;
-use App\Models\ShippingZone;
-use App\Models\ShippingZoneCountry;
-use App\Models\TaxRate;
+use App\Services\CheckoutService;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Http\Resources\Json\AnonymousResourceCollection;
-use Illuminate\Support\Facades\DB;
 
 class OrderController extends Controller
 {
+    public function __construct(
+        private CheckoutService $checkoutService,
+    ) {}
+
     /**
      * Lista as encomendas do utilizador autenticado.
      */
@@ -54,156 +51,17 @@ class OrderController extends Controller
 
     /**
      * Checkout — cria uma encomenda a partir do carrinho do utilizador.
+     * Toda a lógica de negócio está delegada ao CheckoutService.
      */
     public function store(CheckoutRequest $request): JsonResponse
     {
         $user      = $request->user();
         $validated = $request->validated();
 
-        $cartItems = $user->cartItems()->with('product.primaryImage')->get();
-
-        if ($cartItems->isEmpty()) {
-            return response()->json(['message' => 'O carrinho está vazio.'], 422);
-        }
-
-        $shippingMethod = ShippingMethod::find($validated['shipping_method_id']);
-
-        if (! $shippingMethod || ! $shippingMethod->is_active) {
-            return response()->json(['message' => 'O método de envio selecionado não está disponível.'], 422);
-        }
-
-        $shippingData = $this->resolveShippingData($user, $validated);
-
-        $subtotal     = 0;
-        $totalWeight  = 0;
-        foreach ($cartItems as $item) {
-            $subtotal    += $item->quantity * $item->product->price;
-            $totalWeight += ($item->product->weight ?? 0) * $item->quantity;
-        }
-
-        $shippingCost = (float) $shippingMethod->price;
-
-        // Validar que o método pertence à zona do país de destino (com distinção Ilhas para PT)
-        $countryCode = strtoupper($shippingData['country'] ?? 'PT');
-        $postalCode  = $shippingData['postal_code'] ?? null;
-        $expectedZoneId = $this->resolveZoneId($countryCode, $postalCode);
-
-        if ($shippingMethod->shipping_zone_id !== null
-            && $expectedZoneId !== null
-            && $shippingMethod->shipping_zone_id !== $expectedZoneId) {
-            return response()->json([
-                'message' => 'O método de envio selecionado não está disponível para o país de destino.',
-            ], 422);
-        }
-
-        // Validar que o peso total está dentro dos limites do método
-        if (! $shippingMethod->supportsWeight($totalWeight)) {
-            return response()->json([
-                'message' => 'O peso total da encomenda não é compatível com o método de envio selecionado.',
-            ], 422);
-        }
-
-        $taxRateModel = TaxRate::where('country_code', $countryCode)
-            ->where('is_active', true)
-            ->first();
-
-        $taxPercentage = $taxRateModel ? (float) $taxRateModel->rate : 0.0;
-        $taxAmount = round($subtotal * ($taxPercentage / 100), 2);
-
-        $total        = $subtotal + $shippingCost + $taxAmount;
-
-        DB::beginTransaction();
         try {
-            // Decremento atómico do stock com verificação — previne overselling
-            foreach ($cartItems as $item) {
-                $updated = DB::table('products')
-                    ->where('id', $item->product->id)
-                    ->where('stock', '>=', $item->quantity)
-                    ->update(['stock' => DB::raw("stock - {$item->quantity}")]);
-
-                if ($updated === 0) {
-                    DB::rollBack();
-                    // Buscar stock atualizado para a mensagem de erro
-                    $currentStock = DB::table('products')->where('id', $item->product->id)->value('stock');
-                    return response()->json([
-                        'message' => "Stock insuficiente para '{$item->product->name}'. Apenas existem {$currentStock} unidades disponíveis.",
-                    ], 422);
-                }
-            }
-
-            // Cria a encomenda
-            $order = Order::create([
-                'user_id'            => $user->id,
-                'order_number'       => Order::generateOrderNumber(),
-                'status'             => OrderStatus::PENDING,
-                'payment_status'     => PaymentStatus::PENDING,
-
-                'shipping_firstname'   => $shippingData['firstname'],
-                'shipping_lastname'    => $shippingData['lastname'],
-                'shipping_phone'       => $shippingData['phone'] ?? $user->phone,
-                'shipping_address_line1' => $shippingData['address_line1'],
-                'shipping_address_line2' => $shippingData['address_line2'] ?? null,
-                'shipping_city'        => $shippingData['city'],
-                'shipping_postal_code' => $shippingData['postal_code'],
-                'shipping_country'     => $shippingData['country'] ?? 'PT',
-
-                'shipping_method_id'   => $shippingMethod->id,
-                'shipping_carrier'     => $shippingMethod->carrier,
-                'estimated_days'       => $shippingMethod->estimated_days,
-                'weight'               => round($totalWeight, 3),
-
-                'nif'          => $validated['nif'] ?? null,
-                'subtotal'     => round($subtotal, 2),
-                'shipping_cost' => round($shippingCost, 2),
-                'tax_amount'   => $taxAmount,
-                'tax_rate'     => $taxPercentage,
-                'total'        => round($total, 2),
-            ]);
-
-            // Snapshot dos dados do produto em bulk (evita N+1 inserts)
-            $orderItemsData = [];
-            foreach ($cartItems as $item) {
-                $orderItemsData[] = [
-                    'order_id'      => $order->id,
-                    'product_id'    => $item->product->id,
-                    'product_name'  => $item->product->name,
-                    'product_image' => $item->product->primaryImage?->url ?? null,
-                    'unit_price'    => $item->product->price,
-                    'quantity'      => $item->quantity,
-                    'item_total'    => round($item->quantity * $item->product->price, 2),
-                    'created_at'    => now(),
-                    'updated_at'    => now(),
-                ];
-            }
-            $order->orderItems()->insert($orderItemsData);
-
-            $paymentData = null;
-            if ($validated['payment_method'] === PaymentMethod::MULTIBANCO->value) {
-                $paymentData = [
-                    'entity'     => '12345',
-                    'reference'  => rand(100000000, 999999999),
-                    'expires_at' => now()->addDays(3)->toDateTimeString(),
-                ];
-            } elseif ($validated['payment_method'] === PaymentMethod::MBWAY->value) {
-                $paymentData = [
-                    'phone' => $validated['payment_phone'],
-                ];
-            }
-
-            $order->payments()->create([
-                'method'       => $validated['payment_method'],
-                'amount'       => round($total, 2),
-                'currency'     => 'EUR',
-                'status'       => PaymentStatus::PENDING,
-                'payment_data' => $paymentData,
-            ]);
-
-            $user->cartItems()->delete();
-
-            DB::commit();
-        } catch (\Exception $e) {
-            DB::rollBack();
-            return response()->json(['message' => 'Erro ao processar a encomenda.'], 500);
+            $order = $this->checkoutService->process($user, $validated);
+        } catch (CheckoutException $e) {
+            return response()->json(['message' => $e->getMessage()], $e->httpStatus);
         }
 
         $order->load(['orderItems', 'shippingMethod', 'payments']);
@@ -213,58 +71,4 @@ class OrderController extends Controller
             'data'    => new OrderResource($order),
         ], 201);
     }
-
-    /**
-     * Resolve os dados de envio a partir de um endereço guardado ou de campos manuais.
-     */
-    private function resolveShippingData($user, array $validated): array
-    {
-        if (! empty($validated['address_id'])) {
-            $address = $user->addresses()->findOrFail($validated['address_id']);
-
-            return [
-                'firstname'    => $address->firstname,
-                'lastname'     => $address->lastname,
-                'phone'        => $address->phone,
-                'address_line1' => $address->address_line1,
-                'address_line2' => $address->address_line2,
-                'city'         => $address->city,
-                'postal_code'  => $address->postal_code,
-                'country'      => $address->country,
-            ];
-        }
-
-        return [
-            'firstname'    => $validated['firstname'],
-            'lastname'     => $validated['lastname'],
-            'phone'        => $validated['phone'] ?? null,
-            'address_line1' => $validated['address_line1'],
-            'address_line2' => $validated['address_line2'] ?? null,
-            'city'         => $validated['city'],
-            'postal_code'  => $validated['postal_code'],
-            'country'      => $validated['country'] ?? 'PT',
-        ];
-    }
-
-    /**
-     * Resolve a zona de envio com base no país e código postal.
-     * Para PT, distingue Continente vs Ilhas (Açores/Madeira) pelo prefixo do código postal (9xxx).
-     */
-    private function resolveZoneId(string $countryCode, ?string $postalCode): ?int
-    {
-        if ($countryCode === 'PT' && $postalCode && str_starts_with(trim($postalCode), '9')) {
-            $islandsZone = ShippingZone::where('name', 'Ilhas (Açores e Madeira)')
-                ->where('is_active', true)
-                ->first();
-
-            if ($islandsZone) {
-                return $islandsZone->id;
-            }
-        }
-
-        $zoneCountry = ShippingZoneCountry::where('country_code', $countryCode)->first();
-
-        return $zoneCountry?->shipping_zone_id;
-    }
-
 }

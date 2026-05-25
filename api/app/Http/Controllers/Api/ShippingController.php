@@ -4,13 +4,16 @@ namespace App\Http\Controllers\Api;
 
 use App\Http\Controllers\Controller;
 use App\Models\ShippingMethod;
-use App\Models\ShippingZone;
-use App\Models\ShippingZoneCountry;
 use App\Models\TaxRate;
+use App\Services\ShippingZoneResolver;
 use Illuminate\Http\Request;
 
 class ShippingController extends Controller
 {
+    public function __construct(
+        private ShippingZoneResolver $zoneResolver,
+    ) {}
+
     /**
      * Calcular opções de envio disponíveis com base no peso e localização
      */
@@ -41,7 +44,7 @@ class ShippingController extends Controller
         }
 
         // Descobrir a Zona de Envio (com distinção Ilhas para PT)
-        $zoneId = $this->resolveZoneId($countryCode, $postalCode);
+        $zoneId = $this->zoneResolver->resolve($countryCode, $postalCode);
 
         // Buscar métodos de envio disponíveis para este peso e zona
         $shippingMethods = ShippingMethod::active()
@@ -104,27 +107,5 @@ class ShippingController extends Controller
             ]);
 
         return response()->json($methods);
-    }
-
-    /**
-     * Resolve a zona de envio com base no país e código postal.
-     * Para PT, distingue Continente vs Ilhas (Açores/Madeira) pelo prefixo do código postal (9xxx).
-     */
-    private function resolveZoneId(string $countryCode, ?string $postalCode): ?int
-    {
-        // Distinção PT: Ilhas (código postal começa com 9) vs Continental
-        if ($countryCode === 'PT' && $postalCode && str_starts_with(trim($postalCode), '9')) {
-            $islandsZone = ShippingZone::where('name', 'Ilhas (Açores e Madeira)')
-                ->where('is_active', true)
-                ->first();
-
-            if ($islandsZone) {
-                return $islandsZone->id;
-            }
-        }
-
-        $zoneCountry = ShippingZoneCountry::where('country_code', $countryCode)->first();
-
-        return $zoneCountry?->shipping_zone_id;
     }
 }
