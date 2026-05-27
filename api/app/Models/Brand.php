@@ -34,6 +34,17 @@ class Brand extends Model
         return $query->where('is_active', true);
     }
 
+    /* ----- Accessors ----- */
+
+    public function getLogoUrlAttribute(): ?string
+    {
+        if (! $this->logo) {
+            return null;
+        }
+
+        return Storage::disk('public')->url($this->logo);
+    }
+
     protected static function boot(): void
     {
         parent::boot();

@@ -11,6 +11,7 @@ use App\Models\Order;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Http\Resources\Json\AnonymousResourceCollection;
+use Illuminate\Support\Facades\DB;
 
 class OrderController extends Controller
 {
@@ -61,29 +62,33 @@ class OrderController extends Controller
      */
     public function updateStatus(UpdateOrderStatusRequest $request, string $orderNumber): JsonResponse|OrderResource
     {
-        $order = Order::where('order_number', $orderNumber)->first();
+        return DB::transaction(function () use ($request, $orderNumber) {
+            $order = Order::where('order_number', $orderNumber)
+                ->lockForUpdate()
+                ->first();
 
-        if (! $order) {
-            return response()->json(['message' => 'Encomenda não encontrada.'], 404);
-        }
+            if (! $order) {
+                return response()->json(['message' => 'Encomenda não encontrada.'], 404);
+            }
 
-        $data = array_filter([
-            'status'          => $request->validated('status'),
-            'tracking_number' => $request->validated('tracking_number'),
-        ], fn($v) => $v !== null);
+            $data = array_filter([
+                'status'          => $request->validated('status'),
+                'tracking_number' => $request->validated('tracking_number'),
+            ], fn($v) => $v !== null);
 
-        // Marcar como pago automaticamente se o estado mudar para 'delivered'
-        if ($request->validated('status') === OrderStatus::DELIVERED->value && $order->payment_status !== PaymentStatus::PAID) {
-            $data['payment_status'] = PaymentStatus::PAID;
-            $data['paid_at']        = now();
-        }
+            // Marcar como pago automaticamente se o estado mudar para 'delivered'
+            if ($request->validated('status') === OrderStatus::DELIVERED->value && $order->payment_status !== PaymentStatus::PAID) {
+                $data['payment_status'] = PaymentStatus::PAID;
+                $data['paid_at']        = now();
+            }
 
-        $order->update($data);
-        $order->load(['user', 'orderItems', 'shippingMethod']);
+            $order->update($data);
+            $order->load(['user', 'orderItems', 'shippingMethod']);
 
-        return response()->json([
-            'message' => 'Estado da encomenda atualizado com sucesso.',
-            'data'    => new OrderResource($order),
-        ]);
+            return response()->json([
+                'message' => 'Estado da encomenda atualizado com sucesso.',
+                'data'    => new OrderResource($order),
+            ]);
+        });
     }
 }

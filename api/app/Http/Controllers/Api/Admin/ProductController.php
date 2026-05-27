@@ -200,7 +200,11 @@ class ProductController extends Controller
             'stock' => ['required', 'integer', 'min:0']
         ]);
 
-        $product->update($validated);
+        DB::transaction(function () use ($product, $validated) {
+            // Lock para evitar race condition com decrementos atómicos do checkout
+            $product = Product::lockForUpdate()->findOrFail($product->id);
+            $product->update($validated);
+        });
 
         return response()->json([
             'message' => 'Stock atualizado com sucesso.',

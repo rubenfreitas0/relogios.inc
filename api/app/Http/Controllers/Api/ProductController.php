@@ -113,6 +113,7 @@ class ProductController extends Controller
     {
         $product = Product::where('slug', $slug)
             ->where('is_active', true)
+            ->select('id', 'category_id')
             ->firstOrFail();
 
         $related = Product::where('is_active', true)

@@ -22,25 +22,52 @@ class DashboardController extends Controller
         $startOfLastMonth = $now->copy()->subMonth()->startOfMonth();
         $endOfLastMonth = $now->copy()->subMonth()->endOfMonth();
 
-        // — Produtos —
-        $totalProducts = Product::count();
-        $activeProducts = Product::where('is_active', true)->count();
-        $outOfStockProducts = Product::where('stock', 0)->where('is_active', true)->count();
-        $lowStockProducts = Product::where('stock', '>', 0)
-            ->where('stock', '<=', 5)
-            ->where('is_active', true)
-            ->count();
+        // — Produtos (4 queries → 1 query com contagens condicionais) —
+        $productStats = Product::query()
+            ->selectRaw('COUNT(*) as total')
+            ->selectRaw('SUM(CASE WHEN is_active = 1 THEN 1 ELSE 0 END) as active')
+            ->selectRaw('SUM(CASE WHEN is_active = 1 AND stock = 0 THEN 1 ELSE 0 END) as out_of_stock')
+            ->selectRaw('SUM(CASE WHEN is_active = 1 AND stock > 0 AND stock <= 5 THEN 1 ELSE 0 END) as low_stock')
+            ->first();
 
-        // — Encomendas —
-        $ordersThisMonth = Order::where('created_at', '>=', $startOfMonth)->count();
-        $ordersLastMonth = Order::whereBetween('created_at', [$startOfLastMonth, $endOfLastMonth])->count();
-        $ordersToday = Order::whereDate('created_at', $now->toDateString())->count();
+        // — Encomendas: contagens por período (3 queries → 1 query) —
+        $orderStats = Order::query()
+            ->selectRaw('SUM(CASE WHEN created_at >= ? THEN 1 ELSE 0 END) as this_month', [$startOfMonth])
+            ->selectRaw('SUM(CASE WHEN created_at >= ? AND created_at <= ? THEN 1 ELSE 0 END) as last_month', [$startOfLastMonth, $endOfLastMonth])
+            ->selectRaw('SUM(CASE WHEN DATE(created_at) = ? THEN 1 ELSE 0 END) as today', [$now->toDateString()])
+            ->first();
 
         $ordersByStatus = Order::select('status', DB::raw('COUNT(*) as count'))
             ->groupBy('status')
             ->pluck('count', 'status');
 
-        // — Revenue —
+        // — Revenue (12 queries em loop → 1 query com GROUP BY) —
+        $sixMonthsAgo = $now->copy()->subMonths(5)->startOfMonth();
+
+        $revenueRaw = Order::query()
+            ->selectRaw("strftime('%Y-%m', created_at) as month")
+            ->selectRaw('SUM(CASE WHEN payment_status = ? THEN total ELSE 0 END) as revenue', ['paid'])
+            ->selectRaw('COUNT(*) as orders')
+            ->where('created_at', '>=', $sixMonthsAgo)
+            ->groupByRaw("strftime('%Y-%m', created_at)")
+            ->orderBy('month')
+            ->get()
+            ->keyBy('month');
+
+        $revenueByMonth = [];
+        for ($i = 5; $i >= 0; $i--) {
+            $monthStart = $now->copy()->subMonths($i)->startOfMonth();
+            $key = $monthStart->format('Y-m');
+            $row = $revenueRaw->get($key);
+
+            $revenueByMonth[] = [
+                'month' => $key,
+                'label' => $monthStart->translatedFormat('M Y'),
+                'total' => $row ? (float) $row->revenue : 0.0,
+                'orders' => $row ? (int) $row->orders : 0,
+            ];
+        }
+
         $revenueThisMonth = (float) Order::where('created_at', '>=', $startOfMonth)
             ->where('payment_status', 'paid')
             ->sum('total');
@@ -48,22 +75,6 @@ class DashboardController extends Controller
         $revenueLastMonth = (float) Order::whereBetween('created_at', [$startOfLastMonth, $endOfLastMonth])
             ->where('payment_status', 'paid')
             ->sum('total');
-
-        // — Revenue últimos 6 meses (para gráfico) —
-        $revenueByMonth = [];
-        for ($i = 5; $i >= 0; $i--) {
-            $monthStart = $now->copy()->subMonths($i)->startOfMonth();
-            $monthEnd = $now->copy()->subMonths($i)->endOfMonth();
-
-            $revenueByMonth[] = [
-                'month' => $monthStart->format('Y-m'),
-                'label' => $monthStart->translatedFormat('M Y'),
-                'total' => (float) Order::whereBetween('created_at', [$monthStart, $monthEnd])
-                    ->where('payment_status', 'paid')
-                    ->sum('total'),
-                'orders' => Order::whereBetween('created_at', [$monthStart, $monthEnd])->count(),
-            ];
-        }
 
         // — Clientes —
         $totalCustomers = User::where('role', '!=', 'admin')->count();
@@ -91,15 +102,15 @@ class DashboardController extends Controller
 
         return response()->json([
             'products' => [
-                'total'        => $totalProducts,
-                'active'       => $activeProducts,
-                'out_of_stock' => $outOfStockProducts,
-                'low_stock'    => $lowStockProducts,
+                'total'        => (int) $productStats->total,
+                'active'       => (int) $productStats->active,
+                'out_of_stock' => (int) $productStats->out_of_stock,
+                'low_stock'    => (int) $productStats->low_stock,
             ],
             'orders' => [
-                'today'      => $ordersToday,
-                'this_month' => $ordersThisMonth,
-                'last_month' => $ordersLastMonth,
+                'today'      => (int) $orderStats->today,
+                'this_month' => (int) $orderStats->this_month,
+                'last_month' => (int) $orderStats->last_month,
                 'by_status'  => $ordersByStatus,
             ],
             'revenue' => [

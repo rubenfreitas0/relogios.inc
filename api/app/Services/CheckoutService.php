@@ -37,7 +37,10 @@ class CheckoutService
 
             // ─── 1. Carregar carrinho com lock nos produtos ───
             $cartItems = $user->cartItems()
-                ->with(['product' => fn($q) => $q->lockForUpdate()])
+                ->with([
+                    'product' => fn($q) => $q->lockForUpdate(),
+                    'product.primaryImage',
+                ])
                 ->lockForUpdate()
                 ->get();
 
