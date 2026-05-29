@@ -154,7 +154,7 @@
 </template>
 
 <script lang="ts" setup>
-import { reactive, onMounted } from 'vue'
+import { reactive, onMounted, onBeforeUnmount } from 'vue'
 import { useForm, useToast } from 'vuestic-ui'
 import { useCategoriesStore, type Category } from '../../stores/categories-store'
 
@@ -262,4 +262,8 @@ async function executeDelete() {
 }
 
 onMounted(() => store.fetchCategories())
+
+onBeforeUnmount(() => {
+  clearTimeout(debounceTimer)
+})
 </script>

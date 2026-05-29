@@ -219,7 +219,7 @@
 </template>
 
 <script lang="ts" setup>
-import { reactive, onMounted } from 'vue'
+import { reactive, onMounted, onBeforeUnmount } from 'vue'
 import { useRouter } from 'vue-router'
 import { useToast } from 'vuestic-ui'
 import { useProductsStore, type Product } from '../../stores/products-store'
@@ -367,5 +367,9 @@ async function toggleActive(product: Product) {
 onMounted(() => {
   store.fetchProducts()
   store.fetchBrandOptions()
+})
+
+onBeforeUnmount(() => {
+  clearTimeout(debounceTimer)
 })
 </script>

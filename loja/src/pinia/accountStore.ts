@@ -290,6 +290,30 @@ export const useAccountStore = defineStore('account', () => {
 		}
 	}
 
+	async function updateProfile(payload: { firstname?: string; lastname?: string; phone?: string }): Promise<boolean> {
+		error.value = null
+		try {
+			const res = await handleResponse(
+				await fetch(`${API_BASE}/user/profile`, {
+					method: 'PATCH',
+					headers: getAuthHeaders(),
+					body: JSON.stringify(payload),
+				})
+			)
+			const data = await res.json()
+			if (res.ok) {
+				return true
+			}
+			error.value = data.message ?? 'Erro ao atualizar perfil.'
+			return false
+		} catch (e: any) {
+			if (e.message !== 'UNAUTHORIZED' && e.message !== 'NOT_AUTHENTICATED') {
+				error.value = 'Erro de ligação.'
+			}
+			return false
+		}
+	}
+
 	return {
 		orders,
 		ordersPagination,
@@ -304,5 +328,6 @@ export const useAccountStore = defineStore('account', () => {
 		updateAddress,
 		deleteAddress,
 		setDefaultAddress,
+		updateProfile,
 	}
 })

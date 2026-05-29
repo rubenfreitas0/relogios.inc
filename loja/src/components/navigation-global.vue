@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import cartIcon from '/icons/cart-icon.svg'
 import Cart from './Cart/cart-modal.vue'
-import { computed, ref } from 'vue'
+import { computed, onBeforeUnmount, ref } from 'vue'
 import { useCartStore } from '../pinia/cartStore.ts'
 import { useAuthStore } from '../pinia/authStore.ts'
 import { useRouter, useRoute } from 'vue-router'
@@ -114,6 +114,10 @@ const megaMenus: Record<string, {
 		],
 	},
 }
+
+onBeforeUnmount(() => {
+	if (megaLeaveTimeout) clearTimeout(megaLeaveTimeout)
+})
 </script>
 
 <template>

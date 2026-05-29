@@ -17,7 +17,7 @@ const api: AxiosInstance = axios.create({
 // — Request interceptor: injeta Bearer token —
 api.interceptors.request.use(
   (config: InternalAxiosRequestConfig) => {
-    const token = localStorage.getItem('auth_token')
+    const token = localStorage.getItem('backoffice_auth_token')
     if (token && config.headers) {
       config.headers.Authorization = `Bearer ${token}`
     }
@@ -31,8 +31,8 @@ api.interceptors.response.use(
   (response: AxiosResponse) => response,
   (error) => {
     if (error.response?.status === 401) {
-      localStorage.removeItem('auth_token')
-      localStorage.removeItem('auth_user')
+      localStorage.removeItem('backoffice_auth_token')
+      localStorage.removeItem('backoffice_auth_user')
       router.push({ name: 'login' })
     }
     return Promise.reject(error)

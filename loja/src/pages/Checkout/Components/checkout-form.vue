@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { onMounted, watch, ref } from 'vue'
+import { onMounted, onBeforeUnmount, watch, ref } from 'vue'
 import TextInputField from './text-input-field.vue'
 import { useFormStore } from '../../../pinia/formStore.ts'
 import { useAccountStore, type Address } from '../../../pinia/accountStore.ts'
@@ -72,6 +72,10 @@ watch(
 		}, 500)
 	}
 )
+
+onBeforeUnmount(() => {
+	if (debounceTimer) clearTimeout(debounceTimer)
+})
 </script>
 <template>
 	<form

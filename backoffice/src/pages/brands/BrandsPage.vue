@@ -161,7 +161,7 @@
 </template>
 
 <script lang="ts" setup>
-import { reactive, onMounted } from 'vue'
+import { reactive, onMounted, onBeforeUnmount } from 'vue'
 import { useForm, useToast } from 'vuestic-ui'
 import { useBrandsStore, type Brand } from '../../stores/brands-store'
 
@@ -276,4 +276,8 @@ async function executeDeactivate() {
 }
 
 onMounted(() => store.fetchBrands())
+
+onBeforeUnmount(() => {
+  clearTimeout(debounceTimer)
+})
 </script>

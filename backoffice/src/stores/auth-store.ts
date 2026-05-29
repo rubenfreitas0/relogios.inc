@@ -33,8 +33,8 @@ export const useAuthStore = defineStore('auth', () => {
    * Inicializar a store com dados persistidos no localStorage.
    */
   function init() {
-    const storedToken = localStorage.getItem('auth_token')
-    const storedUser = localStorage.getItem('auth_user')
+    const storedToken = localStorage.getItem('backoffice_auth_token')
+    const storedUser = localStorage.getItem('backoffice_auth_user')
 
     if (storedToken && storedUser) {
       token.value = storedToken
@@ -68,8 +68,8 @@ export const useAuthStore = defineStore('auth', () => {
       token.value = data.token
       user.value = data.user
 
-      localStorage.setItem('auth_token', data.token)
-      localStorage.setItem('auth_user', JSON.stringify(data.user))
+      localStorage.setItem('backoffice_auth_token', data.token)
+      localStorage.setItem('backoffice_auth_user', JSON.stringify(data.user))
 
       return true
     } catch (err: any) {
@@ -99,8 +99,8 @@ export const useAuthStore = defineStore('auth', () => {
     } finally {
       token.value = null
       user.value = null
-      localStorage.removeItem('auth_token')
-      localStorage.removeItem('auth_user')
+      localStorage.removeItem('backoffice_auth_token')
+      localStorage.removeItem('backoffice_auth_user')
     }
   }
 

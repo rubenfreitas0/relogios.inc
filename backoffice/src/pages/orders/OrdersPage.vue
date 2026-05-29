@@ -145,7 +145,7 @@
 </template>
 
 <script lang="ts" setup>
-import { reactive, onMounted } from 'vue'
+import { reactive, onMounted, onBeforeUnmount } from 'vue'
 import { useRouter } from 'vue-router'
 import { useOrdersStore, type Order } from '../../stores/orders-store'
 
@@ -248,5 +248,9 @@ function handleRowClick(event: { item: Order }) {
 // — Init —
 onMounted(() => {
   store.fetchOrders()
+})
+
+onBeforeUnmount(() => {
+  clearTimeout(debounceTimer)
 })
 </script>

@@ -46,7 +46,7 @@ class OrderController extends Controller
      */
     public function show(string $orderNumber): JsonResponse|OrderResource
     {
-        $order = Order::with(['user', 'orderItems', 'shippingMethod'])
+        $order = Order::with(['user', 'orderItems', 'shippingMethod', 'payments'])
             ->where('order_number', $orderNumber)
             ->first();
 
