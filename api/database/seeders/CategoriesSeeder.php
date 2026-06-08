@@ -21,6 +21,12 @@ class CategoriesSeeder extends Seeder
             ['name' => 'Mergulho', 'slug' => 'mergulho', 'is_active' => true],
             ['name' => 'Desporto', 'slug' => 'desporto', 'is_active' => true],
             ['name' => 'Clássicos', 'slug' => 'classicos', 'is_active' => true],
+            
+            // Categorias especiais de sistema (protegidas no CategoryController)
+            ['name' => 'Gama de preço', 'slug' => 'gama-de-preco', 'is_active' => true],
+            ['name' => 'Cor', 'slug' => 'cor', 'is_active' => true],
+            ['name' => 'Sexo', 'slug' => 'sexo', 'is_active' => true],
+            ['name' => 'Género', 'slug' => 'genero', 'is_active' => true],
         ];
 
         foreach ($categories as $category) {

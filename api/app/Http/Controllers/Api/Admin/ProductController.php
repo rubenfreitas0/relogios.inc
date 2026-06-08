@@ -120,7 +120,7 @@ class ProductController extends Controller
                 }
             }
 
-            // Reordenação de imagens em bulk (evita N+1 updates)
+            // Reordenação de imagens
             if ($request->filled('image_order')) {
                 $cases = [];
                 $ids = [];
@@ -130,7 +130,7 @@ class ProductController extends Controller
                     $cases[] = "WHEN {$id} THEN {$sort}";
                     $ids[] = $id;
                 }
-                
+
                 if (count($ids) > 0) {
                     $idsStr = implode(',', $ids);
                     $casesStr = implode(' ', $cases);
@@ -201,7 +201,7 @@ class ProductController extends Controller
         ]);
 
         DB::transaction(function () use ($product, $validated) {
-            // Lock para evitar race condition com decrementos atómicos do checkout
+            // Lock para evitar race condition
             $product = Product::lockForUpdate()->findOrFail($product->id);
             $product->update($validated);
         });
@@ -215,7 +215,7 @@ class ProductController extends Controller
     /**
      * Restaurar um produto apagado (Soft Delete)
      */
-    public function restore($id)
+    public function restore(int $id)
     {
         $product = Product::withTrashed()->findOrFail($id);
         $product->restore();

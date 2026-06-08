@@ -57,7 +57,7 @@ class CartController extends Controller
 
             $newTotalQuantity = $cartItem ? ($cartItem->quantity + $requestedQuantity) : $requestedQuantity;
 
-            // Impedimento: O utilizador tenta adicionar ao carrinho mais unidades do que a loja tem
+            // Impedimento: O utilizador não pode adicionar ao carrinho mais unidades do que a loja tem
             if ($newTotalQuantity > $product->stock) {
                 abort(422, 'Stock insuficiente. Apenas existem ' . $product->stock . ' unidades disponíveis.');
             }

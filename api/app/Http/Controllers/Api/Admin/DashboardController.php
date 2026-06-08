@@ -22,7 +22,7 @@ class DashboardController extends Controller
         $startOfLastMonth = $now->copy()->subMonth()->startOfMonth();
         $endOfLastMonth = $now->copy()->subMonth()->endOfMonth();
 
-        // — Produtos (4 queries → 1 query com contagens condicionais) —
+        // — Produtos
         $productStats = Product::query()
             ->selectRaw('COUNT(*) as total')
             ->selectRaw('SUM(CASE WHEN is_active = 1 THEN 1 ELSE 0 END) as active')
@@ -30,7 +30,7 @@ class DashboardController extends Controller
             ->selectRaw('SUM(CASE WHEN is_active = 1 AND stock > 0 AND stock <= 5 THEN 1 ELSE 0 END) as low_stock')
             ->first();
 
-        // — Encomendas: contagens por período (3 queries → 1 query) —
+        // — Encomendas
         $orderStats = Order::query()
             ->selectRaw('SUM(CASE WHEN created_at >= ? THEN 1 ELSE 0 END) as this_month', [$startOfMonth])
             ->selectRaw('SUM(CASE WHEN created_at >= ? AND created_at <= ? THEN 1 ELSE 0 END) as last_month', [$startOfLastMonth, $endOfLastMonth])
@@ -41,15 +41,22 @@ class DashboardController extends Controller
             ->groupBy('status')
             ->pluck('count', 'status');
 
-        // — Revenue (12 queries em loop → 1 query com GROUP BY) —
+        // — Revenue
         $sixMonthsAgo = $now->copy()->subMonths(5)->startOfMonth();
 
+        $driver = DB::connection()->getDriverName();
+        $monthExpression = match ($driver) {
+            'mysql' => "DATE_FORMAT(created_at, '%Y-%m')",
+            'pgsql' => "to_char(created_at, 'YYYY-MM')",
+            default => "strftime('%Y-%m', created_at)", // sqlite & others
+        };
+
         $revenueRaw = Order::query()
-            ->selectRaw("strftime('%Y-%m', created_at) as month")
+            ->selectRaw("$monthExpression as month")
             ->selectRaw('SUM(CASE WHEN payment_status = ? THEN total ELSE 0 END) as revenue', ['paid'])
             ->selectRaw('COUNT(*) as orders')
             ->where('created_at', '>=', $sixMonthsAgo)
-            ->groupByRaw("strftime('%Y-%m', created_at)")
+            ->groupByRaw($monthExpression)
             ->orderBy('month')
             ->get()
             ->keyBy('month');
@@ -68,13 +75,10 @@ class DashboardController extends Controller
             ];
         }
 
-        $revenueThisMonth = (float) Order::where('created_at', '>=', $startOfMonth)
-            ->where('payment_status', 'paid')
-            ->sum('total');
-
-        $revenueLastMonth = (float) Order::whereBetween('created_at', [$startOfLastMonth, $endOfLastMonth])
-            ->where('payment_status', 'paid')
-            ->sum('total');
+        $thisMonthKey     = $now->format('Y-m');
+        $lastMonthKey     = $now->copy()->subMonth()->format('Y-m');
+        $revenueThisMonth = $revenueRaw->has($thisMonthKey) ? (float) $revenueRaw->get($thisMonthKey)->revenue : 0.0;
+        $revenueLastMonth = $revenueRaw->has($lastMonthKey) ? (float) $revenueRaw->get($lastMonthKey)->revenue : 0.0;
 
         // — Clientes —
         $totalCustomers = User::where('role', '!=', 'admin')->count();
