@@ -10,6 +10,10 @@ class ActivityLog extends Model
 
     use HasFactory;
 
+    protected $table = 'activity_log';
+
+    const UPDATED_AT = null;
+
     protected $fillable = [
         'user_id',
         'event',

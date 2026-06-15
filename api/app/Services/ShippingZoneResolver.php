@@ -26,12 +26,14 @@ class ShippingZoneResolver
                 ->where('is_active', true)
                 ->first();
 
-            if ($islandsZone) {
-                return $islandsZone->id;
-            }
+            return $islandsZone?->id;
         }
 
-        $zoneCountry = ShippingZoneCountry::where('country_code', $countryCode)->first();
+        $zoneCountry = ShippingZoneCountry::where('country_code', $countryCode)
+            ->whereHas('shippingZone', function ($query) {
+                $query->where('is_active', true);
+            })
+            ->first();
 
         return $zoneCountry?->shipping_zone_id;
     }

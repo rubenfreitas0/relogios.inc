@@ -14,10 +14,8 @@ return new class extends Migration
         Schema::create('shipping_zone_countries', function (Blueprint $table) {
             $table->id();
             $table->foreignId('shipping_zone_id')->constrained('shipping_zones')->onDelete('cascade');
-            $table->string('country_code', 2);
+            $table->string('country_code', 2)->unique();
             $table->timestamps();
-            
-            $table->unique(['shipping_zone_id', 'country_code']);
         });
     }
 

@@ -2,11 +2,13 @@
 
 namespace App\Models;
 
+use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 
 class ShippingZoneCountry extends Model
 {
+    use HasFactory;
     protected $fillable = [
         'shipping_zone_id',
         'country_code',

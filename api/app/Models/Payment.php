@@ -19,6 +19,7 @@ class Payment extends Model
         'amount',
         'currency',
         'status',
+        'payment_data',
         'paid_at',
     ];
 

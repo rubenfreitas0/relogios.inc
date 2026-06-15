@@ -63,6 +63,14 @@ class CheckoutService
             $totalWeight = 0;
 
             foreach ($cartItems as $item) {
+                if (! $item->product) {
+                    throw new CheckoutException('Um ou mais produtos no seu carrinho já não estão disponíveis.');
+                }
+
+                if (! $item->product->is_active) {
+                    throw new CheckoutException("O produto '{$item->product->name}' já não está disponível.");
+                }
+
                 $subtotal    += $item->quantity * $item->product->price;
                 $totalWeight += ($item->product->weight ?? 0) * $item->quantity;
             }
@@ -72,12 +80,12 @@ class CheckoutService
             $postalCode  = $shippingData['postal_code'] ?? null;
             $expectedZoneId = $this->zoneResolver->resolve($countryCode, $postalCode);
 
-            if ($shippingMethod->shipping_zone_id !== null
-                && $expectedZoneId !== null
-                && $shippingMethod->shipping_zone_id !== $expectedZoneId) {
-                throw new CheckoutException(
-                    'O método de envio selecionado não está disponível para o país de destino.'
-                );
+            if ($shippingMethod->shipping_zone_id !== null) {
+                if ($expectedZoneId === null || $shippingMethod->shipping_zone_id !== $expectedZoneId) {
+                    throw new CheckoutException(
+                        'O método de envio selecionado não está disponível para o país de destino.'
+                    );
+                }
             }
 
             // ─── 6. Validar peso ───
@@ -103,7 +111,7 @@ class CheckoutService
                 $updated = DB::table('products')
                     ->where('id', $item->product->id)
                     ->where('stock', '>=', $item->quantity)
-                    ->update(['stock' => DB::raw("stock - {$item->quantity}")]);
+                    ->decrement('stock', $item->quantity);
 
                 if ($updated === 0) {
                     $currentStock = DB::table('products')

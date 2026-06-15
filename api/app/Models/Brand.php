@@ -2,6 +2,7 @@
 
 namespace App\Models;
 
+use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Support\Str;
@@ -10,6 +11,8 @@ use Illuminate\Support\Facades\Storage;
 
 class Brand extends Model
 {
+    use HasFactory;
+
     protected $fillable = [
         'name',
         'slug',
@@ -42,7 +45,9 @@ class Brand extends Model
             return null;
         }
 
-        return Storage::disk('public')->url($this->logo);
+        /** @var \Illuminate\Filesystem\FilesystemAdapter $disk */
+        $disk = Storage::disk('public');
+        return $disk->url($this->logo);
     }
 
     protected static function boot(): void

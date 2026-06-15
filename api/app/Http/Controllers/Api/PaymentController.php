@@ -23,7 +23,7 @@ class PaymentController extends Controller
 
         DB::beginTransaction();
         try {
-            // Lock pessimista — impede processamento duplicado de webhooks concorrentes
+            // Impede o processamento duplicado de webhooks concorrentes
             $payment = Payment::with('order')
                 ->lockForUpdate()
                 ->findOrFail($validated['payment_id']);
@@ -39,10 +39,16 @@ class PaymentController extends Controller
                 'transaction_id' => $validated['transaction_id'] ?? 'SIM-' . time(),
             ]);
 
-            $payment->order->update([
+            $orderData = [
                 'payment_status' => PaymentStatus::PAID,
                 'paid_at'        => now(),
-            ]);
+            ];
+
+            if ($payment->order->status === \App\Enums\OrderStatus::PENDING) {
+                $orderData['status'] = \App\Enums\OrderStatus::PROCESSING;
+            }
+
+            $payment->order->update($orderData);
 
             DB::commit();
 

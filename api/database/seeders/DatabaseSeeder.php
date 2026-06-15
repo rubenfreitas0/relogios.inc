@@ -24,13 +24,13 @@ class DatabaseSeeder extends Seeder
             ProductsSeeder::class,
             ProductImagesSeeder::class,
             AddressesSeeder::class,
+            ShippingZoneSeeder::class,
+            TaxRateSeeder::class,
+            ShippingMethodSeeder::class,
             OrdersSeeder::class,
             OrderItemsSeeder::class,
             PaymentsSeeder::class,
             CartItemsSeeder::class,
-            ShippingZoneSeeder::class,
-            TaxRateSeeder::class,
-            ShippingMethodSeeder::class,
         ]);
     }
 }
