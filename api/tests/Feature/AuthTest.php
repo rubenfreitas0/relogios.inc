@@ -11,10 +11,7 @@ class AuthTest extends TestCase
 {
     use RefreshDatabase, TestHelpers;
 
-    // ─────────────────────────────────────────────
     // REGISTER
-    // ─────────────────────────────────────────────
-
     public function test_user_can_register(): void
     {
         $response = $this->postJson('/api/register', [
@@ -68,10 +65,7 @@ class AuthTest extends TestCase
             ->assertJsonValidationErrors(['firstname', 'lastname', 'password']);
     }
 
-    // ─────────────────────────────────────────────
     // LOGIN
-    // ─────────────────────────────────────────────
-
     public function test_user_can_login(): void
     {
         User::factory()->create([
@@ -124,10 +118,7 @@ class AuthTest extends TestCase
             ->assertJson(['message' => 'Conta desativada']);
     }
 
-    // ─────────────────────────────────────────────
     // LOGOUT
-    // ─────────────────────────────────────────────
-
     public function test_user_can_logout(): void
     {
         ['headers' => $headers, 'user' => $user] = $this->createUser();
@@ -141,10 +132,7 @@ class AuthTest extends TestCase
         $this->assertDatabaseCount('personal_access_tokens', 0);
     }
 
-    // ─────────────────────────────────────────────
     // PROTEÇÃO DE ROTAS
-    // ─────────────────────────────────────────────
-
     public function test_guest_cannot_access_protected_routes(): void
     {
         $response = $this->getJson('/api/user');

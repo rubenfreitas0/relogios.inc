@@ -18,10 +18,10 @@ const formStore = useFormStore()
 			class="my-10 flex h-full w-full flex-col gap-5 overflow-x-hidden overflow-y-scroll"
 		>
 			<SummaryItem
-				v-for="(value, _, index) in cartStore.cart"
+				v-for="(value, key) in cartStore.cart"
 				:cart-item="value.product"
 				:item-count="value.amount"
-				:key="index"
+				:key="key"
 			/>
 		</div>
 		<div class="flex flex-row justify-between">

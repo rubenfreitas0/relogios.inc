@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import switchesImage from '/display/watch-hero.png'
+import watchHeroImage from '/display/watch-hero.png'
 </script>
 
 <template>
@@ -33,7 +33,7 @@ import switchesImage from '/display/watch-hero.png'
 				<img
 					loading="lazy"
 					class="h-full w-full object-cover"
-					:src="switchesImage"
+					:src="watchHeroImage"
 					alt=""
 					srcset=""
 				/>

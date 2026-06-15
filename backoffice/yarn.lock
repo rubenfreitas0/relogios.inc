@@ -4509,7 +4509,7 @@ duplexify@^3.5.0, duplexify@^3.6.0:
     readable-stream "^2.0.0"
     stream-shift "^1.0.0"
 
-"e2e@file:C:\\Users\\ruben\\Herd\\relogios.inc\\backoffice\\e2e":
+"e2e@file:C:\\Users\\ruben\\Herd\\relogios.inc\\relogios.inc\\backoffice\\e2e":
   version "0.0.0"
   resolved "file:e2e"
 

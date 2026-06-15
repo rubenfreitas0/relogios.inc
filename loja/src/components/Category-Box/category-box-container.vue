@@ -1,24 +1,24 @@
 <script setup lang="ts">
 import CategoryBox from './category-box.vue'
 
-import keebImage from '/products/categories/relogiocontainer1.png'
-import keycapImage from '/products/categories/relogiocontainer2.png'
-import deskmatImage from '/products/categories/relogiocontainer3.png'
+import watchMenImage from '/products/categories/relogiocontainer1.png'
+import watchWomenImage from '/products/categories/relogiocontainer2.png'
+import watchUnisexImage from '/products/categories/relogiocontainer3.png'
 
 const categories = [
 	{
-		src: keebImage,
-		category: 'Relógios Clássicos',
+		src: watchMenImage,
+		category: 'homens',
 		imgClass: ['scale-75', 'object-contain', '-mb-4'],
 	},
 	{
-		src: keycapImage,
-		category: 'Relógios Digitais',
+		src: watchWomenImage,
+		category: 'mulheres',
 		imgClass: ['scale-55', 'object-contain', 'object-center', '-mt-4'],
 	},
 	{
-		src: deskmatImage,
-		category: 'Braceletes',
+		src: watchUnisexImage,
+		category: 'unisexo',
 		imgClass: ['scale-50', 'object-contain', 'object-center', '-mt-4'],
 	},
 ]

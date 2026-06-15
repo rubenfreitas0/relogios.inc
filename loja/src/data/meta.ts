@@ -1,7 +1,7 @@
-import bannerImage from '/icons/KIIIBS-banner.png'
-import keyboardsImage from '/products/keyboards/cow-full.webp'
-import keycapsImage from '/products/keycaps/cap2.webp'
-import deskmatsImage from '/products/deskmats/grrr-full.webp'
+import bannerImage from '/display/watch-hero.png'
+import menCategoryMetaImage from '/products/categories/relogiocontainer1.png'
+import womenCategoryMetaImage from '/products/categories/relogiocontainer2.png'
+import unisexCategoryMetaImage from '/products/categories/relogiocontainer3.png'
 import { meta, metaContainer } from './meta-types.ts'
 
 export const landingPageMeta: meta = {
@@ -16,19 +16,19 @@ export const categoryPageMeta: metaContainer = {
 		title: 'Relógios de Homem | RELOGIOS.inc',
 		description:
 			'Descobre a nossa seleção de relógios masculinos que combinam robustez, precisão e elegância.',
-		image: keyboardsImage,
+		image: menCategoryMetaImage,
 	},
 	mulheres: {
 		title: 'Relógios de Mulher | RELOGIOS.inc',
 		description:
 			'Elegância e sofisticação em cada detalhe. Escolhe o relógio perfeito para o teu estilo.',
-		image: keycapsImage,
+		image: womenCategoryMetaImage,
 	},
 	unisexo: {
 		title: 'Relógios Unisexo | RELOGIOS.inc',
 		description:
 			'Design versátil para todos. Explora a nossa gama de relógios casuais e desportivos.',
-		image: deskmatsImage,
+		image: unisexCategoryMetaImage,
 	},
 }
 

@@ -32,7 +32,7 @@ interface CartState {
 
 export const useCartStore = defineStore('cart', {
 	state: (): CartState => ({
-		cart: useStorage('cart', {} as cart).value,
+		cart: useStorage('cart', {} as cart) as unknown as cart,
 		showCart: false,
 		showQuickAdd: true,
 		

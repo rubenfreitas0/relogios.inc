@@ -319,8 +319,9 @@ const hasActiveFilters = computed(
 						v-for="(product, index) in products"
 						:item="product"
 						:category="props.category"
+						:index="index"
 						:data-test="`product-card-${props.category}-${product.id}`"
-						:key="index"
+						:key="product.id"
 					/>
 				</div>
 

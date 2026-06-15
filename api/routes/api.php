@@ -67,7 +67,7 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::get('/email/status',  [VerificationController::class, 'status']);
 
     // Perfil do utilizador autenticado
-    Route::get('/user', fn(Request $request) => new \App\Http\Resources\UserResource($request->user()));
+    Route::get('/user', fn(\Illuminate\Http\Request $request) => new \App\Http\Resources\UserResource($request->user()));
     Route::patch('/user/profile', [\App\Http\Controllers\Api\ProfileController::class, 'update']);
 
     Route::delete('/cart', [CartController::class, 'clear']);
@@ -81,7 +81,7 @@ Route::middleware('auth:sanctum')->group(function () {
     // Encomendas do cliente
     Route::get('/orders',              [OrderController::class, 'index']);
     Route::post('/orders',             [OrderController::class, 'store']);
-    Route::get('/orders/{orderNumber}', [OrderController::class, 'show'])->whereAlphaNumeric('orderNumber');
+    Route::get('/orders/{orderNumber}', [OrderController::class, 'show'])->where('orderNumber', '[A-Za-z0-9\-]+');
 
     Route::middleware('verified')->group(function () {
         Route::get('/zona-privada', function () {

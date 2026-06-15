@@ -11,15 +11,14 @@ import ButtonSolid from '../../components/Buttons/button-solid.vue'
 		>
 			<h1 class="text-7xl font-black text-k-main">404</h1>
 			<p class="text-md tracking-widest opacity-70">
-				Stare at the abyss and the abyss stares back at you!
+				A página que procura não existe ou foi movida.
 			</p>
 			<ButtonSolid
 				to="/"
 				:color="'light'"
-				:content="'To Safety'"
+				:content="'Voltar ao Início'"
 				:size="'big'"
 				add="font-bold mt-8"
-			
 			/>
 		</div>
 	</main>

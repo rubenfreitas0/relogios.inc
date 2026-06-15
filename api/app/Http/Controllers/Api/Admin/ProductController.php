@@ -63,7 +63,7 @@ class ProductController extends Controller
             DB::beginTransaction();
 
             $validated = $request->validated();
-            $product = Product::create($validated);
+            $product = Product::create(\Illuminate\Support\Arr::except($validated, ['images', 'primary_image']));
 
             if ($request->hasFile('images')) {
                 foreach ($request->file('images') as $index => $image) {
@@ -110,7 +110,7 @@ class ProductController extends Controller
             DB::beginTransaction();
 
             $validated = $request->validated();
-            $product->update($validated);
+            $product->update(\Illuminate\Support\Arr::except($validated, ['images', 'remove_image_ids', 'image_order', 'primary_image_id']));
 
             // Remoção de imagens
             if ($request->filled('remove_image_ids')) {

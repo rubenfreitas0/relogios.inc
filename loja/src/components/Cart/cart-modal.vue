@@ -56,10 +56,10 @@ const cartStore = useCartStore()
 					data-test="cart-item-container"
 				>
 					<CartItem
-						v-for="(value, _, index) in cartStore.cart"
+						v-for="(value, key) in cartStore.cart"
 						:cart-item="value.product as any"
 						:item-count="value.amount"
-						:key="index"
+						:key="key"
 					/>
 				</div>
 				<div
@@ -70,7 +70,7 @@ const cartStore = useCartStore()
 						TOTAL
 					</p>
 					<p class="text-2xl font-bold text-black">
-						${{ cartStore.cartValue }}
+						€{{ cartStore.cartValue.toFixed(2) }}
 					</p>
 				</div>
 				<ButtonSolid

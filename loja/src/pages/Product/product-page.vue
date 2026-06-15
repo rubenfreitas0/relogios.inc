@@ -10,6 +10,7 @@ import Features from './Components/product-features.vue'
 import { useCatalogStore } from '../../pinia/catalogStore'
 import type { Product } from '../../data/product-types'
 import { ref, onMounted, watch } from 'vue'
+import { resolveProductImageUrl } from '../../utils/utilities'
 
 const props = defineProps<{
 	category: string
@@ -38,9 +39,9 @@ watch(() => props.productSlug, () => {
 		<Core :item="item" />
 		<Features :features="item.features || ''" :inthebox="item.inthebox || []" />
 		<Grid
-			:topSrc="item.images?.[1]?.url || item.primary_image?.url || ''"
-			:botSrc="item.images?.[2]?.url || item.primary_image?.url || ''"
-			:rightSrc="item.images?.[3]?.url || item.primary_image?.url || ''"
+			:topSrc="resolveProductImageUrl(item.images?.[1]?.url || item.primary_image?.url || '', item.id + 1)"
+			:botSrc="resolveProductImageUrl(item.images?.[2]?.url || item.primary_image?.url || '', item.id + 2)"
+			:rightSrc="resolveProductImageUrl(item.images?.[3]?.url || item.primary_image?.url || '', item.id + 3)"
 		/>
 		<Ymal :productSlug="item.slug" />
 		<Info />

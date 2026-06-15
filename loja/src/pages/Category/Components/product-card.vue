@@ -1,6 +1,7 @@
 <script setup lang="ts">
 import type { Product } from '../../../data/product-types.ts'
 import { useCartStore } from '../../../pinia/cartStore.ts'
+import { resolveProductImageUrl } from '../../../utils/utilities'
 
 import ButtonSolid from '../../../components/Buttons/button-solid.vue'
 
@@ -9,6 +10,7 @@ const cartStore = useCartStore()
 const props = defineProps<{
 	category: string
 	item: Product
+	index?: number
 }>()
 
 const formatPrice = (price?: number) => {
@@ -35,7 +37,7 @@ const formatPrice = (price?: number) => {
 			<img
 				loading="lazy"
 				class="h-full w-full object-cover opacity-90 transition-opacity duration-300 group-hover:opacity-100"
-				:src="props.item.primary_image?.url || '/images/placeholder.png'"
+				:src="resolveProductImageUrl(props.item.primary_image?.url, props.item.id)"
 				:alt="props.item.name"
 			/>
 		</router-link>
@@ -78,6 +80,7 @@ const formatPrice = (price?: number) => {
 					@click.prevent="cartStore.addToCart(props.item)"
 					class="flex h-11 w-11 items-center justify-center rounded-full bg-white/5 text-white hover:bg-[#FFC700] hover:text-black hover:scale-110 active:scale-95 transition-all duration-300"
 					title="Adicionar ao carrinho"
+					:data-test="props.index !== undefined ? `quick-add-${props.category}-${props.index}` : undefined"
 				>
 					<svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" viewBox="0 0 20 20" fill="currentColor">
 					  <path fill-rule="evenodd" d="M10 3a1 1 0 011 1v5h5a1 1 0 110 2h-5v5a1 1 0 11-2 0v-5H4a1 1 0 110-2h5V4a1 1 0 011-1z" clip-rule="evenodd" />

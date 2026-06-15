@@ -260,7 +260,7 @@ export const useFormStore = defineStore('form', {
 		},
 		isValidAddress(state: FormState) {
 			if (state.address === '') return 'empty'
-			return /[\w',-\\/.\\s]/.test(state.address) === true ? 'true' : 'false'
+			return new RegExp('^[a-zA-ZÀ-ÿ0-9\\s,.\'/ -]+$').test(state.address) === true ? 'true' : 'false'
 		},
 		isValidZip(state: FormState) {
 			if (state.zip === '') return 'empty'
@@ -270,7 +270,7 @@ export const useFormStore = defineStore('form', {
 		},
 		isValidCity(state: FormState) {
 			if (state.city === '') return 'empty'
-			return /[a-zA-Z\s]+/.test(state.city) === true ? 'true' : 'false'
+			return /^[a-zA-ZÀ-ÿ\s]+$/.test(state.city) === true ? 'true' : 'false'
 		},
 		isValidCountry(state: FormState) {
 			if (state.country === '') return 'empty'

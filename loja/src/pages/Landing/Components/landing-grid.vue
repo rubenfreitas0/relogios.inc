@@ -7,14 +7,31 @@ import ButtonSolid from '../../../components/Buttons/button-solid.vue'
 import watchDetailImage from '/display/watch-detail.png'
 import watchBraceletsImage from '/display/watch-bracelets.png'
 import watchBraceletsFlatImage from '/display/watch-bracelets-flat.png'
+import { resolveProductImageUrl } from '../../../utils/utilities'
 
 const catalogStore = useCatalogStore()
 const featuredProduct = ref<Product | null>(null)
+
+const getProductRoute = (product: Product) => {
+	const gender = product.gender
+	let categorySegment = 'unisexo'
+	if (gender === 'masculino') {
+		categorySegment = 'homens'
+	} else if (gender === 'feminino') {
+		categorySegment = 'mulheres'
+	}
+	return `/${categorySegment}/${product.slug}`
+}
 
 onMounted(async () => {
 	const featured = await catalogStore.fetchFeatured()
 	if (featured.length > 0) {
 		featuredProduct.value = featured[0]
+	} else {
+		const res = await catalogStore.fetchProducts({ per_page: 1 })
+		if (res && res.data.length > 0) {
+			featuredProduct.value = res.data[0]
+		}
 	}
 })
 </script>
@@ -36,7 +53,7 @@ onMounted(async () => {
 					class="group order-1 flex h-full w-full flex-col items-center justify-center md:order-none md:grid md:grid-cols-7"
 				>
 					<router-link
-						:to="`/${featuredProduct.category?.slug || 'homens'}/${featuredProduct.slug}`"
+						:to="getProductRoute(featuredProduct)"
 						class="relative flex h-full w-full flex-col items-center justify-center overflow-hidden md:col-span-4 md:px-10"
 					>
 						<!-- Glow dourado que aparece no hover -->
@@ -44,7 +61,7 @@ onMounted(async () => {
 
 						<!-- Relógio: escala suave + ligeiro float no hover -->
 						<img
-							:src="featuredProduct.primary_image?.url || '/images/placeholder.png'"
+							:src="resolveProductImageUrl(featuredProduct.primary_image?.url, featuredProduct.id)"
 							:alt="featuredProduct.name"
 							class="relative z-20 my-5 aspect-auto drop-shadow-2xl md:my-0 md:scale-110 md:transition md:duration-700 md:group-hover:scale-125 md:group-hover:-translate-y-3 max-h-80 object-contain"
 						/>
@@ -71,7 +88,7 @@ onMounted(async () => {
 							{{ featuredProduct.short_description || featuredProduct.description || 'Um relógio incrível para todas as ocasiões.' }}
 						</p>
 						<ButtonSolid
-							:to="`/${featuredProduct.category?.slug || 'homens'}/${featuredProduct.slug}`"
+							:to="getProductRoute(featuredProduct)"
 							content="VER RELÓGIO"
 							add="font-semibold"
 							class="mb-10 self-center md:mb-0 md:self-start"

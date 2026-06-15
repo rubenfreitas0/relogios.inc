@@ -3,12 +3,20 @@ import ButtonSolid from '../../../components/Buttons/button-solid.vue'
 import ButtonGoBack from '../../../components/Buttons/button-go-back.vue'
 import type { Product } from '../../../data/product-types.ts'
 import { useCartStore } from '../../../pinia/cartStore.ts'
+import { resolveProductImageUrl } from '../../../utils/utilities'
+import { computed } from 'vue'
 
 const cartStore = useCartStore()
 
 const props = defineProps<{
 	item: Product
 }>()
+
+const productImage = computed(() => {
+	const item = props.item
+	if (!item) return ''
+	return item.primary_image?.url || item.images?.find(img => img.is_primary)?.url || item.images?.[0]?.url || ''
+})
 </script>
 
 <template>
@@ -48,7 +56,7 @@ const props = defineProps<{
 			<img
 				loading="lazy"
 				class="relative aspect-square object-cover"
-				:src="props.item.primary_image?.url || '/images/placeholder.png'"
+				:src="resolveProductImageUrl(productImage, props.item.id)"
 				:alt="props.item.name"
 			/>
 		</div>

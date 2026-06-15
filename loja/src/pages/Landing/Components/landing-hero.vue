@@ -20,6 +20,17 @@ import { watch } from 'vue'
 watch(hero, (p) => {
 	heroImage.value = p?.primary_image?.url || fallbackImage
 }, { immediate: true })
+
+const getProductRoute = (product: Product) => {
+	const gender = product.gender
+	let categorySegment = 'unisexo'
+	if (gender === 'masculino') {
+		categorySegment = 'homens'
+	} else if (gender === 'feminino') {
+		categorySegment = 'mulheres'
+	}
+	return `/${categorySegment}/${product.slug}`
+}
 </script>
 
 <template>
@@ -58,7 +69,7 @@ watch(hero, (p) => {
 					</template>
 				</p>
 				<ButtonSolid
-					:to="hero ? `/${hero.category?.slug || 'homens'}/${hero.slug}` : '/homens'"
+					:to="hero ? getProductRoute(hero) : '/homens'"
 					:content="hero ? 'ver relógio' : 'explorar'"
 					color="light"
 					add="font-bold mb-20"
