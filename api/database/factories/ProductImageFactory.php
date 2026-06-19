@@ -20,7 +20,7 @@ class ProductImageFactory extends Factory
     {
         return [
             'product_id' => Product::factory(),
-            'url' => fake()->imageUrl(640, 480, 'watches'),
+            'url' => 'https://via.placeholder.com/640x480',
             'is_primary' => false,
             'sort_order' => fake()->numberBetween(1, 5),
         ];

@@ -2,6 +2,7 @@
 import { useAccountStore } from '../../../pinia/accountStore'
 import { onMounted, watch, computed } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
+import { resolveProductImageUrl } from '../../../utils/utilities'
 
 const store = useAccountStore()
 const route = useRoute()
@@ -33,19 +34,21 @@ function formatDate(iso: string): string {
 	})
 }
 
-function formatPrice(value: number): string {
-	return value.toFixed(2).replace('.', ',')
+function formatPrice(value: number | string): string {
+	const num = Number(value)
+	if (isNaN(num)) return '0,00'
+	return num.toFixed(2).replace('.', ',')
 }
 
 const statusColor = (value: string) => {
 	switch (value) {
-		case 'pending': return 'bg-amber-500/10 text-amber-400 border-amber-500/20'
-		case 'processing': return 'bg-blue-500/10 text-blue-400 border-blue-500/20'
-		case 'shipped': return 'bg-indigo-500/10 text-indigo-400 border-indigo-500/20'
-		case 'delivered': return 'bg-green-500/10 text-green-400 border-green-500/20'
-		case 'cancelled': return 'bg-red-500/10 text-red-400 border-red-500/20'
-		case 'refunded': return 'bg-gray-500/10 text-gray-400 border-gray-500/20'
-		default: return 'bg-white/5 text-white/50 border-white/10'
+	case 'pending': return 'bg-amber-500/10 text-amber-400 border-amber-500/20'
+	case 'processing': return 'bg-blue-500/10 text-blue-400 border-blue-500/20'
+	case 'shipped': return 'bg-indigo-500/10 text-indigo-400 border-indigo-500/20'
+	case 'delivered': return 'bg-green-500/10 text-green-400 border-green-500/20'
+	case 'cancelled': return 'bg-red-500/10 text-red-400 border-red-500/20'
+	case 'refunded': return 'bg-gray-500/10 text-gray-400 border-gray-500/20'
+	default: return 'bg-white/5 text-white/50 border-white/10'
 	}
 }
 
@@ -144,7 +147,7 @@ const currentStepIndex = computed(() => {
 						<div class="h-14 w-14 flex-shrink-0 overflow-hidden rounded-lg bg-white/5">
 							<img
 								v-if="item.product_image"
-								:src="item.product_image"
+								:src="resolveProductImageUrl(item.product_image)"
 								:alt="item.product_name"
 								class="h-full w-full object-cover"
 							/>

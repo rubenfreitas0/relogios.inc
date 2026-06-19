@@ -200,7 +200,8 @@ export const useAuthStore = defineStore('auth', () => {
 				},
 			})
 			if (res.ok) {
-				user.value = await res.json()
+				const responseData = await res.json()
+				user.value = responseData.data ?? responseData
 				// Sincronizar carrinho se viemos de um refresh e já temos token
 				const cartStore = useCartStore()
 				await cartStore.fetchCart()

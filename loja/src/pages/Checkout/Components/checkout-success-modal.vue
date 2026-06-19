@@ -2,6 +2,7 @@
 import ButtonSolid from '../../../components/Buttons/button-solid.vue'
 import { useFormStore } from '../../../pinia/formStore'
 import { onBeforeMount, onBeforeUnmount, computed } from 'vue'
+import { resolveProductImageUrl } from '../../../utils/utilities'
 
 const formStore = useFormStore()
 
@@ -76,7 +77,7 @@ onBeforeUnmount(() => {
 						<div v-if="firstItem" class="flex h-full w-full flex-row items-center">
 							<img
 								class="aspect-square h-24"
-								:src="firstItem.product_image"
+								:src="resolveProductImageUrl(firstItem.product_image)"
 								alt=""
 								loading="lazy"
 							/>

@@ -2,15 +2,13 @@
 import Navigation from '../../components/navigation-global.vue'
 import Core from './Components/product-core.vue'
 import Ymal from '../../components/ymal-boxes.vue'
-import Grid from './Components/product-image-grid.vue'
-import Info from '../../components/info-section.vue'
+import DetailsExtra from './Components/product-details-extra.vue'
+import RecentlyViewed from '../../components/recently-viewed.vue'
 import Footer from '../../components/footer-global.vue'
-import Features from './Components/product-features.vue'
 
 import { useCatalogStore } from '../../pinia/catalogStore'
 import type { Product } from '../../data/product-types'
 import { ref, onMounted, watch } from 'vue'
-import { resolveProductImageUrl } from '../../utils/utilities'
 
 const props = defineProps<{
 	category: string
@@ -21,7 +19,11 @@ const catalogStore = useCatalogStore()
 const item = ref<Product | null>(null)
 
 const loadProduct = async () => {
-	item.value = await catalogStore.fetchProductDetail(props.productSlug)
+	const data = await catalogStore.fetchProductDetail(props.productSlug)
+	if (data) {
+		item.value = data
+		catalogStore.addToRecentlyViewed(data)
+	}
 }
 
 onMounted(() => {
@@ -34,20 +36,21 @@ watch(() => props.productSlug, () => {
 </script>
 
 <template>
-	<main v-if="item" class="flex h-full w-screen flex-col items-center bg-white">
+	<main v-if="item" class="flex h-full w-screen flex-col items-center bg-k-black text-white">
 		<Navigation color="black" />
 		<Core :item="item" />
-		<Features :features="item.features || ''" :inthebox="item.inthebox || []" />
-		<Grid
-			:topSrc="resolveProductImageUrl(item.images?.[1]?.url || item.primary_image?.url || '', item.id + 1)"
-			:botSrc="resolveProductImageUrl(item.images?.[2]?.url || item.primary_image?.url || '', item.id + 2)"
-			:rightSrc="resolveProductImageUrl(item.images?.[3]?.url || item.primary_image?.url || '', item.id + 3)"
-		/>
-		<Ymal :productSlug="item.slug" />
-		<Info />
+		
+		<DetailsExtra :item="item" />
+		
+		<!-- Dark section for Recently Viewed & You May Also Like at the bottom -->
+		<div class="w-full bg-k-black text-white flex flex-col items-center py-12 border-t border-white/5">
+			<RecentlyViewed :currentSlug="item.slug" />
+			<Ymal :productSlug="item.slug" />
+		</div>
+		
 		<Footer />
 	</main>
-	<div v-else class="flex h-screen w-screen items-center justify-center bg-white text-black">
+	<div v-else class="flex h-screen w-screen items-center justify-center bg-k-black text-white">
 		<p>A carregar produto...</p>
 	</div>
 </template>

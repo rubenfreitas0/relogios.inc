@@ -1,5 +1,6 @@
 <script setup lang="ts">
 import { useCartStore } from './pinia/cartStore.ts'
+import { resolveProductImageUrl } from './utils/utilities'
 const cartStore = useCartStore()
 </script>
 
@@ -15,7 +16,7 @@ const cartStore = useCartStore()
             >
                 <div class="h-12 w-12 flex-shrink-0 overflow-hidden rounded-md bg-gray-50">
                     <img 
-                        :src="cartStore.lastAddedItem.primary_image?.url || '/images/placeholder.png'" 
+                        :src="resolveProductImageUrl(cartStore.lastAddedItem.primary_image?.url, cartStore.lastAddedItem.id) || '/images/placeholder.png'" 
                         :alt="cartStore.lastAddedItem.name"
                         class="h-full w-full object-cover"
                     />

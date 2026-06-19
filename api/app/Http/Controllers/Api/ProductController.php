@@ -36,7 +36,13 @@ class ProductController extends Controller
         }
 
         if ($request->filled('gender')) {
-            $query->where('gender', $request->gender);
+            $gender = $request->gender;
+            if ($gender === 'homens') {
+                $gender = 'masculino';
+            } elseif ($gender === 'mulheres') {
+                $gender = 'feminino';
+            }
+            $query->where('gender', $gender);
         }
 
         if ($request->filled('min_price')) {
@@ -96,11 +102,11 @@ class ProductController extends Controller
     /**
      * Produto em Detalhe
      */
-    public function show($slug)
+    public function show(string $slug)
     {
         $product = Product::where('slug', $slug)
             ->where('is_active', true)
-            ->with(['brand', 'category', 'images'])
+            ->with(['brand', 'category', 'images', 'primaryImage'])
             ->firstOrFail();
 
         return new ProductResource($product);
@@ -109,7 +115,7 @@ class ProductController extends Controller
     /**
      * Obter Produtos Relacionados (mesma categoria)
      */
-    public function related($slug)
+    public function related(string $slug)
     {
         $product = Product::where('slug', $slug)
             ->where('is_active', true)

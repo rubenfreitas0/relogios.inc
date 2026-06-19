@@ -10,6 +10,8 @@ const props = defineProps<{
 	cartItem: CartItemProduct
 	itemCount: number
 }>()
+
+import { resolveProductImageUrl } from '../../../utils/utilities'
 </script>
 
 <template>
@@ -19,8 +21,8 @@ const props = defineProps<{
 	>
 		<div class="basis-1/4 justify-self-start overflow-hidden rounded-lg">
 			<img
-				class="aspect-square h-fit w-fit object-cover shadow-md"
-				:src="props.cartItem.primary_image?.url || '/images/placeholder.png'"
+				class="aspect-square h-fit w-fit bg-black object-contain p-2 shadow-md"
+				:src="resolveProductImageUrl(props.cartItem.primary_image?.url, props.cartItem.id) || '/images/placeholder.png'"
 				:alt="props.cartItem.name"
 			/>
 		</div>

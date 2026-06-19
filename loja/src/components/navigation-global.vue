@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import cartIcon from '/icons/cart-icon.svg'
 import Cart from './Cart/cart-modal.vue'
-import { computed, onBeforeUnmount, ref } from 'vue'
+import { computed, onBeforeUnmount, ref, onMounted } from 'vue'
 import { useCartStore } from '../pinia/cartStore.ts'
 import { useAuthStore } from '../pinia/authStore.ts'
 import { useRouter, useRoute } from 'vue-router'
@@ -115,6 +115,12 @@ const megaMenus: Record<string, {
 	},
 }
 
+onMounted(async () => {
+	if (authStore.token && !authStore.user) {
+		await authStore.fetchUser()
+	}
+})
+
 onBeforeUnmount(() => {
 	if (megaLeaveTimeout) clearTimeout(megaLeaveTimeout)
 })
@@ -169,6 +175,7 @@ onBeforeUnmount(() => {
 						class="uppercase text-white transition duration-300 hover:text-k-main text-sm flex items-center gap-1"
 						:class="activeMega === 'homens' ? 'text-k-main' : ''"
 						@click="activeMega = null"
+						data-test="nav-homens"
 					>
 						Homens
 						<svg class="w-3 h-3 transition-transform duration-200" :class="activeMega === 'homens' ? 'rotate-180' : ''" fill="none" viewBox="0 0 24 24" stroke="currentColor">
@@ -188,6 +195,7 @@ onBeforeUnmount(() => {
 						class="uppercase text-white transition duration-300 hover:text-k-main text-sm flex items-center gap-1"
 						:class="activeMega === 'mulheres' ? 'text-k-main' : ''"
 						@click="activeMega = null"
+						data-test="nav-mulheres"
 					>
 						Mulheres
 						<svg class="w-3 h-3 transition-transform duration-200" :class="activeMega === 'mulheres' ? 'rotate-180' : ''" fill="none" viewBox="0 0 24 24" stroke="currentColor">
@@ -207,6 +215,7 @@ onBeforeUnmount(() => {
 						class="uppercase text-white transition duration-300 hover:text-k-main text-sm flex items-center gap-1"
 						:class="activeMega === 'unisexo' ? 'text-k-main' : ''"
 						@click="activeMega = null"
+						data-test="nav-unisexo"
 					>
 						Unisexo
 						<svg class="w-3 h-3 transition-transform duration-200" :class="activeMega === 'unisexo' ? 'rotate-180' : ''" fill="none" viewBox="0 0 24 24" stroke="currentColor">
@@ -218,7 +227,7 @@ onBeforeUnmount(() => {
 				<router-link
 					to="/sobre-nos"
 					class="uppercase text-white transition duration-300 hover:text-k-main active:translate-y-0.5 text-sm"
-					data-test="nav-deskmats"
+					data-test="nav-sobre-nos"
 				>Sobre Nós</router-link>
 			</nav>
 
@@ -229,7 +238,7 @@ onBeforeUnmount(() => {
 				<div v-if="authStore.user" class="relative hidden lg:block" data-test="user-menu">
 					<button @click="userMenuOpen = !userMenuOpen" class="flex items-center gap-2 group transition duration-200">
 						<div class="flex items-center justify-center w-8 h-8 rounded-full bg-k-main text-k-black text-xs font-black tracking-tight select-none">
-							{{ authStore.user.firstname.charAt(0).toUpperCase() }}{{ authStore.user.lastname.charAt(0).toUpperCase() }}
+							{{ (authStore.user?.firstname?.charAt(0) || '').toUpperCase() }}{{ (authStore.user?.lastname?.charAt(0) || '').toUpperCase() }}
 						</div>
 						<span class="text-white/70 text-xs uppercase tracking-wider group-hover:text-white transition duration-200 hidden xl:block">
 							{{ authStore.user.firstname }}
@@ -434,10 +443,10 @@ onBeforeUnmount(() => {
 					Fechar ✕
 				</button>
 				<router-link to="/" class="uppercase text-white transition duration-300 hover:text-k-main active:translate-y-0.5" :class="$route.path === '/' && 'hidden'" @click="hideHamburger()" data-test="mobile-nav-home">Home</router-link>
-				<router-link to="/homens" class="uppercase text-white transition duration-300 hover:text-k-main active:translate-y-0.5" @click="hideHamburger()">Homens</router-link>
-				<router-link to="/mulheres" class="uppercase text-white transition duration-300 hover:text-k-main active:translate-y-0.5" @click="hideHamburger()">Mulheres</router-link>
-				<router-link to="/unisexo" class="uppercase text-white transition duration-300 hover:text-k-main active:translate-y-0.5" @click="hideHamburger()">Unisexo</router-link>
-				<router-link to="/sobre-nos" class="uppercase text-white transition duration-300 hover:text-k-main active:translate-y-0.5" :class="$route.path === '/sobre-nos' && 'hidden'" @click="hideHamburger()" data-test="mobile-nav-deskmats">Sobre Nós</router-link>
+				<router-link to="/homens" class="uppercase text-white transition duration-300 hover:text-k-main active:translate-y-0.5" @click="hideHamburger()" data-test="mobile-nav-homens">Homens</router-link>
+				<router-link to="/mulheres" class="uppercase text-white transition duration-300 hover:text-k-main active:translate-y-0.5" @click="hideHamburger()" data-test="mobile-nav-mulheres">Mulheres</router-link>
+				<router-link to="/unisexo" class="uppercase text-white transition duration-300 hover:text-k-main active:translate-y-0.5" @click="hideHamburger()" data-test="mobile-nav-unisexo">Unisexo</router-link>
+				<router-link to="/sobre-nos" class="uppercase text-white transition duration-300 hover:text-k-main active:translate-y-0.5" :class="$route.path === '/sobre-nos' && 'hidden'" @click="hideHamburger()" data-test="mobile-nav-sobre-nos">Sobre Nós</router-link>
 
 				<!-- Divisor -->
 				<div class="w-16 h-px bg-white/10 my-1"></div>
@@ -446,7 +455,7 @@ onBeforeUnmount(() => {
 				<template v-if="authStore.user">
 					<div class="text-center">
 						<div class="flex items-center justify-center w-10 h-10 rounded-full bg-k-main text-k-black text-sm font-black mx-auto mb-2">
-							{{ authStore.user.firstname.charAt(0).toUpperCase() }}{{ authStore.user.lastname.charAt(0).toUpperCase() }}
+							{{ (authStore.user?.firstname?.charAt(0) || '').toUpperCase() }}{{ (authStore.user?.lastname?.charAt(0) || '').toUpperCase() }}
 						</div>
 						<p class="text-white/60 text-xs">{{ authStore.user.firstname }} {{ authStore.user.lastname }}</p>
 					</div>

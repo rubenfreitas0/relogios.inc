@@ -18,6 +18,11 @@ export interface ProductImage {
 	is_primary: boolean
 }
 
+export interface BoxItem {
+	count?: number
+	content: string
+}
+
 export interface Product {
 	id: number
 	name: string
@@ -34,10 +39,12 @@ export interface Product {
 	category?: Category
 	images?: ProductImage[]
 	primary_image?: ProductImage
+	weight?: number | string
 
 	// Para compatibilidade temporária com componentes antigos (se necessário)
 	features?: string
-	inthebox?: any[]
+	inthebox?: (string | BoxItem)[]
+	in_the_box?: (string | BoxItem)[]
 }
 
 export interface PaginatedResponse<T> {

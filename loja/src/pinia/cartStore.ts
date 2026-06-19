@@ -5,7 +5,7 @@ import { useStorage } from '@vueuse/core'
 interface CartProduct extends Omit<Partial<Product>, 'primary_image'> {
 	id: number
 	name?: string
-	primary_image?: { url: string } | any
+	primary_image?: { url: string }
 	price: number | string
 }
 
@@ -113,14 +113,14 @@ export const useCartStore = defineStore('cart', {
 			await this.fetchCart()
 		},
 
-		async addToCart(item: CartProduct) {
+		async addToCart(item: CartProduct, quantity: number = 1) {
 			const itemKey = 'api_' + item.id
 			const token = localStorage.getItem('auth_token')
 
 			if (itemKey in this.cart) {
-				this.cart[itemKey].amount = this.cart[itemKey].amount + 1
+				this.cart[itemKey].amount = this.cart[itemKey].amount + quantity
 			} else {
-				this.cart[itemKey] = { product: item, amount: 1 }
+				this.cart[itemKey] = { product: item, amount: quantity }
 			}
 
 			if (token) {
@@ -132,7 +132,7 @@ export const useCartStore = defineStore('cart', {
 							Accept: 'application/json',
 							Authorization: `Bearer ${token}`,
 						},
-						body: JSON.stringify({ product_id: item.id, quantity: 1 }),
+						body: JSON.stringify({ product_id: item.id, quantity: quantity }),
 					})
 					if (res.ok) {
 						await this.fetchCart()

@@ -12,7 +12,7 @@ describe('Desktop: Empty cart - customer', () => {
 		cy.visit('/checkout')
 		cy.get('[data-test="checkout-button"]').click()
 		cy.on('window:alert', (str) => {
-			expect(str).to.equal('Shopping cart is empty!')
+			expect(str).to.equal('O carrinho está vazio!')
 		})
 	})
 })
@@ -20,17 +20,36 @@ describe('Desktop: Empty cart - customer', () => {
 describe('Desktop: Filled cart - customer', () => {
 	beforeEach(() => {
 		cy.viewport('macbook-15')
-		cy.visit('/keyboards')
-		cy.get('[data-test="quick-add-keyboards-0"]').click().click()
-		cy.get('[data-test="nav-deskmats"]').click()
-		cy.get('[data-test="quick-add-deskmats-0"]').click()
+		cy.intercept('GET', '/api/shipping/calculate*').as('calculateShipping')
+		
+		// Efetuar login programático com o utilizador seeded
+		cy.request('POST', '/api/login', {
+			email: 'admin@relogios.inc',
+			password: 'password'
+		}).then((response) => {
+			const token = response.body.token
+			window.localStorage.setItem('auth_token', token)
+			cy.request({
+				method: 'DELETE',
+				url: '/api/cart',
+				headers: {
+					Authorization: `Bearer ${token}`
+				}
+			})
+		})
+
+		cy.visit('/homens')
+		cy.contains('.group', 'Submariner').find('[data-test^="quick-add-"]').click()
+		cy.contains('.group', 'Submariner').find('[data-test^="quick-add-"]').click()
+		cy.get('[data-test="nav-unisexo"]').click()
+		cy.contains('.group', 'F-91W').find('[data-test^="quick-add-"]').click()
 		cy.get('[data-test="cart-bubble"]').contains(3)
 		cy.get('[data-test="cart-button"]').click()
 		cy.get('[data-test="cart-checkout-button"]').click()
 		cy.get('[data-test="checkout-summary"]')
 			.children()
-			.should('contain', 'XX59')
-			.and('contain', 'Grrr')
+			.should('contain', 'Submariner')
+			.and('contain', 'F-91W')
 			.and('be.visible')
 	})
 	it('doesnt see "Required" labels upon first checkout visit.', () => {
@@ -58,28 +77,40 @@ describe('Desktop: Filled cart - customer', () => {
 			.should('not.be.visible')
 	})
 	it('types in correct data, pays and goes back to home with button', () => {
-		cy.get('[data-test="checkout-button"]').click()
 		cy.url().should('include', '/checkout')
-		cy.get('[data-test="text-input-field-name"]').type('Steven Bruben')
-		cy.get('[data-test="text-input-field-email"]').type('steve@bruben.com')
-		cy.get('[data-test="text-input-field-address"]').type('Alexanderplatz 12')
-		cy.get('[data-test="text-input-field-zip"]').type('10178')
-		cy.get('[data-test="text-input-field-city"]').type('Berlin')
-		cy.get('[data-test="text-input-field-country"]').type('Germany')
+		cy.get('[data-test="text-input-field-name"]').clear().type('Steven Bruben')
+		cy.get('[data-test="text-input-field-email"]').clear().type('steve@bruben.com')
+		cy.get('[data-test="text-input-field-address"]').clear().type('Alexanderplatz 12')
+		cy.get('[data-test="text-input-field-zip"]').clear().type('10178')
+		cy.get('[data-test="text-input-field-city"]').clear().type('Berlin')
+		cy.get('[data-test="text-input-field-country"]').clear().type('DE')
+		cy.wait('@calculateShipping').then((interception) => {
+			if (interception.request.url.includes('country=PT')) {
+				cy.wait('@calculateShipping')
+			}
+		})
 		cy.get('[data-test="form-button-cash"]').click()
 		cy.get('[data-test="form-text-area"]').type('Please send some stickers')
 		cy.get('[data-test="checkout-button"]').click()
 		cy.get('[data-test="checkout-success-modal"]')
 			.children()
-			.should('contain', 'XX59')
+			.should('contain', 'Submariner')
 			.and('contain', 'and 1 other item')
 			.and('be.visible')
 		cy.get('[data-test="checkout-success-modal-button"]').click()
 		cy.url().should('eq', 'http://localhost:5173/')
 	})
 	it('doesnt fill form, clicks pay without success and sees required fields.', () => {
-		cy.get('[data-test="checkout-button"]').click()
 		cy.url().should('include', '/checkout')
+		// Limpar o formulário (pode ter vindo com dados da morada default do utilizador)
+		cy.get('[data-test="text-input-field-name"]').clear()
+		cy.get('[data-test="text-input-field-email"]').clear()
+		cy.get('[data-test="text-input-field-address"]').clear()
+		cy.get('[data-test="text-input-field-zip"]').clear()
+		cy.get('[data-test="text-input-field-city"]').clear()
+		cy.get('[data-test="text-input-field-country"]').clear()
+		
+		cy.get('[data-test="checkout-button"]').click()
 		cy.get('[data-test="checkout-success-modal"]').should('not.exist')
 		cy.get('[data-test="text-input-name"]')
 			.contains('Required.')
@@ -104,13 +135,12 @@ describe('Desktop: Filled cart - customer', () => {
 			.should('be.visible')
 	})
 	it('types in partially correct and some missing data, attempts to pay without success, fixes input and succeeds.', () => {
-		cy.get('[data-test="checkout-button"]').click()
 		cy.url().should('include', '/checkout')
-		cy.get('[data-test="text-input-field-name"]').type('Steven Bruben')
-		cy.get('[data-test="text-input-field-email"]').type('steve@bruben')
-		cy.get('[data-test="text-input-field-address"]').type('Alexanderplatz 12')
-		cy.get('[data-test="text-input-field-zip"]').type('10178')
-		cy.get('[data-test="text-input-field-country"]').type('10178')
+		cy.get('[data-test="text-input-field-name"]').clear().type('Steven Bruben')
+		cy.get('[data-test="text-input-field-email"]').clear().type('steve@bruben')
+		cy.get('[data-test="text-input-field-address"]').clear().type('Alexanderplatz 12')
+		cy.get('[data-test="text-input-field-zip"]').clear().type('10178')
+		cy.get('[data-test="text-input-field-country"]').clear().type('10') // Fails /^[a-zA-Z]{2}$/
 		cy.get('[data-test="form-button-emoney"]').click()
 		cy.get('[data-test="form-text-area"]').type('Please send some stickers')
 		cy.get('[data-test="checkout-button"]').click()
@@ -121,7 +151,7 @@ describe('Desktop: Filled cart - customer', () => {
 			.should('not.be.visible')
 
 		cy.get('[data-test="text-input-email"]')
-			.contains('Must be a valid email address.')
+			.contains('Email inválido.')
 			.should('be.visible')
 		cy.get('[data-test="text-input-email"]')
 			.contains('Required.')
@@ -144,7 +174,7 @@ describe('Desktop: Filled cart - customer', () => {
 			.should('be.visible')
 
 		cy.get('[data-test="text-input-country"]')
-			.contains('Must contain non-special characters.')
+			.contains('Código de 2 letras (ex: PT, ES, DE).')
 			.should('be.visible')
 
 		cy.get('[data-test="text-input-country"]')
@@ -155,12 +185,17 @@ describe('Desktop: Filled cart - customer', () => {
 			.clear()
 			.type('steve@bruben.com')
 		cy.get('[data-test="text-input-field-city"]').type('Berlin')
-		cy.get('[data-test="text-input-field-country"]').clear().type('Germany')
+		cy.get('[data-test="text-input-field-country"]').clear().type('DE')
+		cy.wait('@calculateShipping').then((interception) => {
+			if (interception.request.url.includes('country=PT')) {
+				cy.wait('@calculateShipping')
+			}
+		})
 		cy.get('[data-test="checkout-button"]').click()
 
 		cy.get('[data-test="checkout-success-modal"]')
 			.children()
-			.should('contain', 'XX59')
+			.should('contain', 'Submariner')
 			.and('contain', 'and 1 other item')
 			.and('be.visible')
 		cy.get('[data-test="checkout-success-modal-button"]').click()
@@ -183,7 +218,7 @@ describe('Mobile: Empty cart - customer', () => {
 		cy.visit('/checkout')
 		cy.get('[data-test="checkout-button"]').click()
 		cy.on('window:alert', (str) => {
-			expect(str).to.equal('Shopping cart is empty!')
+			expect(str).to.equal('O carrinho está vazio!')
 		})
 	})
 })
@@ -191,18 +226,37 @@ describe('Mobile: Empty cart - customer', () => {
 describe('Mobile: Filled cart - customer', () => {
 	beforeEach(() => {
 		cy.viewport('iphone-7')
-		cy.visit('/keyboards')
-		cy.get('[data-test="quick-add-keyboards-0"]').click().click()
+		cy.intercept('GET', '/api/shipping/calculate*').as('calculateShipping')
+		
+		// Efetuar login programático com o utilizador seeded
+		cy.request('POST', '/api/login', {
+			email: 'admin@relogios.inc',
+			password: 'password'
+		}).then((response) => {
+			const token = response.body.token
+			window.localStorage.setItem('auth_token', token)
+			cy.request({
+				method: 'DELETE',
+				url: '/api/cart',
+				headers: {
+					Authorization: `Bearer ${token}`
+				}
+			})
+		})
+
+		cy.visit('/homens')
+		cy.contains('.group', 'Submariner').find('[data-test^="quick-add-"]').click()
+		cy.contains('.group', 'Submariner').find('[data-test^="quick-add-"]').click()
 		cy.get('[data-test="hamburger"]').click()
-		cy.get('[data-test="mobile-nav-deskmats"]').click()
-		cy.get('[data-test="quick-add-deskmats-0"]').click()
+		cy.get('[data-test="mobile-nav-unisexo"]').click()
+		cy.contains('.group', 'F-91W').find('[data-test^="quick-add-"]').click()
 		cy.get('[data-test="cart-bubble"]').contains(3)
 		cy.get('[data-test="cart-button"]').click()
 		cy.get('[data-test="cart-checkout-button"]').click()
 		cy.get('[data-test="checkout-summary"]')
 			.children()
-			.should('contain', 'XX59')
-			.and('contain', 'Grrr')
+			.should('contain', 'Submariner')
+			.and('contain', 'F-91W')
 			.and('be.visible')
 	})
 	it('doesnt see "Required" labels upon first checkout visit.', () => {
@@ -230,26 +284,39 @@ describe('Mobile: Filled cart - customer', () => {
 			.should('not.be.visible')
 	})
 	it('types in correct data, pays and goes back to home with button', () => {
-		cy.get('[data-test="checkout-button"]').click()
 		cy.url().should('include', '/checkout')
-		cy.get('[data-test="text-input-field-name"]').type('Steven Bruben')
-		cy.get('[data-test="text-input-field-email"]').type('steve@bruben.com')
-		cy.get('[data-test="text-input-field-address"]').type('Alexanderplatz 12')
-		cy.get('[data-test="text-input-field-zip"]').type('10178')
-		cy.get('[data-test="text-input-field-city"]').type('Berlin')
-		cy.get('[data-test="text-input-field-country"]').type('Germany')
+		cy.get('[data-test="text-input-field-name"]').clear().type('Steven Bruben')
+		cy.get('[data-test="text-input-field-email"]').clear().type('steve@bruben.com')
+		cy.get('[data-test="text-input-field-address"]').clear().type('Alexanderplatz 12')
+		cy.get('[data-test="text-input-field-zip"]').clear().type('10178')
+		cy.get('[data-test="text-input-field-city"]').clear().type('Berlin')
+		cy.get('[data-test="text-input-field-country"]').clear().type('DE')
+		cy.wait('@calculateShipping').then((interception) => {
+			if (interception.request.url.includes('country=PT')) {
+				cy.wait('@calculateShipping')
+			}
+		})
 		cy.get('[data-test="form-button-cash"]').click()
 		cy.get('[data-test="form-text-area"]').type('Please send some stickers')
 		cy.get('[data-test="checkout-button"]').click()
 		cy.get('[data-test="checkout-success-modal"]')
 			.children()
-			.should('contain', 'XX59')
+			.should('contain', 'Submariner')
 			.and('contain', 'and 1 other item')
 			.and('be.visible')
 		cy.get('[data-test="checkout-success-modal-button"]').click()
 		cy.url().should('eq', 'http://localhost:5173/')
 	})
 	it('doesnt fill form, clicks pay without success and sees required fields.', () => {
+		cy.url().should('include', '/checkout')
+		// Limpar o formulário
+		cy.get('[data-test="text-input-field-name"]').clear()
+		cy.get('[data-test="text-input-field-email"]').clear()
+		cy.get('[data-test="text-input-field-address"]').clear()
+		cy.get('[data-test="text-input-field-zip"]').clear()
+		cy.get('[data-test="text-input-field-city"]').clear()
+		cy.get('[data-test="text-input-field-country"]').clear()
+
 		cy.get('[data-test="checkout-button"]').click()
 		cy.url().should('include', '/checkout')
 		cy.get('[data-test="checkout-success-modal"]').should('not.exist')
@@ -276,13 +343,12 @@ describe('Mobile: Filled cart - customer', () => {
 			.should('be.visible')
 	})
 	it('types in partially correct and some missing data, attempts to pay without success, fixes input and succeeds.', () => {
-		cy.get('[data-test="checkout-button"]').click()
 		cy.url().should('include', '/checkout')
-		cy.get('[data-test="text-input-field-name"]').type('Steven Bruben')
-		cy.get('[data-test="text-input-field-email"]').type('steve@bruben')
-		cy.get('[data-test="text-input-field-address"]').type('Alexanderplatz 12')
-		cy.get('[data-test="text-input-field-zip"]').type('10178')
-		cy.get('[data-test="text-input-field-country"]').type('10178')
+		cy.get('[data-test="text-input-field-name"]').clear().type('Steven Bruben')
+		cy.get('[data-test="text-input-field-email"]').clear().type('steve@bruben')
+		cy.get('[data-test="text-input-field-address"]').clear().type('Alexanderplatz 12')
+		cy.get('[data-test="text-input-field-zip"]').clear().type('10178')
+		cy.get('[data-test="text-input-field-country"]').clear().type('10') // Fails /^[a-zA-Z]{2}$/
 		cy.get('[data-test="form-button-emoney"]').click()
 		cy.get('[data-test="form-text-area"]').type('Please send some stickers')
 		cy.get('[data-test="checkout-button"]').click()
@@ -293,7 +359,7 @@ describe('Mobile: Filled cart - customer', () => {
 			.should('not.be.visible')
 
 		cy.get('[data-test="text-input-email"]')
-			.contains('Must be a valid email address.')
+			.contains('Email inválido.')
 			.should('be.visible')
 		cy.get('[data-test="text-input-email"]')
 			.contains('Required.')
@@ -316,7 +382,7 @@ describe('Mobile: Filled cart - customer', () => {
 			.should('be.visible')
 
 		cy.get('[data-test="text-input-country"]')
-			.contains('Must contain non-special characters.')
+			.contains('Código de 2 letras (ex: PT, ES, DE).')
 			.should('be.visible')
 
 		cy.get('[data-test="text-input-country"]')
@@ -327,12 +393,17 @@ describe('Mobile: Filled cart - customer', () => {
 			.clear()
 			.type('steve@bruben.com')
 		cy.get('[data-test="text-input-field-city"]').type('Berlin')
-		cy.get('[data-test="text-input-field-country"]').clear().type('Germany')
+		cy.get('[data-test="text-input-field-country"]').clear().type('DE')
+		cy.wait('@calculateShipping').then((interception) => {
+			if (interception.request.url.includes('country=PT')) {
+				cy.wait('@calculateShipping')
+			}
+		})
 		cy.get('[data-test="checkout-button"]').click()
 
 		cy.get('[data-test="checkout-success-modal"]')
 			.children()
-			.should('contain', 'XX59')
+			.should('contain', 'Submariner')
 			.and('contain', 'and 1 other item')
 			.and('be.visible')
 		cy.get('[data-test="checkout-success-modal-button"]').click()
@@ -340,8 +411,3 @@ describe('Mobile: Filled cart - customer', () => {
 		cy.url().should('eq', 'http://localhost:5173/')
 	})
 })
-// describe('Mobile: checkout', () => {
-// 	it('alerts when no items in cart', () => {
-// 		cy.visit('/')
-// 	})
-// })

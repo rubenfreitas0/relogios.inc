@@ -9,8 +9,21 @@ import { computed, ref, watch, onMounted } from 'vue'
 const props = defineProps<{ category: string }>()
 const catalogStore = useCatalogStore()
 
+interface PriceRange {
+	label: string
+	min: number
+	max: number
+}
+
+interface CategoryFilterMeta {
+	label: string
+	subtitle: string
+	brands: string[]
+	priceRanges: PriceRange[]
+}
+
 // ── Static filter data (future: fetch from API) ──────────────────
-const filterData: Record<string, any> = {
+const filterData: Record<string, CategoryFilterMeta> = {
 	homens: {
 		label: 'Homens',
 		subtitle: 'Elegância e precisão para ele.',
@@ -59,7 +72,7 @@ const totalProducts = ref(0)
 const totalPages = ref(1)
 
 const loadProducts = async () => {
-	const params: Record<string, any> = {
+	const params: Record<string, string | number> = {
 		gender: props.category,
 		page: currentPage.value,
 		per_page: 20
@@ -92,6 +105,7 @@ onMounted(() => {
 
 watch([() => props.category, selectedBrands, selectedPriceRange], () => {
 	currentPage.value = 1
+	products.value = []
 	loadProducts()
 })
 
@@ -101,7 +115,13 @@ watch(currentPage, () => {
 
 function toggleBrand(b: string) {
 	const i = selectedBrands.value.indexOf(b)
-	i === -1 ? selectedBrands.value.push(b) : selectedBrands.value.splice(i, 1)
+	const newBrands = [...selectedBrands.value]
+	if (i === -1) {
+		newBrands.push(b)
+	} else {
+		newBrands.splice(i, 1)
+	}
+	selectedBrands.value = newBrands
 }
 function setPriceRange(r: { label: string; min: number; max: number } | null) {
 	selectedPriceRange.value = r

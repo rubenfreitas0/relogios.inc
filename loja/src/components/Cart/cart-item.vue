@@ -2,6 +2,7 @@
 import ButtonCount from '../Buttons/button-count.vue'
 import type { Product } from '../../data/product-types.ts'
 import { useCartStore } from '../../pinia/cartStore.ts'
+import { resolveProductImageUrl } from '../../utils/utilities'
 
 const cartStore = useCartStore()
 
@@ -18,8 +19,8 @@ const props = defineProps<{
 	>
 		<div class="flex h-full w-full flex-row gap-6">
 			<img
-				class="aspect-square w-20 rounded-lg object-cover shadow-md lg:w-24"
-				:src="props.cartItem.primary_image?.url || '/images/placeholder.png'"
+				class="aspect-square w-20 rounded-lg bg-black object-contain p-2 shadow-md lg:w-24"
+				:src="resolveProductImageUrl(props.cartItem.primary_image?.url, props.cartItem.id) || '/images/placeholder.png'"
 				:alt="props.cartItem.name"
 			/>
 			<div class="flex flex-col justify-center">

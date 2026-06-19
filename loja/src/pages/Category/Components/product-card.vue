@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import type { Product } from '../../../data/product-types.ts'
 import { useCartStore } from '../../../pinia/cartStore.ts'
-import { resolveProductImageUrl } from '../../../utils/utilities'
+import { resolveProductImageUrl, getProductImageStyle } from '../../../utils/utilities'
 
 import ButtonSolid from '../../../components/Buttons/button-solid.vue'
 
@@ -13,9 +13,12 @@ const props = defineProps<{
 	index?: number
 }>()
 
-const formatPrice = (price?: number) => {
+const formatPrice = (price?: number | string) => {
 	if (price !== undefined) {
-		return `€${price.toFixed(2).replace('.', ',')}`
+		const num = Number(price)
+		if (!isNaN(num)) {
+			return `€${num.toFixed(2).replace('.', ',')}`
+		}
 	}
 	return '€199,00'
 }
@@ -36,9 +39,10 @@ const formatPrice = (price?: number) => {
 			</div>
 			<img
 				loading="lazy"
-				class="h-full w-full object-cover opacity-90 transition-opacity duration-300 group-hover:opacity-100"
+				class="h-full w-full object-contain p-4 opacity-90 transition-opacity duration-300 group-hover:opacity-100"
 				:src="resolveProductImageUrl(props.item.primary_image?.url, props.item.id)"
 				:alt="props.item.name"
+				:style="getProductImageStyle(props.item.id)"
 			/>
 		</router-link>
 
