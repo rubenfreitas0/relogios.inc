@@ -45,6 +45,8 @@ export const useCartStore = defineStore('cart', {
 	actions: {
 		cartOn() {
 			this.showCart = true
+			this.showToast = false
+			if (this.toastTimeout) clearTimeout(this.toastTimeout)
 			document.body.classList.add('overflow-y-hidden')
 		},
 

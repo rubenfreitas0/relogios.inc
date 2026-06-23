@@ -50,6 +50,7 @@ describe('Account — Profile Tab', () => {
 		cy.contains('Perfil').should('be.visible')
 		cy.contains('Encomendas').should('be.visible')
 		cy.contains('Moradas').should('be.visible')
+		cy.contains('Ajuda & Suporte').should('be.visible')
 	})
 
 	it('profile tab is active by default', () => {
@@ -140,6 +141,10 @@ describe('Account — Tab Navigation', () => {
 		// Navigate to addresses
 		cy.contains('Moradas').click()
 		cy.url().should('include', '/conta/moradas')
+
+		// Navigate to help/support
+		cy.contains('Ajuda & Suporte').click()
+		cy.url().should('include', '/conta/ajuda')
 
 		// Back to profile
 		cy.contains('Perfil').click()

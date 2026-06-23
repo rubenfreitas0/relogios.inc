@@ -1,39 +1,21 @@
 <template>
-  <VaLayout v-if="breakpoint.lgUp" class="h-screen bg-[var(--va-background-secondary)]">
-    <template #left>
-      <div
-        class="h-full flex flex-col items-center justify-center"
-        style="width: 35vw; background: linear-gradient(135deg, #1a1a2e 0%, #16213e 50%, #0f3460 100%)"
-      >
-        <span class="text-white text-3xl font-black tracking-tight mb-2">RELOGIOS.inc</span>
-        <span class="text-white/60 text-sm">Painel de Administração</span>
+  <div class="min-h-screen w-full flex items-center justify-center bg-white p-4 font-sans">
+    <div class="w-full max-w-[360px] flex flex-col items-center">
+      <div class="flex flex-col items-center mb-8">
+        <RouterLink to="/" aria-label="Ir para o início" class="flex flex-col items-center">
+          <span class="text-3xl font-black tracking-tight text-black select-none">
+            RELOGIOS<span class="text-[#FFC700]">.inc</span>
+          </span>
+          <span class="text-[10px] tracking-widest uppercase text-gray-500 mt-1.5 select-none font-semibold">
+            Painel de Administração
+          </span>
+        </RouterLink>
       </div>
-    </template>
-    <template #content>
-      <main class="h-full flex items-center justify-center mx-auto max-w-[420px]">
-        <RouterView />
-      </main>
-    </template>
-  </VaLayout>
-
-  <VaLayout v-else class="h-screen bg-[var(--va-background-secondary)]">
-    <template #content>
-      <div class="p-4">
-        <main class="h-full flex flex-row items-center justify-start mx-auto max-w-[420px]">
-          <div class="flex flex-col items-start">
-            <RouterLink class="py-4" to="/" aria-label="Ir para o início">
-              <span class="text-2xl font-black tracking-tight">RELOGIOS.inc</span>
-            </RouterLink>
-            <RouterView />
-          </div>
-        </main>
-      </div>
-    </template>
-  </VaLayout>
+      <RouterView class="w-full" />
+    </div>
+  </div>
 </template>
 
 <script lang="ts" setup>
-import { useBreakpoint } from 'vuestic-ui'
-
-const breakpoint = useBreakpoint()
+// Layout centralizado minimalista com fundo branco.
 </script>

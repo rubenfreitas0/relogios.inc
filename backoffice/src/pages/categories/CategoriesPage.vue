@@ -2,9 +2,7 @@
   <div>
     <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 mb-6">
       <h1 class="page-title font-bold">Categorias</h1>
-      <VaButton icon="add" @click="openModal()">
-        Nova Categoria
-      </VaButton>
+      <VaButton icon="add" @click="openModal()"> Nova Categoria </VaButton>
     </div>
 
     <!-- Filtros -->
@@ -94,7 +92,7 @@
           </VaDataTable>
 
           <!-- Paginação -->
-          <div class="flex justify-between items-center mt-4" v-if="store.pagination.last_page > 1">
+          <div v-if="store.pagination.last_page > 1" class="flex justify-between items-center mt-4">
             <span class="text-sm text-[var(--va-secondary)]">{{ store.pagination.total }} categoria(s)</span>
             <VaPagination
               v-model="store.pagination.current_page"
@@ -106,7 +104,10 @@
             />
           </div>
 
-          <div v-if="!store.loading && store.categories.length === 0" class="text-center py-8 text-[var(--va-secondary)]">
+          <div
+            v-if="!store.loading && store.categories.length === 0"
+            class="text-center py-8 text-[var(--va-secondary)]"
+          >
             <VaIcon name="category" size="48px" class="mb-2" />
             <p>Nenhuma categoria encontrada.</p>
           </div>
@@ -115,19 +116,19 @@
     </VaCard>
 
     <!-- Modal Criar/Editar -->
-    <VaModal v-model="modal.show" :title="modal.category ? 'Editar Categoria' : 'Nova Categoria'" hide-default-actions size="small">
+    <VaModal
+      v-model="modal.show"
+      :title="modal.category ? 'Editar Categoria' : 'Nova Categoria'"
+      hide-default-actions
+      size="small"
+    >
       <VaForm ref="categoryForm">
         <VaAlert v-if="store.error" color="danger" class="mb-3" dense>
           <pre class="whitespace-pre-wrap text-sm">{{ store.error }}</pre>
         </VaAlert>
 
         <div class="flex flex-col gap-4">
-          <VaInput
-            v-model="modal.name"
-            label="Nome"
-            placeholder="Ex: Relógios de Pulso"
-            :rules="[required]"
-          />
+          <VaInput v-model="modal.name" label="Nome" placeholder="Ex: Relógios de Pulso" :rules="[required]" />
 
           <VaSwitch v-model="modal.is_active" label="Categoria ativa" size="small" color="success" />
         </div>
@@ -144,8 +145,17 @@
     </VaModal>
 
     <!-- Modal Eliminar -->
-    <VaModal v-model="deleteModal.show" title="Eliminar Categoria" ok-text="Eliminar" cancel-text="Cancelar" @ok="executeDelete">
-      <p>Tens a certeza que queres eliminar a categoria <strong>{{ deleteModal.categoryName }}</strong>?</p>
+    <VaModal
+      v-model="deleteModal.show"
+      title="Eliminar Categoria"
+      ok-text="Eliminar"
+      cancel-text="Cancelar"
+      @ok="executeDelete"
+    >
+      <p>
+        Tens a certeza que queres eliminar a categoria <strong>{{ deleteModal.categoryName }}</strong
+        >?
+      </p>
       <p class="text-sm text-[var(--va-secondary)] mt-2">
         Produtos associados a esta categoria deixarão de ter categoria definida.
       </p>

@@ -123,8 +123,7 @@ export const productImagesApi = {
     api.post(`/admin/products/${productId}/images`, data, {
       headers: { 'Content-Type': 'multipart/form-data' },
     }),
-  destroy: (productId: number, imageId: number) =>
-    api.delete(`/admin/products/${productId}/images/${imageId}`),
+  destroy: (productId: number, imageId: number) => api.delete(`/admin/products/${productId}/images/${imageId}`),
   reorder: (productId: number, imageIds: number[]) =>
     api.patch(`/admin/products/${productId}/images/reorder`, { order: imageIds }),
   setPrimary: (productId: number, imageId: number) =>

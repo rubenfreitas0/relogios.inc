@@ -19,13 +19,20 @@ const tabs = [
 	{ label: 'Perfil', path: '/conta/perfil', icon: 'user' },
 	{ label: 'Encomendas', path: '/conta/encomendas', icon: 'orders' },
 	{ label: 'Moradas', path: '/conta/moradas', icon: 'address' },
+	{ label: 'Ajuda & Suporte', path: '/conta/ajuda', icon: 'help' },
 ]
 
 const activeTab = computed(() => {
 	if (route.path.startsWith('/conta/encomendas')) return '/conta/encomendas'
 	if (route.path.startsWith('/conta/moradas')) return '/conta/moradas'
+	if (route.path.startsWith('/conta/ajuda')) return '/conta/ajuda'
 	return '/conta/perfil'
 })
+
+async function handleLogout() {
+	await authStore.logout()
+	router.push('/')
+}
 </script>
 
 <template>
@@ -64,15 +71,33 @@ const activeTab = computed(() => {
 						</svg>
 						<!-- Orders icon -->
 						<svg v-if="tab.icon === 'orders'" class="h-4 w-4 flex-shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-							<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2m-3 7h3m-3 4h3m-6-4h.01M9 16h.01" />
+							<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2m-3 7h3m-3 4h3m-6-4h.01M9 16h.01" />
 						</svg>
 						<!-- Address icon -->
 						<svg v-if="tab.icon === 'address'" class="h-4 w-4 flex-shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor">
 							<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z" />
 							<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 11a3 3 0 11-6 0 3 3 0 016 0z" />
 						</svg>
+						<!-- Help icon -->
+						<svg v-if="tab.icon === 'help'" class="h-4 w-4 flex-shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+							<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8.228 9c.549-1.165 2.03-2 3.772-2 2.21 0 4 1.343 4 3 0 1.4-1.278 2.575-3.006 2.907-.542.104-.994.54-.994 1.093m0 3h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+						</svg>
 						{{ tab.label }}
 					</router-link>
+
+					<!-- Divider (Desktop) -->
+					<div class="my-3 hidden h-px bg-white/10 lg:block"></div>
+
+					<!-- Logout Button (Desktop) -->
+					<button
+						@click="handleLogout"
+						class="hidden lg:flex items-center gap-3 whitespace-nowrap rounded-lg px-4 py-3 text-sm font-semibold text-red-400/80 hover:bg-red-500/10 hover:text-red-400 border border-transparent transition-all duration-200"
+					>
+						<svg class="h-4 w-4 flex-shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+							<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1" />
+						</svg>
+						Terminar Sessão
+					</button>
 				</nav>
 
 				<!-- Content area -->

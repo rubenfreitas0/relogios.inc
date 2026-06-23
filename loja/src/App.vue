@@ -11,7 +11,7 @@ const cartStore = useCartStore()
         <!-- Global Toast Notification -->
         <Transition name="toast">
             <div 
-                v-if="cartStore.showToast && cartStore.lastAddedItem" 
+                v-if="cartStore.showToast && cartStore.lastAddedItem && !cartStore.showCart" 
                 class="fixed bottom-6 right-6 z-[100] flex items-center gap-4 rounded-xl bg-white p-4 shadow-[0_10px_40px_-10px_rgba(0,0,0,0.2)] border border-gray-100"
             >
                 <div class="h-12 w-12 flex-shrink-0 overflow-hidden rounded-md bg-gray-50">

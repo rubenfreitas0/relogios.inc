@@ -3,15 +3,11 @@
     <!-- Header -->
     <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 mb-6">
       <div>
-        <VaButton preset="plain" icon="arrow_back" class="mb-2" :to="{ name: 'products' }">
-          Voltar
-        </VaButton>
+        <VaButton preset="plain" icon="arrow_back" class="mb-2" :to="{ name: 'products' }"> Voltar </VaButton>
         <h1 class="page-title font-bold">{{ isEdit ? 'Editar Produto' : 'Novo Produto' }}</h1>
       </div>
       <div class="flex gap-2">
-        <VaButton preset="secondary" :to="{ name: 'products' }">
-          Cancelar
-        </VaButton>
+        <VaButton preset="secondary" :to="{ name: 'products' }"> Cancelar </VaButton>
         <VaButton :loading="store.saving" :disabled="store.saving" @click="handleSubmit">
           {{ isEdit ? 'Guardar Alterações' : 'Criar Produto' }}
         </VaButton>
@@ -125,9 +121,7 @@
                   :max-rows="6"
                   autosize
                 />
-                <p class="text-xs text-[var(--va-secondary)] -mt-2">
-                  Um item por linha. Será guardado como lista.
-                </p>
+                <p class="text-xs text-[var(--va-secondary)] -mt-2">Um item por linha. Será guardado como lista.</p>
               </div>
             </VaCardContent>
           </VaCard>
@@ -144,10 +138,16 @@
                     v-for="img in existingImages"
                     :key="img.id"
                     class="relative group rounded-xl overflow-hidden border-2 transition-all"
-                    :class="img.is_primary ? 'border-[var(--va-primary)]' : 'border-transparent hover:border-[var(--va-background-border)]'"
+                    :class="
+                      img.is_primary
+                        ? 'border-[var(--va-primary)]'
+                        : 'border-transparent hover:border-[var(--va-background-border)]'
+                    "
                   >
                     <img :src="img.url" :alt="'Imagem ' + img.id" class="w-full aspect-square object-cover" />
-                    <div class="absolute inset-0 bg-black/50 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center gap-2">
+                    <div
+                      class="absolute inset-0 bg-black/50 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center gap-2"
+                    >
                       <VaButton
                         v-if="!img.is_primary"
                         preset="plain"
@@ -168,17 +168,17 @@
                         @click="markForRemoval(img.id)"
                       />
                     </div>
-                    <VaBadge
-                      v-if="img.is_primary"
-                      text="Principal"
-                      color="primary"
-                      class="absolute top-2 left-2"
-                    />
+                    <VaBadge v-if="img.is_primary" text="Principal" color="primary" class="absolute top-2 left-2" />
                     <div
                       v-if="imagesToRemove.includes(img.id)"
                       class="absolute inset-0 bg-red-500/70 flex items-center justify-center"
                     >
-                      <VaButton preset="plain" size="small" class="bg-white rounded-full" @click="unmarkRemoval(img.id)">
+                      <VaButton
+                        preset="plain"
+                        size="small"
+                        class="bg-white rounded-full"
+                        @click="unmarkRemoval(img.id)"
+                      >
                         Anular
                       </VaButton>
                     </div>
@@ -253,22 +253,10 @@
             <VaCardTitle class="font-semibold">Visibilidade</VaCardTitle>
             <VaCardContent>
               <div class="flex flex-col gap-3">
-                <VaSwitch
-                  v-model="form.is_active"
-                  label="Produto ativo"
-                  size="small"
-                  color="success"
-                />
-                <p class="text-xs text-[var(--va-secondary)] -mt-1">
-                  Produtos inativos não aparecem na loja.
-                </p>
+                <VaSwitch v-model="form.is_active" label="Produto ativo" size="small" color="success" />
+                <p class="text-xs text-[var(--va-secondary)] -mt-1">Produtos inativos não aparecem na loja.</p>
 
-                <VaSwitch
-                  v-model="form.is_featured"
-                  label="Produto em destaque"
-                  size="small"
-                  color="warning"
-                />
+                <VaSwitch v-model="form.is_featured" label="Produto em destaque" size="small" color="warning" />
                 <p class="text-xs text-[var(--va-secondary)] -mt-1">
                   Aparece na secção de destaques da página inicial.
                 </p>
@@ -307,11 +295,10 @@
 </template>
 
 <script lang="ts" setup>
-import { ref, reactive, computed, onMounted, watch } from 'vue'
+import { ref, reactive, computed, onMounted } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
 import { useForm, useToast } from 'vuestic-ui'
 import { useProductsStore, type Product, type ProductImage } from '../../stores/products-store'
-import { productImagesApi } from '../../services/api'
 
 const store = useProductsStore()
 const route = useRoute()
@@ -437,7 +424,10 @@ function buildFormData(): FormData {
 
   // in_the_box: converter linhas para JSON array
   if (form.in_the_box.trim()) {
-    const items = form.in_the_box.split('\n').map((s) => s.trim()).filter(Boolean)
+    const items = form.in_the_box
+      .split('\n')
+      .map((s) => s.trim())
+      .filter(Boolean)
     fd.append('in_the_box', JSON.stringify(items))
   }
 

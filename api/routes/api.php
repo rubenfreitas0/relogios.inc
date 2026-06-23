@@ -28,6 +28,7 @@ use App\Http\Controllers\Api\CartController;
 use App\Http\Controllers\Api\AddressController;
 
 use App\Http\Controllers\Api\OrderController;
+use App\Http\Controllers\Api\SupportController;
 use App\Http\Controllers\Api\Admin\OrderController as AdminOrderController;
 use App\Http\Controllers\Api\Admin\DashboardController as AdminDashboardController;
 
@@ -69,6 +70,7 @@ Route::middleware('auth:sanctum')->group(function () {
     // Perfil do utilizador autenticado
     Route::get('/user', fn(\Illuminate\Http\Request $request) => new \App\Http\Resources\UserResource($request->user()));
     Route::patch('/user/profile', [\App\Http\Controllers\Api\ProfileController::class, 'update']);
+    Route::post('/support', [SupportController::class, 'store']);
 
     Route::delete('/cart', [CartController::class, 'clear']);
     Route::apiResource('cart', CartController::class)->except(['show']);

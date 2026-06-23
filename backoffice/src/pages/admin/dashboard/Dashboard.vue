@@ -11,7 +11,7 @@
             <VaIcon :name="kpi.icon" size="32px" :color="kpi.color" />
             <div>
               <p class="text-xs uppercase text-[var(--va-secondary)] font-semibold tracking-wide">{{ kpi.title }}</p>
-              <p class="text-2xl font-bold" v-if="!loading">{{ kpi.value }}</p>
+              <p v-if="!loading" class="text-2xl font-bold">{{ kpi.value }}</p>
               <VaSkeletonGroup v-else>
                 <VaSkeleton variant="text" :lines="1" />
               </VaSkeletonGroup>

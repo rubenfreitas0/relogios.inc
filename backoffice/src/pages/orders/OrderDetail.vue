@@ -3,9 +3,7 @@
     <!-- Header -->
     <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 mb-6">
       <div>
-        <VaButton preset="plain" icon="arrow_back" class="mb-2" :to="{ name: 'orders' }">
-          Voltar
-        </VaButton>
+        <VaButton preset="plain" icon="arrow_back" class="mb-2" :to="{ name: 'orders' }"> Voltar </VaButton>
         <h1 class="page-title font-bold">
           Encomenda
           <span class="font-mono text-[var(--va-primary)]">#{{ orderNumber }}</span>
@@ -38,32 +36,35 @@
 
               <!-- Timeline visual -->
               <div class="flex items-center justify-between mb-6">
-                <div
-                  v-for="(step, i) in statusTimeline"
-                  :key="step.value"
-                  class="flex flex-col items-center flex-1"
-                >
+                <div v-for="(step, i) in statusTimeline" :key="step.value" class="flex flex-col items-center flex-1">
                   <div
                     class="w-10 h-10 rounded-full flex items-center justify-center text-white text-sm font-semibold transition-all"
                     :class="step.reached ? 'bg-[var(--va-primary)]' : 'bg-[var(--va-background-element)]'"
                   >
                     <VaIcon :name="step.icon" size="small" :color="step.reached ? 'white' : 'secondary'" />
                   </div>
-                  <span class="text-xs mt-1 text-center" :class="step.reached ? 'font-semibold' : 'text-[var(--va-secondary)]'">
+                  <span
+                    class="text-xs mt-1 text-center"
+                    :class="step.reached ? 'font-semibold' : 'text-[var(--va-secondary)]'"
+                  >
                     {{ step.label }}
                   </span>
                   <!-- Connector line -->
-                  <div
-                    v-if="i < statusTimeline.length - 1"
-                    class="absolute"
-                  />
+                  <div v-if="i < statusTimeline.length - 1" class="absolute" />
                 </div>
               </div>
 
               <!-- Formulário de atualização de estado -->
               <VaDivider class="mb-4" />
               <p class="text-sm font-semibold mb-3">Atualizar Estado</p>
-              <VaAlert v-if="store.error" color="danger" class="mb-3" dense closeable @update:modelValue="store.error = null">
+              <VaAlert
+                v-if="store.error"
+                color="danger"
+                class="mb-3"
+                dense
+                closeable
+                @update:modelValue="store.error = null"
+              >
                 <pre class="whitespace-pre-wrap text-sm">{{ store.error }}</pre>
               </VaAlert>
               <div class="grid grid-cols-1 sm:grid-cols-3 gap-3">
@@ -84,8 +85,8 @@
                   <VaButton
                     :loading="store.saving"
                     :disabled="store.saving || !updateForm.status"
-                    @click="handleUpdateStatus"
                     class="w-full"
+                    @click="handleUpdateStatus"
                   >
                     Atualizar
                   </VaButton>
@@ -105,7 +106,9 @@
                   class="flex items-center gap-4 p-3 rounded-xl bg-[var(--va-background-element)]"
                 >
                   <!-- Imagem -->
-                  <div class="w-14 h-14 rounded-lg overflow-hidden bg-white flex-shrink-0 flex items-center justify-center">
+                  <div
+                    class="w-14 h-14 rounded-lg overflow-hidden bg-white flex-shrink-0 flex items-center justify-center"
+                  >
                     <img
                       v-if="item.product_image"
                       :src="item.product_image"
@@ -139,7 +142,7 @@
                   <span class="text-[var(--va-secondary)]">Envio</span>
                   <span class="font-mono">{{ formatCurrency(order.shipping_cost) }}</span>
                 </div>
-                <div class="flex justify-between text-sm" v-if="order.tax_amount > 0">
+                <div v-if="order.tax_amount > 0" class="flex justify-between text-sm">
                   <span class="text-[var(--va-secondary)]">IVA ({{ order.tax_rate }}%)</span>
                   <span class="font-mono">{{ formatCurrency(order.tax_amount) }}</span>
                 </div>

@@ -266,6 +266,17 @@ onBeforeUnmount(() => {
 									</svg>
 									A Minha Conta
 								</router-link>
+								<router-link
+									to="/conta/encomendas"
+									@click="userMenuOpen = false"
+									class="w-full flex items-center gap-2.5 px-3 py-2 text-sm text-white/60 hover:text-[#FFC700] hover:bg-[#FFC700]/5 rounded-lg transition duration-200"
+									data-test="nav-orders"
+								>
+									<svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+										<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2m-3 7h3m-3 4h3m-6-4h.01M9 16h.01" />
+									</svg>
+									As Minhas Encomendas
+								</router-link>
 								<button
 									@click="handleLogout"
 									class="w-full flex items-center gap-2.5 px-3 py-2 text-sm text-white/60 hover:text-red-400 hover:bg-red-500/10 rounded-lg transition duration-200"
@@ -429,7 +440,7 @@ onBeforeUnmount(() => {
 			</div>
 		</Transition>
 
-		<Cart v-show="cartStore.showCart" />
+		<Cart v-if="cartStore.showCart" />
 
 		<!-- Menu Mobile (hamburger) -->
 		<transition>
@@ -460,6 +471,7 @@ onBeforeUnmount(() => {
 						<p class="text-white/60 text-xs">{{ authStore.user.firstname }} {{ authStore.user.lastname }}</p>
 					</div>
 					<router-link to="/conta" class="uppercase text-[#FFC700]/80 hover:text-[#FFC700] transition duration-300" @click="hideHamburger()" data-test="mobile-nav-account">A Minha Conta</router-link>
+					<router-link to="/conta/encomendas" class="uppercase text-[#FFC700]/80 hover:text-[#FFC700] transition duration-300" @click="hideHamburger()" data-test="mobile-nav-orders">As Minhas Encomendas</router-link>
 					<button @click="handleLogout(); hideHamburger()" class="uppercase text-red-400/80 hover:text-red-400 transition duration-300" data-test="mobile-nav-logout">Terminar Sessão</button>
 				</template>
 				<template v-else>

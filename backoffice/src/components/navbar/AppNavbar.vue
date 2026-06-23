@@ -11,7 +11,11 @@
             @click="isSidebarMinimized = !isSidebarMinimized"
           />
         </Transition>
-        <RouterLink to="/" aria-label="Visit home page" class="text-xl font-black tracking-tight hover:text-primary transition-colors">
+        <RouterLink
+          to="/"
+          aria-label="Visit home page"
+          class="text-xl font-black tracking-tight hover:text-primary transition-colors"
+        >
           RELOGIOS.inc
         </RouterLink>
       </div>

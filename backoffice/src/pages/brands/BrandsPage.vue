@@ -2,9 +2,7 @@
   <div>
     <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 mb-6">
       <h1 class="page-title font-bold">Marcas</h1>
-      <VaButton icon="add" @click="openModal()">
-        Nova Marca
-      </VaButton>
+      <VaButton icon="add" @click="openModal()"> Nova Marca </VaButton>
     </div>
 
     <!-- Filtros -->
@@ -46,7 +44,9 @@
           <VaDataTable :items="store.brands" :columns="columns" hoverable>
             <!-- Logo -->
             <template #cell(logo)="{ value }">
-              <div class="w-10 h-10 rounded-lg overflow-hidden bg-[var(--va-background-element)] flex items-center justify-center">
+              <div
+                class="w-10 h-10 rounded-lg overflow-hidden bg-[var(--va-background-element)] flex items-center justify-center"
+              >
                 <img v-if="value" :src="value" alt="Logo" class="w-full h-full object-contain p-1" />
                 <VaIcon v-else name="image" size="small" color="secondary" />
               </div>
@@ -73,22 +73,29 @@
             <!-- Ações -->
             <template #cell(actions)="{ rowData }">
               <div class="flex gap-1">
-                <VaButton preset="plain" icon="edit" size="small" color="primary" title="Editar" @click="openModal(rowData)" />
                 <VaButton
+                  preset="plain"
+                  icon="edit"
+                  size="small"
+                  color="primary"
+                  title="Editar"
+                  @click="openModal(rowData)"
+                />
+                <VaButton
+                  v-if="rowData.is_active"
                   preset="plain"
                   icon="block"
                   size="small"
                   color="warning"
                   title="Desativar"
                   @click="confirmDeactivate(rowData)"
-                  v-if="rowData.is_active"
                 />
               </div>
             </template>
           </VaDataTable>
 
           <!-- Paginação -->
-          <div class="flex justify-between items-center mt-4" v-if="store.pagination.last_page > 1">
+          <div v-if="store.pagination.last_page > 1" class="flex justify-between items-center mt-4">
             <span class="text-sm text-[var(--va-secondary)]">{{ store.pagination.total }} marca(s)</span>
             <VaPagination
               v-model="store.pagination.current_page"
@@ -109,19 +116,19 @@
     </VaCard>
 
     <!-- Modal Criar/Editar -->
-    <VaModal v-model="modal.show" :title="modal.brand ? 'Editar Marca' : 'Nova Marca'" hide-default-actions size="small">
+    <VaModal
+      v-model="modal.show"
+      :title="modal.brand ? 'Editar Marca' : 'Nova Marca'"
+      hide-default-actions
+      size="small"
+    >
       <VaForm ref="brandForm">
         <VaAlert v-if="store.error" color="danger" class="mb-3" dense>
           <pre class="whitespace-pre-wrap text-sm">{{ store.error }}</pre>
         </VaAlert>
 
         <div class="flex flex-col gap-4">
-          <VaInput
-            v-model="modal.name"
-            label="Nome"
-            placeholder="Ex: Casio"
-            :rules="[required]"
-          />
+          <VaInput v-model="modal.name" label="Nome" placeholder="Ex: Casio" :rules="[required]" />
 
           <div>
             <label class="text-sm font-semibold text-[var(--va-secondary)] mb-1 block">Logo</label>
@@ -133,7 +140,11 @@
               :limitations="{ maxFileSize: 2 * 1024 * 1024 }"
             />
             <div v-if="modal.brand?.logo && !modal.logoFile?.length" class="mt-2">
-              <img :src="modal.brand.logo" alt="Logo atual" class="w-16 h-16 object-contain rounded-lg bg-[var(--va-background-element)] p-1" />
+              <img
+                :src="modal.brand.logo"
+                alt="Logo atual"
+                class="w-16 h-16 object-contain rounded-lg bg-[var(--va-background-element)] p-1"
+              />
               <span class="text-xs text-[var(--va-secondary)] ml-2">Logo atual</span>
             </div>
           </div>
@@ -153,9 +164,20 @@
     </VaModal>
 
     <!-- Modal Desativar -->
-    <VaModal v-model="deactivateModal.show" title="Desativar Marca" ok-text="Desativar" cancel-text="Cancelar" @ok="executeDeactivate">
-      <p>Tens a certeza que queres desativar a marca <strong>{{ deactivateModal.brandName }}</strong>?</p>
-      <p class="text-sm text-[var(--va-secondary)] mt-2">A marca ficará inativa mas os produtos associados não serão afetados.</p>
+    <VaModal
+      v-model="deactivateModal.show"
+      title="Desativar Marca"
+      ok-text="Desativar"
+      cancel-text="Cancelar"
+      @ok="executeDeactivate"
+    >
+      <p>
+        Tens a certeza que queres desativar a marca <strong>{{ deactivateModal.brandName }}</strong
+        >?
+      </p>
+      <p class="text-sm text-[var(--va-secondary)] mt-2">
+        A marca ficará inativa mas os produtos associados não serão afetados.
+      </p>
     </VaModal>
   </div>
 </template>

@@ -23,10 +23,7 @@
 
         <!-- Logout -->
         <VaList>
-          <VaListItem
-            class="menu-item px-4 text-base cursor-pointer h-10 mt-2"
-            @click="handleLogout"
-          >
+          <VaListItem class="menu-item px-4 text-base cursor-pointer h-10 mt-2" @click="handleLogout">
             <VaIcon name="mso-logout" class="pr-2" color="danger" />
             <span class="text-[var(--va-danger)]">Terminar sessão</span>
           </VaListItem>

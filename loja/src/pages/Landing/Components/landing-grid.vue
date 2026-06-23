@@ -3,8 +3,8 @@ import ButtonEmpty from '../../../components/Buttons/button-empty.vue'
 import ButtonSolid from '../../../components/Buttons/button-solid.vue'
 import watchFrontImage from '/products/categories/relogiocontainer1.png'
 import watchDetailImage from '/display/watch-detail.png'
-import watchBraceletsImage from '/display/watch-bracelets.png'
-import watchBraceletsFlatImage from '/display/watch-bracelets-flat.png'
+import watchBraceletsImage from '/display/about-movement.png'
+import watchBraceletsFlatImage from '/display/watch-hero.png'
 </script>
 
 <template>
@@ -33,7 +33,7 @@ import watchBraceletsFlatImage from '/display/watch-bracelets-flat.png'
 						<img
 							:src="watchFrontImage"
 							alt="Relógio em destaque"
-							class="relative z-20 my-5 aspect-auto drop-shadow-2xl md:my-0 md:scale-110 md:transition md:duration-700 md:group-hover:scale-125 md:group-hover:-translate-y-3 max-h-80 object-contain"
+							class="relative z-20 my-5 aspect-auto drop-shadow-2xl md:my-0 md:scale-[180%] md:transition md:duration-700 md:group-hover:scale-[200%] md:group-hover:-translate-y-3 max-h-[24rem] object-contain"
 						/>
 
 						<!-- Anéis decorativos — respiram no hover -->
@@ -67,20 +67,20 @@ import watchBraceletsFlatImage from '/display/watch-bracelets-flat.png'
 				</div>
 			</div>
 
-			<!-- Bloco texto — Braceletes -->
+			<!-- Bloco texto — Relógios -->
 			<div
 				class="order-3 flex w-full flex-col items-center overflow-hidden rounded-md bg-k-grey text-black md:order-none md:col-span-2 md:row-span-2 md:h-full"
 			>
-				<!-- Imagem de braceletes ao fundo do card -->
+				<!-- Imagem ao fundo do card -->
 				<img
 					:src="watchBraceletsFlatImage"
-					alt="Braceletes e pulseiras"
+					alt="Coleção de Relógios"
 					class="h-48 w-full object-cover md:h-56"
 				/>
 				<div class="flex flex-col items-center gap-4 p-6 md:items-start">
-					<h2 class="text-3xl font-semibold uppercase">Braceletes & Pulseiras</h2>
+					<h2 class="text-3xl font-semibold uppercase">Relógios</h2>
 					<ButtonEmpty
-						:to="{ path: '/mulheres' }"
+						:to="{ path: '/homens' }"
 						content="ver coleção"
 					/>
 				</div>
@@ -98,14 +98,14 @@ import watchBraceletsFlatImage from '/display/watch-bracelets-flat.png'
 				/>
 			</router-link>
 
-			<!-- Bloco imagem — braceletes -->
+			<!-- Bloco imagem — mecanismo de relógio -->
 			<div
 				class="order-4 col-span-3 row-span-2 overflow-hidden rounded-md bg-k-grey text-black md:order-none md:h-full"
 			>
 				<img
 					class="h-full w-full scale-110 object-cover transition duration-300 hover:scale-105"
 					:src="watchBraceletsImage"
-					alt="Coleção de braceletes e pulseiras"
+					alt="Mecanismo de relógio detalhado"
 				/>
 			</div>
 

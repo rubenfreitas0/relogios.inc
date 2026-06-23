@@ -2,8 +2,8 @@
 import CategoryBox from './category-box.vue'
 
 import watchMenImage from '/products/categories/relogiocontainer1.png'
-import watchWomenImage from '/products/categories/relogiocontainer2.png'
-import watchUnisexImage from '/products/categories/relogiocontainer3.png'
+import watchWomenImage from '/products/premium/watch3.png'
+import watchUnisexImage from '/products/premium/watch2.png'
 
 const categories = [
 	{
@@ -14,12 +14,12 @@ const categories = [
 	{
 		src: watchWomenImage,
 		category: 'mulheres',
-		imgClass: ['scale-55', 'object-contain', 'object-center', '-mt-4'],
+		imgClass: ['scale-[58%]', 'object-contain', '-translate-y-8'],
 	},
 	{
 		src: watchUnisexImage,
 		category: 'unisexo',
-		imgClass: ['scale-50', 'object-contain', 'object-center', '-mt-4'],
+		imgClass: ['scale-[58%]', 'object-contain', '-translate-y-8'],
 	},
 ]
 </script>

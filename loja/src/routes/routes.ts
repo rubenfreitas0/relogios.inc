@@ -74,6 +74,11 @@ const routes = [
 				name: 'AccountAddresses',
 				component: () => import('../pages/Account/Components/AccountAddressesTab.vue'),
 			},
+			{
+				path: 'ajuda',
+				name: 'AccountHelp',
+				component: () => import('../pages/Account/Components/AccountHelpTab.vue'),
+			},
 		],
 	},
 	{

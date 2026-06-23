@@ -1,6 +1,7 @@
 export default {
   presets: {
     light: {
+      primary: '#FFC700',
       backgroundPrimary: '#F4F6F8',
       backgroundSecondary: '#FFFFFF',
       backgroundCardPrimary: '#F7F9F9',
@@ -11,6 +12,7 @@ export default {
       warning: '#FFD43A',
     },
     dark: {
+      primary: '#FFC700',
       backgroundCardPrimary: '#111827',
       backgroundCardSecondary: '#0f172a',
     },

@@ -105,5 +105,17 @@ export const useCategoriesStore = defineStore('categories', () => {
     pagination.value.current_page = page
   }
 
-  return { categories, pagination, loading, saving, error, isProtected, fetchCategories, createCategory, updateCategory, deleteCategory, setPage }
+  return {
+    categories,
+    pagination,
+    loading,
+    saving,
+    error,
+    isProtected,
+    fetchCategories,
+    createCategory,
+    updateCategory,
+    deleteCategory,
+    setPage,
+  }
 })

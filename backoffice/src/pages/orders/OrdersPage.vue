@@ -2,7 +2,7 @@
   <div>
     <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 mb-6">
       <h1 class="page-title font-bold">Encomendas</h1>
-      <div class="text-sm text-[var(--va-secondary)]" v-if="!store.loading">
+      <div v-if="!store.loading" class="text-sm text-[var(--va-secondary)]">
         {{ store.pagination.total }} encomenda(s)
       </div>
     </div>
@@ -53,13 +53,7 @@
         </div>
 
         <template v-else>
-          <VaDataTable
-            :items="store.orders"
-            :columns="columns"
-            hoverable
-            clickable
-            @row:click="handleRowClick"
-          >
+          <VaDataTable :items="store.orders" :columns="columns" hoverable clickable @row:click="handleRowClick">
             <!-- Nº Encomenda -->
             <template #cell(order_number)="{ value }">
               <span class="font-mono font-semibold text-[var(--va-primary)]">{{ value }}</span>
@@ -68,9 +62,7 @@
             <!-- Cliente -->
             <template #cell(customer)="{ rowData }">
               <div>
-                <span class="font-semibold">
-                  {{ rowData.customer.firstname }} {{ rowData.customer.lastname }}
-                </span>
+                <span class="font-semibold"> {{ rowData.customer.firstname }} {{ rowData.customer.lastname }} </span>
                 <div class="text-xs text-[var(--va-secondary)]">
                   {{ rowData.customer.email }}
                 </div>
@@ -79,18 +71,12 @@
 
             <!-- Estado -->
             <template #cell(status)="{ rowData }">
-              <VaBadge
-                :text="rowData.status.label"
-                :color="statusColor(rowData.status.value)"
-              />
+              <VaBadge :text="rowData.status.label" :color="statusColor(rowData.status.value)" />
             </template>
 
             <!-- Pagamento -->
             <template #cell(payment_status)="{ rowData }">
-              <VaBadge
-                :text="rowData.payment_status.label"
-                :color="paymentColor(rowData.payment_status.value)"
-              />
+              <VaBadge :text="rowData.payment_status.label" :color="paymentColor(rowData.payment_status.value)" />
             </template>
 
             <!-- Total -->
@@ -119,7 +105,7 @@
           </VaDataTable>
 
           <!-- Paginação -->
-          <div class="flex justify-between items-center mt-4" v-if="store.pagination.last_page > 1">
+          <div v-if="store.pagination.last_page > 1" class="flex justify-between items-center mt-4">
             <span class="text-sm text-[var(--va-secondary)]">
               Página {{ store.pagination.current_page }} de {{ store.pagination.last_page }}
             </span>

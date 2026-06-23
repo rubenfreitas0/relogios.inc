@@ -2,9 +2,7 @@
   <div>
     <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 mb-6">
       <h1 class="page-title font-bold">Produtos</h1>
-      <VaButton icon="add" :to="{ name: 'product-create' }">
-        Novo Produto
-      </VaButton>
+      <VaButton icon="add" :to="{ name: 'product-create' }"> Novo Produto </VaButton>
     </div>
 
     <!-- Filtros -->
@@ -63,16 +61,12 @@
         </div>
 
         <template v-else>
-          <VaDataTable
-            :items="store.products"
-            :columns="columns"
-            hoverable
-            clickable
-            @row:click="handleRowClick"
-          >
+          <VaDataTable :items="store.products" :columns="columns" hoverable clickable @row:click="handleRowClick">
             <!-- Imagem -->
             <template #cell(image)="{ rowData }">
-              <div class="w-12 h-12 rounded-lg overflow-hidden bg-[var(--va-background-element)] flex items-center justify-center">
+              <div
+                class="w-12 h-12 rounded-lg overflow-hidden bg-[var(--va-background-element)] flex items-center justify-center"
+              >
                 <img
                   v-if="getPrimaryImage(rowData)"
                   :src="getPrimaryImage(rowData)"
@@ -110,19 +104,12 @@
 
             <!-- Estado -->
             <template #cell(is_active)="{ value }">
-              <VaBadge
-                :text="value ? 'Ativo' : 'Inativo'"
-                :color="value ? 'success' : 'secondary'"
-              />
+              <VaBadge :text="value ? 'Ativo' : 'Inativo'" :color="value ? 'success' : 'secondary'" />
             </template>
 
             <!-- Destaque -->
             <template #cell(is_featured)="{ value }">
-              <VaIcon
-                :name="value ? 'star' : 'star_outline'"
-                :color="value ? 'warning' : 'secondary'"
-                size="small"
-              />
+              <VaIcon :name="value ? 'star' : 'star_outline'" :color="value ? 'warning' : 'secondary'" size="small" />
             </template>
 
             <!-- Ações -->
@@ -157,7 +144,7 @@
           </VaDataTable>
 
           <!-- Paginação -->
-          <div class="flex justify-between items-center mt-4" v-if="store.pagination.last_page > 1">
+          <div v-if="store.pagination.last_page > 1" class="flex justify-between items-center mt-4">
             <span class="text-sm text-[var(--va-secondary)]">
               {{ store.pagination.total }} produto(s) encontrado(s)
             </span>
@@ -181,22 +168,11 @@
     </VaCard>
 
     <!-- Modal Stock -->
-    <VaModal
-      v-model="stockModal.show"
-      title="Atualizar Stock"
-      ok-text="Guardar"
-      cancel-text="Cancelar"
-      @ok="saveStock"
-    >
+    <VaModal v-model="stockModal.show" title="Atualizar Stock" ok-text="Guardar" cancel-text="Cancelar" @ok="saveStock">
       <p class="mb-4">
         Produto: <strong>{{ stockModal.productName }}</strong>
       </p>
-      <VaInput
-        v-model.number="stockModal.newStock"
-        type="number"
-        label="Novo stock"
-        :min="0"
-      />
+      <VaInput v-model.number="stockModal.newStock" type="number" label="Novo stock" :min="0" />
     </VaModal>
 
     <!-- Modal Confirmação Delete -->
@@ -209,7 +185,8 @@
     >
       <p>
         Tens a certeza que queres eliminar o produto
-        <strong>{{ deleteModal.productName }}</strong>?
+        <strong>{{ deleteModal.productName }}</strong
+        >?
       </p>
       <p class="text-sm text-[var(--va-secondary)] mt-2">
         O produto será desativado (soft delete) e pode ser restaurado mais tarde.

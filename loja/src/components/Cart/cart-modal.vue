@@ -7,83 +7,125 @@ const cartStore = useCartStore()
 </script>
 
 <template>
-	<Transition>
+	<Transition name="cart-drawer">
 		<div
-			class="fixed z-50 flex h-screen w-full flex-col items-center backdrop-blur-sm lg:block lg:items-start"
+			class="fixed inset-0 z-50 flex justify-end bg-black/50 backdrop-blur-sm"
 			data-test="cart-modal"
 		>
+			<!-- Clickable background area to close the cart -->
 			<div
 				@click="cartStore.cartOff()"
-				class="absolute h-screen w-full bg-black opacity-40 lg:relative"
+				class="absolute inset-0 cursor-pointer"
 				data-test="cart-background"
 			></div>
+
+			<!-- Drawer panel -->
 			<div
-				class="relative mt-16 flex h-full max-h-[80%] w-11/12 max-w-[32rem] flex-col items-center rounded-lg bg-white opacity-100 lg:absolute lg:right-10 lg:top-10 lg:mt-0 lg:w-1/3"
+				class="drawer-content relative flex h-full w-full max-w-md flex-col bg-white text-black shadow-2xl"
 			>
-				<button
-					@click="cartStore.cartOff()"
-					class="mb-4 mt-8 cursor-pointer self-start px-6 font-semibold text-black opacity-60 lg:px-10"
-					data-test="cart-close-button"
-				>
-					Close
-				</button>
-				<div
-					class="mb-8 flex w-full flex-row items-end justify-between px-6 lg:px-10"
-				>
+				<!-- Close button and Header -->
+				<div class="flex items-center justify-between px-6 pt-8 lg:px-10">
 					<p
 						class="font-Manrope text-2xl font-bold text-k-black lg:text-3xl"
 						data-test="cart-header"
 					>
 						CART ({{ cartStore.cartLength }})
 					</p>
+					<button
+						@click="cartStore.cartOff()"
+						class="cursor-pointer font-semibold text-black opacity-60 hover:opacity-100 transition"
+						data-test="cart-close-button"
+					>
+						✕ Close
+					</button>
+				</div>
+
+				<div class="mb-4 mt-2 px-6 lg:px-10">
 					<p
 						@click="cartStore.clearCart()"
-						class="cursor-pointer text-k-dark-grey underline opacity-70 transition hover:opacity-100 active:translate-y-0.5"
+						class="cursor-pointer text-sm text-k-dark-grey underline opacity-70 transition hover:opacity-100 active:translate-y-0.5 inline-block"
 						data-test="cart-delete-all"
 					>
 						Delete All
 					</p>
 				</div>
+
+				<!-- Cart items list (Scrollable) -->
 				<div
-					v-if="cartStore.cartLength === 0"
-					class="text-lg text-black opacity-60 lg:text-xl"
-					data-test="cart-empty-message"
-				>
-					No items in cart.
-				</div>
-				<div
-					class="mb-10 flex h-full w-full flex-col gap-5 overflow-y-scroll"
+					class="flex-1 overflow-y-auto px-6 py-4 lg:px-10"
 					data-test="cart-item-container"
 				>
-					<CartItem
-						v-for="(value, key) in cartStore.cart"
-						:cart-item="value.product as any"
-						:item-count="value.amount"
-						:key="key"
+					<div
+						v-if="cartStore.cartLength === 0"
+						class="flex h-full flex-col items-center justify-center text-lg text-black opacity-60 lg:text-xl"
+						data-test="cart-empty-message"
+					>
+						No items in cart.
+					</div>
+					<div v-else class="flex flex-col gap-5">
+						<CartItem
+							v-for="(value, key) in cartStore.cart"
+							:cart-item="value.product as any"
+							:item-count="value.amount"
+							:key="key"
+						/>
+					</div>
+				</div>
+
+				<!-- Fixed footer with total and checkout button -->
+				<div class="border-t border-zinc-100 p-6 bg-zinc-50/50 lg:p-10">
+					<div
+						class="mb-6 flex w-full flex-row justify-between"
+						data-test="cart-total-section"
+					>
+						<p class="text-lg font-semibold text-black opacity-50 lg:text-xl">
+							TOTAL
+						</p>
+						<p class="text-2xl font-bold text-black">
+							€{{ cartStore.cartValue.toFixed(2) }}
+						</p>
+					</div>
+					<ButtonSolid
+						v-if="!(cartStore.cartLength === 0)"
+						to="/checkout"
+						class="w-full flex justify-center"
+						add="font-bold w-full py-4"
+						color="light"
+						content="Checkout"
+						@click="cartStore.cartOff"
+						data-test="cart-checkout-button"
 					/>
 				</div>
-				<div
-					class="mb-6 flex w-full flex-row justify-between px-6 lg:px-10"
-					data-test="cart-total-section"
-				>
-					<p class="text-xl font-semibold text-black opacity-50 lg:text-2xl">
-						TOTAL
-					</p>
-					<p class="text-2xl font-bold text-black">
-						€{{ cartStore.cartValue.toFixed(2) }}
-					</p>
-				</div>
-				<ButtonSolid
-					v-if="!(cartStore.cartLength === 0)"
-					to="/checkout"
-					class="mb-10"
-					add="font-bold"
-					color="light"
-					content="Checkout"
-					@click="cartStore.cartOff"
-					data-test="cart-checkout-button"
-				/>
 			</div>
 		</div>
 	</Transition>
 </template>
+
+<style scoped>
+/* Transição da Drawer (deslizar da direita) */
+.cart-drawer-enter-active,
+.cart-drawer-leave-active {
+	transition: opacity 0.3s ease;
+}
+
+.cart-drawer-enter-active .drawer-content,
+.cart-drawer-leave-active .drawer-content {
+	transition: transform 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.cart-drawer-enter-from {
+	opacity: 0;
+}
+
+.cart-drawer-enter-from .drawer-content {
+	transform: translateX(100%);
+}
+
+.cart-drawer-leave-to {
+	opacity: 0;
+}
+
+.cart-drawer-leave-to .drawer-content {
+	transform: translateX(100%);
+}
+</style>
