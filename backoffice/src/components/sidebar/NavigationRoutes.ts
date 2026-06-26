@@ -18,6 +18,53 @@ export default {
         icon: 'vuestic-iconset-dashboard',
       },
     },
+    // — Relogios.inc custom pages —
+    {
+      name: 'products',
+      displayName: 'Produtos',
+      meta: {
+        icon: 'watch',
+      },
+    },
+    {
+      name: 'orders',
+      displayName: 'Encomendas',
+      meta: {
+        icon: 'shopping_cart',
+      },
+    },
+    {
+      name: 'brands',
+      displayName: 'Marcas',
+      meta: {
+        icon: 'sell',
+      },
+    },
+    {
+      name: 'categories',
+      displayName: 'Categorias',
+      meta: {
+        icon: 'category',
+      },
+    },
+    {
+      name: 'shipping',
+      displayName: 'Envios',
+      meta: {
+        icon: 'local_shipping',
+      },
+      children: [
+        {
+          name: 'shipping-methods',
+          displayName: 'Métodos',
+        },
+        {
+          name: 'shipping-zones',
+          displayName: 'Zonas',
+        },
+      ],
+    },
+    // — Vuestic demo pages —
     {
       name: 'users',
       displayName: 'menu.users',
@@ -54,39 +101,10 @@ export default {
       ],
     },
     {
-      name: 'auth',
-      displayName: 'menu.auth',
-      meta: {
-        icon: 'login',
-      },
-      children: [
-        {
-          name: 'login',
-          displayName: 'menu.login',
-        },
-        {
-          name: 'signup',
-          displayName: 'menu.signup',
-        },
-        {
-          name: 'recover-password',
-          displayName: 'menu.recover-password',
-        },
-      ],
-    },
-
-    {
       name: 'faq',
       displayName: 'menu.faq',
       meta: {
         icon: 'quiz',
-      },
-    },
-    {
-      name: '404',
-      displayName: 'menu.404',
-      meta: {
-        icon: 'vuestic-iconset-files',
       },
     },
     {

@@ -151,6 +151,7 @@ class CheckoutService
                 'tax_amount'    => $taxAmount,
                 'tax_rate'      => $taxPercentage,
                 'total'         => round($total, 2),
+                'notes'         => $validated['notes'] ?? null,
             ]);
 
             // ─── 10. Snapshot dos items (bulk insert) ───

@@ -69,7 +69,7 @@
               >
                 <img
                   v-if="getPrimaryImage(rowData)"
-                  :src="getPrimaryImage(rowData)"
+                  :src="getPrimaryImage(rowData) ?? undefined"
                   :alt="rowData.name"
                   class="w-full h-full object-cover"
                 />
@@ -96,7 +96,7 @@
             <template #cell(stock)="{ value, rowData }">
               <VaBadge
                 :text="String(value)"
-                :color="stockColor(value)"
+                :color="stockColor(Number(value))"
                 class="cursor-pointer"
                 @click.stop="openStockModal(rowData)"
               />

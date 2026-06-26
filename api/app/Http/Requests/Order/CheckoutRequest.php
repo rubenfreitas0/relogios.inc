@@ -41,6 +41,7 @@ class CheckoutRequest extends FormRequest
             'city'          => ['required_without:address_id', 'nullable', 'string', 'max:100'],
             'postal_code'   => ['required_without:address_id', 'nullable', 'string', 'max:20'],
             'country'       => ['nullable', 'string', 'size:2'],
+            'notes'         => ['nullable', 'string', 'max:5000'],
         ];
     }
 

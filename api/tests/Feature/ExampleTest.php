@@ -38,6 +38,6 @@ class ExampleTest extends TestCase
         $this->assertNotNull(\App\Models\ShippingZoneCountry::factory()->create());
         $this->assertNotNull(\App\Models\ShippingMethod::factory()->create());
         $this->assertNotNull(\App\Models\TaxRate::factory()->create());
-        $this->assertNotNull(\App\Models\ActivityLog::factory()->create());
+        $this->assertNotNull(\App\Models\Ticket::factory()->create());
     }
 }

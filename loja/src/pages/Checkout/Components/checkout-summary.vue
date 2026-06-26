@@ -52,7 +52,7 @@ const formStore = useFormStore()
 			content="Confirmar e Pagar"
 			color="light"
 			class="mt-8 self-center font-bold"
-			:disabled="formStore.isSubmitting"
+			:disabled="formStore.isSubmitting || formStore.shippingLoading"
 			@click="formStore.submit()"
 			data-test="checkout-button"
 		/>

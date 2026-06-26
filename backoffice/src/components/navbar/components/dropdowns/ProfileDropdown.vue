@@ -36,18 +36,23 @@
 <script lang="ts" setup>
 import { ref, computed } from 'vue'
 import { useI18n } from 'vue-i18n'
+import { useRouter } from 'vue-router'
 import { useColors } from 'vuestic-ui'
+import { useAuthStore } from '../../../../stores/auth-store'
 
 const { colors, setHSLAColor } = useColors()
 const hoverColor = computed(() => setHSLAColor(colors.focus, { a: 0.1 }))
 
 const { t } = useI18n()
+const router = useRouter()
+const authStore = useAuthStore()
 
 type ProfileListItem = {
   name: string
   to?: string
   href?: string
   icon: string
+  action?: () => void
 }
 
 type ProfileOptions = {
@@ -110,7 +115,6 @@ withDefaults(
         list: [
           {
             name: 'logout',
-            to: 'login',
             icon: 'mso-logout',
           },
         ],
@@ -121,7 +125,15 @@ withDefaults(
 
 const isShown = ref(false)
 
+const handleLogout = async () => {
+  await authStore.logout()
+  router.push({ name: 'login' })
+}
+
 const resolveLinkAttribute = (item: ProfileListItem) => {
+  if (item.name === 'logout') {
+    return { onClick: handleLogout }
+  }
   return item.to ? { to: { name: item.to } } : item.href ? { href: item.href, target: '_blank' } : {}
 }
 </script>

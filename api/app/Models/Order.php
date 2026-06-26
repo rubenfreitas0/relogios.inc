@@ -40,6 +40,7 @@ class Order extends Model
         'total',
         'tracking_number',
         'paid_at',
+        'notes',
     ];
 
     protected function casts(): array

@@ -27,6 +27,13 @@ interface Order {
 		unit_price: number
 		quantity: number
 	}[]
+	payments?: {
+		method: { value: string; label: string }
+		status: { value: string; label: string }
+		amount: number
+		payment_data: Record<string, unknown> | null
+		transaction_id: string | null
+	}[]
 }
 
 interface FormState {
@@ -39,6 +46,7 @@ interface FormState {
 	city: string
 	country: string
 	payment: string
+	paymentPhone: string
 	comment: string
 	showErrors: boolean
 	isSubmitting: boolean
@@ -60,7 +68,8 @@ export const useFormStore = defineStore('form', {
 		zip: '',
 		city: '',
 		country: 'PT',
-		payment: 'electronic',
+		payment: 'credit_card',
+		paymentPhone: '',
 		comment: '',
 		showErrors: false,
 		isSubmitting: false,
@@ -78,14 +87,7 @@ export const useFormStore = defineStore('form', {
 		bannerOff() {
 			this.bannerState = 'hide'
 		},
-		setCash(e: Event) {
-			e.preventDefault()
-			this.payment = 'cash'
-		},
-		setElectronic(e: Event) {
-			e.preventDefault()
-			this.payment = 'electronic'
-		},
+
 
 		/**
 		 * Busca métodos de envio disponíveis com base no país e código postal.
@@ -154,15 +156,11 @@ export const useFormStore = defineStore('form', {
 				return
 			}
 
-			if (!this.shipping_method_id) {
-				alert('Por favor selecione um método de envio.')
-				return
-			}
-
 			const allSet =
 				this.isValidName === 'true' &&
 				this.isValidEmail === 'true' &&
 				this.isValidPhone !== 'false' &&
+				this.isValidPaymentPhone !== 'false' &&
 				this.isValidAddress === 'true' &&
 				this.isValidZip === 'true' &&
 				this.isValidCity === 'true' &&
@@ -170,6 +168,16 @@ export const useFormStore = defineStore('form', {
 
 			if (!allSet) {
 				this.showErrors = true
+				return
+			}
+
+			if (this.shippingLoading) {
+				alert('Por favor aguarde que os custos de envio sejam calculados.')
+				return
+			}
+
+			if (!this.shipping_method_id) {
+				alert('Por favor selecione um método de envio.')
 				return
 			}
 
@@ -182,10 +190,23 @@ export const useFormStore = defineStore('form', {
 			const firstname = nameParts[0]
 			const lastname = nameParts.slice(1).join(' ') || firstname // Fallback se não tiver apelido
 
-			// Preparar payload
-			const payload = {
+			interface CheckoutPayload {
+				shipping_method_id: number
+				payment_method: string
+				firstname: string
+				lastname: string
+				phone: string
+				address_line1: string
+				city: string
+				postal_code: string
+				country: string
+				notes: string
+				payment_phone?: string
+			}
+
+			const payload: CheckoutPayload = {
 				shipping_method_id: this.shipping_method_id,
-				payment_method: this.payment === 'electronic' ? 'credit_card' : 'multibanco',
+				payment_method: this.payment,
 				firstname: firstname,
 				lastname: lastname,
 				phone: this.phone,
@@ -194,6 +215,10 @@ export const useFormStore = defineStore('form', {
 				postal_code: this.zip,
 				country: this.country.substring(0, 2).toUpperCase() || 'PT',
 				notes: this.comment
+			}
+
+			if (this.payment === 'mbway') {
+				payload.payment_phone = this.paymentPhone
 			}
 
 			try {
@@ -239,8 +264,10 @@ export const useFormStore = defineStore('form', {
 		showBanner(state: FormState) {
 			return state.bannerState == 'show'
 		},
-		choseCash(state: FormState) {
-			return state.payment == 'cash'
+		isValidPaymentPhone(state: FormState) {
+			if (state.payment !== 'mbway') return 'true'
+			if (state.paymentPhone === '') return 'empty'
+			return /^[0-9()+\-\s]+$/.test(state.paymentPhone) === true ? 'true' : 'false'
 		},
 		isValidName(state: FormState) {
 			if (state.name === '') return 'empty'

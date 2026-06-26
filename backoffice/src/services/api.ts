@@ -7,7 +7,7 @@ import router from '../router'
  * Injeta automaticamente o token Sanctum e trata 401s.
  */
 const api: AxiosInstance = axios.create({
-  baseURL: import.meta.env.VITE_API_BASE_URL || 'http://relogios.inc.test/api',
+  baseURL: import.meta.env.VITE_API_BASE_URL || '/api',
   headers: {
     'Content-Type': 'application/json',
     Accept: 'application/json',

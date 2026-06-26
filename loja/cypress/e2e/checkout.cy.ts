@@ -21,6 +21,7 @@ describe('Desktop: Filled cart - customer', () => {
 	beforeEach(() => {
 		cy.viewport('macbook-15')
 		cy.intercept('GET', '/api/shipping/calculate*').as('calculateShipping')
+		cy.intercept('GET', '/api/shipping/calculate*country=DE*').as('calculateShippingDE')
 		
 		// Efetuar login programático com o utilizador seeded
 		cy.request('POST', '/api/login', {
@@ -84,11 +85,7 @@ describe('Desktop: Filled cart - customer', () => {
 		cy.get('[data-test="text-input-field-zip"]').clear().type('10178')
 		cy.get('[data-test="text-input-field-city"]').clear().type('Berlin')
 		cy.get('[data-test="text-input-field-country"]').clear().type('DE')
-		cy.wait('@calculateShipping').then((interception) => {
-			if (interception.request.url.includes('country=PT')) {
-				cy.wait('@calculateShipping')
-			}
-		})
+		cy.wait('@calculateShippingDE')
 		cy.get('[data-test="form-button-cash"]').click()
 		cy.get('[data-test="form-text-area"]').type('Please send some stickers')
 		cy.get('[data-test="checkout-button"]').click()
@@ -186,11 +183,7 @@ describe('Desktop: Filled cart - customer', () => {
 			.type('steve@bruben.com')
 		cy.get('[data-test="text-input-field-city"]').type('Berlin')
 		cy.get('[data-test="text-input-field-country"]').clear().type('DE')
-		cy.wait('@calculateShipping').then((interception) => {
-			if (interception.request.url.includes('country=PT')) {
-				cy.wait('@calculateShipping')
-			}
-		})
+		cy.wait('@calculateShippingDE')
 		cy.get('[data-test="checkout-button"]').click()
 
 		cy.get('[data-test="checkout-success-modal"]')
@@ -227,6 +220,7 @@ describe('Mobile: Filled cart - customer', () => {
 	beforeEach(() => {
 		cy.viewport('iphone-7')
 		cy.intercept('GET', '/api/shipping/calculate*').as('calculateShipping')
+		cy.intercept('GET', '/api/shipping/calculate*country=DE*').as('calculateShippingDE')
 		
 		// Efetuar login programático com o utilizador seeded
 		cy.request('POST', '/api/login', {
@@ -291,11 +285,7 @@ describe('Mobile: Filled cart - customer', () => {
 		cy.get('[data-test="text-input-field-zip"]').clear().type('10178')
 		cy.get('[data-test="text-input-field-city"]').clear().type('Berlin')
 		cy.get('[data-test="text-input-field-country"]').clear().type('DE')
-		cy.wait('@calculateShipping').then((interception) => {
-			if (interception.request.url.includes('country=PT')) {
-				cy.wait('@calculateShipping')
-			}
-		})
+		cy.wait('@calculateShippingDE')
 		cy.get('[data-test="form-button-cash"]').click()
 		cy.get('[data-test="form-text-area"]').type('Please send some stickers')
 		cy.get('[data-test="checkout-button"]').click()
@@ -394,11 +384,7 @@ describe('Mobile: Filled cart - customer', () => {
 			.type('steve@bruben.com')
 		cy.get('[data-test="text-input-field-city"]').type('Berlin')
 		cy.get('[data-test="text-input-field-country"]').clear().type('DE')
-		cy.wait('@calculateShipping').then((interception) => {
-			if (interception.request.url.includes('country=PT')) {
-				cy.wait('@calculateShipping')
-			}
-		})
+		cy.wait('@calculateShippingDE')
 		cy.get('[data-test="checkout-button"]').click()
 
 		cy.get('[data-test="checkout-success-modal"]')

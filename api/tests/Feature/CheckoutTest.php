@@ -290,4 +290,28 @@ class CheckoutTest extends TestCase
         $this->assertCount(2, $orders);
         $this->assertNotEquals($orders[0]->order_number, $orders[1]->order_number);
     }
+
+    public function test_checkout_saves_notes(): void
+    {
+        ['user' => $user, 'headers' => $headers] = $this->createUser();
+        $shipping = $this->setupShipping();
+        $product = $this->createProduct(['price' => 100.00, 'stock' => 5, 'weight' => 0.5]);
+        $this->addToCart($user, $product, 1);
+
+        $response = $this->postJson('/api/orders', [
+            'shipping_method_id' => $shipping['shippingMethod']->id,
+            'payment_method'     => 'credit_card',
+            'firstname'          => 'Ruben',
+            'lastname'           => 'Freitas',
+            'address_line1'      => 'Rua das Flores 12',
+            'city'               => 'Porto',
+            'postal_code'        => '4000-000',
+            'country'            => 'PT',
+            'notes'              => 'Deixar na caixa do correio se não estiver ninguém.',
+        ], $headers);
+
+        $response->assertStatus(201);
+        $order = Order::latest()->first();
+        $this->assertEquals('Deixar na caixa do correio se não estiver ninguém.', $order->notes);
+    }
 }

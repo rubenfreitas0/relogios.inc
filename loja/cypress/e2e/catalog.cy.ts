@@ -86,7 +86,7 @@ describe('Catalog — Desktop: Filters', () => {
 
 	it('filtering by brand updates the results', () => {
 		// Get initial count
-		cy.contains(/\d+ resultado/).invoke('text').then((initialText) => {
+		cy.contains(/\d+ resultado/).invoke('text').then(() => {
 			// Click on a brand filter (e.g. "Rolex")
 			cy.contains('label', 'Rolex').click()
 			cy.wait('@fetchProducts')

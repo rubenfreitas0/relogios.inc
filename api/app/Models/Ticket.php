@@ -4,25 +4,21 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Relations\BelongsTo;
 
-class ActivityLog extends Model
+class Ticket extends Model
 {
-
     use HasFactory;
-
-    protected $table = 'activity_log';
-
-    const UPDATED_AT = null;
 
     protected $fillable = [
         'user_id',
-        'event',
-        'subject_type',
-        'subject_id',
-        'description',
+        'subject',
+        'message',
+        'status',
+        'type',
     ];
 
-    public function user()
+    public function user(): BelongsTo
     {
         return $this->belongsTo(User::class);
     }

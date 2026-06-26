@@ -63,13 +63,16 @@ let debounceTimer: ReturnType<typeof setTimeout> | null = null
 watch(
 	() => [formStore.country, formStore.zip],
 	() => {
+		formStore.shippingLoading = true
 		if (debounceTimer) clearTimeout(debounceTimer)
 		debounceTimer = setTimeout(() => {
 			const country = formStore.country.substring(0, 2).toUpperCase()
 			if (country.length === 2) {
 				formStore.fetchShippingForCountry(country, formStore.zip)
+			} else {
+				formStore.shippingLoading = false
 			}
-		}, 500)
+		}, 300)
 	}
 )
 
@@ -255,32 +258,94 @@ onBeforeUnmount(() => {
 			</p>
 			<p class="mb-1 font-bold text-black">Método de Pagamento</p>
 			<div class="flex w-full flex-col gap-4 lg:grid lg:grid-cols-2">
+				<!-- Cartão de Crédito -->
 				<button
 					type="button"
 					class="group flex w-full cursor-pointer flex-row items-center gap-4 rounded border border-black border-opacity-60 p-3 transition-all active:translate-y-0.5"
-					:class="{ 'bg-k-main': !formStore.choseCash }"
-					@click="formStore.setElectronic($event)"
+					:class="{ 'bg-k-main': formStore.payment === 'credit_card' }"
+					@click="formStore.payment = 'credit_card'"
 					data-test="form-button-emoney"
 				>
 					<div
 						class="aspect-square h-3 rounded-full border border-black border-opacity-60"
-						:class="{ 'bg-black': !formStore.choseCash }"
+						:class="{ 'bg-black': formStore.payment === 'credit_card' }"
 					></div>
 					<span class="font-semibold text-black"> Cartão de Crédito </span>
 				</button>
+
+				<!-- Multibanco -->
 				<button
 					type="button"
 					class="group flex w-full cursor-pointer flex-row items-center gap-4 rounded border border-black border-opacity-60 p-3 transition-all active:translate-y-0.5"
-					:class="{ 'bg-k-main': formStore.choseCash }"
-					@click="formStore.setCash($event)"
+					:class="{ 'bg-k-main': formStore.payment === 'multibanco' }"
+					@click="formStore.payment = 'multibanco'"
 					data-test="form-button-cash"
 				>
 					<div
 						class="aspect-square h-3 rounded-full border border-black border-opacity-60"
-						:class="{ 'bg-black': formStore.choseCash }"
+						:class="{ 'bg-black': formStore.payment === 'multibanco' }"
 					></div>
 					<span class="font-semibold text-black"> Multibanco </span>
 				</button>
+
+				<!-- MB Way -->
+				<button
+					type="button"
+					class="group flex w-full cursor-pointer flex-row items-center gap-4 rounded border border-black border-opacity-60 p-3 transition-all active:translate-y-0.5"
+					:class="{ 'bg-k-main': formStore.payment === 'mbway' }"
+					@click="formStore.payment = 'mbway'"
+					data-test="form-button-mbway"
+				>
+					<div
+						class="aspect-square h-3 rounded-full border border-black border-opacity-60"
+						:class="{ 'bg-black': formStore.payment === 'mbway' }"
+					></div>
+					<span class="font-semibold text-black"> MB Way </span>
+				</button>
+
+				<!-- Apple Pay -->
+				<button
+					type="button"
+					class="group flex w-full cursor-pointer flex-row items-center gap-4 rounded border border-black border-opacity-60 p-3 transition-all active:translate-y-0.5"
+					:class="{ 'bg-k-main': formStore.payment === 'apple_pay' }"
+					@click="formStore.payment = 'apple_pay'"
+					data-test="form-button-apple-pay"
+				>
+					<div
+						class="aspect-square h-3 rounded-full border border-black border-opacity-60"
+						:class="{ 'bg-black': formStore.payment === 'apple_pay' }"
+					></div>
+					<span class="font-semibold text-black"> Apple Pay </span>
+				</button>
+
+				<!-- Google Pay -->
+				<button
+					type="button"
+					class="group flex w-full cursor-pointer flex-row items-center gap-4 rounded border border-black border-opacity-60 p-3 transition-all active:translate-y-0.5 lg:col-span-2"
+					:class="{ 'bg-k-main': formStore.payment === 'google_pay' }"
+					@click="formStore.payment = 'google_pay'"
+					data-test="form-button-google-pay"
+				>
+					<div
+						class="aspect-square h-3 rounded-full border border-black border-opacity-60"
+						:class="{ 'bg-black': formStore.payment === 'google_pay' }"
+					></div>
+					<span class="font-semibold text-black"> Google Pay </span>
+				</button>
+
+				<!-- Dynamic MB Way Phone field -->
+				<div v-if="formStore.payment === 'mbway'" class="col-span-2 mt-2">
+					<TextInputField
+						type="text"
+						:validator="formStore.isValidPaymentPhone"
+						id="paymentPhone"
+						label="Número de Telemóvel MB Way"
+						placeholder="912345678"
+						error-message="Por favor introduza um número de telemóvel válido."
+						autocomplete="off"
+						:required="true"
+					/>
+				</div>
 
 				<div class="col-span-2 flex h-40 flex-col">
 					<label class="mb-1 mt-4 font-bold text-black" for="comment"

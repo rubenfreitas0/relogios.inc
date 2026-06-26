@@ -12,6 +12,22 @@ const handleClose = () => {
 
 const order = computed(() => formStore.lastOrder)
 const firstItem = computed(() => order.value?.items?.[0])
+const payment = computed(() => order.value?.payments?.[0])
+
+function formatReference(ref: string | number): string {
+	const str = String(ref)
+	return `${str.substring(0, 3)} ${str.substring(3, 6)} ${str.substring(6, 9)}`
+}
+
+function formatDate(iso: string): string {
+	return new Date(iso).toLocaleDateString('pt-PT', {
+		day: '2-digit',
+		month: '2-digit',
+		year: 'numeric',
+		hour: '2-digit',
+		minute: '2-digit',
+	})
+}
 
 onBeforeMount(() => {
 	if (formStore.showBanner) {
@@ -36,7 +52,7 @@ onBeforeUnmount(() => {
 				class="absolute h-screen w-full bg-black opacity-40"
 			></router-link>
 			<div
-				class="relative z-10 mx-4 mt-6 flex flex-col rounded-md bg-white p-10 md:mt-20 md:p-12"
+				class="relative z-10 mx-4 mt-6 flex flex-col rounded-md bg-white p-10 md:mt-20 md:p-12 w-full max-w-xl overflow-y-auto max-h-[90vh]"
 			>
 				<div
 					class="absolute right-10 flex h-10 w-10 flex-shrink-0 flex-row items-center justify-center rounded-full bg-k-main md:static lg:h-20 lg:w-20"
@@ -68,6 +84,23 @@ onBeforeUnmount(() => {
 				>
 					You will receive an email confirmation shortly.
 				</p>
+
+				<!-- MB Way payment info -->
+				<div v-if="payment?.method?.value === 'mbway'" class="mt-4 p-4 bg-k-main/10 border border-dashed border-k-main rounded-md text-sm text-black">
+					<p class="font-bold">Pagamento MB Way pendente</p>
+					<p class="mt-1">Por favor autorize o pagamento de <span class="font-bold">€{{ order.total }}</span> na aplicação MB Way associada ao telemóvel <span class="font-bold">{{ (payment.payment_data as any)?.phone }}</span>.</p>
+				</div>
+
+				<!-- Multibanco payment info -->
+				<div v-if="payment?.method?.value === 'multibanco' && payment.payment_data" class="mt-4 p-4 bg-k-grey border border-black/10 rounded-md text-sm text-black">
+					<p class="font-bold uppercase tracking-wider text-black mb-2 text-xs">Dados de Pagamento Multibanco</p>
+					<div class="space-y-1 bg-white p-3 rounded border border-black/15">
+						<div class="flex justify-between border-b border-black/5 pb-1"><span class="opacity-60 text-xs">Entidade:</span> <span class="font-mono font-bold text-xs">{{ (payment.payment_data as any).entity }}</span></div>
+						<div class="flex justify-between border-b border-black/5 pb-1"><span class="opacity-60 text-xs">Referência:</span> <span class="font-mono font-bold text-xs">{{ formatReference((payment.payment_data as any).reference) }}</span></div>
+						<div class="flex justify-between border-b border-black/5 pb-1"><span class="opacity-60 text-xs">Montante:</span> <span class="font-bold text-xs">€{{ order.total }}</span></div>
+						<div class="flex justify-between pt-1"><span class="opacity-40 text-[10px]">Expira a:</span> <span class="text-[10px] opacity-60">{{ formatDate((payment.payment_data as any).expires_at) }}</span></div>
+					</div>
+				</div>
 				<div
 					class="mb-4 mt-6 flex h-full w-full flex-col overflow-hidden rounded-lg lg:mb-6 lg:mt-8 lg:flex-row lg:items-center"
 				>

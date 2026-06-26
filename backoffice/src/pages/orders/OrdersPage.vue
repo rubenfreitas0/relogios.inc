@@ -81,7 +81,7 @@
 
             <!-- Total -->
             <template #cell(total)="{ value }">
-              <span class="font-mono font-semibold">{{ formatCurrency(value) }}</span>
+              <span class="font-mono font-semibold">{{ formatCurrency(Number(value)) }}</span>
             </template>
 
             <!-- Data -->

@@ -67,6 +67,13 @@ const currentStepIndex = computed(() => {
 	if (val === 'cancelled' || val === 'refunded') return -1
 	return timelineSteps.indexOf(val)
 })
+
+const payment = computed(() => store.currentOrder?.payments?.[0])
+
+function formatReference(ref: string | number): string {
+	const str = String(ref)
+	return `${str.substring(0, 3)} ${str.substring(3, 6)} ${str.substring(6, 9)}`
+}
 </script>
 
 <template>
@@ -165,7 +172,7 @@ const currentStepIndex = computed(() => {
 			</div>
 
 			<!-- Summary + Shipping + Payment grid -->
-			<div class="grid gap-6 md:grid-cols-2">
+			<div class="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
 				<!-- Resumo financeiro -->
 				<div class="rounded-xl border border-white/10 bg-white/[0.03] p-6">
 					<h3 class="mb-4 text-[0.65rem] font-bold uppercase tracking-[0.15em] text-[#FFC700]">Resumo</h3>
@@ -202,6 +209,43 @@ const currentStepIndex = computed(() => {
 							</a>
 							<span v-else class="text-xs font-bold text-white">{{ store.currentOrder.tracking_number }}</span>
 						</p>
+					</div>
+				</div>
+
+				<!-- Pagamento -->
+				<div class="rounded-xl border border-white/10 bg-white/[0.03] p-6 col-span-1 md:col-span-2 lg:col-span-1">
+					<h3 class="mb-4 text-[0.65rem] font-bold uppercase tracking-[0.15em] text-[#FFC700]">Pagamento</h3>
+					<div v-if="payment" class="text-sm text-white/60 space-y-2">
+						<div class="flex justify-between">
+							<span class="text-white/40">Método</span>
+							<span class="font-semibold text-white">{{ payment.method.label }}</span>
+						</div>
+						<div class="flex justify-between">
+							<span class="text-white/40">Estado</span>
+							<span
+								class="rounded-full px-2 py-0.5 text-[0.65rem] font-bold uppercase tracking-wider"
+								:class="payment.status.value === 'paid' ? 'bg-green-500/10 text-green-400 border border-green-500/20' : 'bg-amber-500/10 text-amber-400 border border-amber-500/20'"
+							>
+								{{ payment.status.label }}
+							</span>
+						</div>
+
+						<!-- Detalhes extra para Multibanco -->
+						<div v-if="payment.method.value === 'multibanco' && payment.payment_data" class="mt-4 border-t border-white/10 pt-3 space-y-2">
+							<p class="text-[0.65rem] font-bold uppercase tracking-wider text-[#FFC700]">Dados Multibanco</p>
+							<div class="flex justify-between"><span class="text-white/40 text-xs">Entidade:</span> <span class="font-mono text-white text-xs">{{ (payment.payment_data as any).entity }}</span></div>
+							<div class="flex justify-between"><span class="text-white/40 text-xs">Referência:</span> <span class="font-mono text-[#FFC700] text-xs font-bold">{{ formatReference((payment.payment_data as any).reference) }}</span></div>
+							<div class="flex justify-between"><span class="text-white/40 text-xs">Montante:</span> <span class="text-white text-xs">€{{ formatPrice(payment.amount) }}</span></div>
+						</div>
+
+						<!-- Detalhes extra para MB Way -->
+						<div v-if="payment.method.value === 'mbway' && payment.payment_data" class="mt-4 border-t border-white/10 pt-3 space-y-1 text-xs">
+							<p class="text-[0.65rem] font-bold uppercase tracking-wider text-[#FFC700] mb-2">Detalhes MB Way</p>
+							<div class="flex justify-between"><span class="text-white/40">Telemóvel:</span> <span class="font-semibold text-white">{{ (payment.payment_data as any).phone }}</span></div>
+						</div>
+					</div>
+					<div v-else class="text-sm text-white/30 italic">
+						Sem informação de pagamento disponível.
 					</div>
 				</div>
 			</div>

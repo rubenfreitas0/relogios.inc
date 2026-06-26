@@ -24,28 +24,36 @@ class SupportController extends Controller
         $subject = $validated['subject'];
         $messageContent = $validated['message'];
 
-        // Enviar o email para o log/SMTP configurado
+        // Guardar o ticket na base de dados
+        $ticket = $user->tickets()->create([
+            'subject' => $subject,
+            'message' => $messageContent,
+            'status'  => 'open',
+            'type'    => $subject, // Ex: 'devolucao', 'reembolso', etc.
+        ]);
+
+        // Enviar o email para o log/SMTP configurado como backup/notificação
         try {
             Mail::raw(
-                "Mensagem de Apoio ao Cliente:\n\n" .
+                "Mensagem de Apoio ao Cliente (Ticket #{$ticket->id}):\n\n" .
                 "Cliente: {$user->firstname} {$user->lastname}\n" .
                 "Email: {$user->email}\n" .
                 "Assunto: {$subject}\n\n" .
                 "Mensagem:\n{$messageContent}",
-                function ($mail) use ($user, $subject) {
+                function ($mail) use ($user, $subject, $ticket) {
                     $mail->to('geral@relogios.inc')
-                         ->subject("[Apoio ao Cliente] " . ucfirst($subject) . " - {$user->firstname} {$user->lastname}");
+                         ->subject("[Apoio ao Cliente] Ticket #{$ticket->id} - " . ucfirst($subject) . " - {$user->firstname} {$user->lastname}");
                 }
             );
 
-            Log::info("Email de apoio ao cliente enviado com sucesso para geral@relogios.inc. Assunto: {$subject}");
+            Log::info("Email de apoio ao cliente para Ticket #{$ticket->id} enviado com sucesso.");
         } catch (\Exception $e) {
             Log::error("Falha ao enviar email de apoio: " . $e->getMessage());
-            // Mesmo se o mailer falhar localmente por falta de rede, registamos no log e informamos
         }
 
         return response()->json([
             'message' => 'Pedido de contacto enviado com sucesso.',
+            'ticket' => $ticket,
         ]);
     }
 }

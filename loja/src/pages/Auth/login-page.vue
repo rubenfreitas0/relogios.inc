@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { ref, computed, onMounted, onUnmounted } from 'vue'
+import { ref, computed, onUnmounted } from 'vue'
 import { useRouter } from 'vue-router'
 import { useAuthStore } from '../../pinia/authStore'
 import Navigation from '../../components/navigation-global.vue'
@@ -12,7 +12,6 @@ const email = ref('')
 const password = ref('')
 const showPassword = ref(false)
 
-const isDev = import.meta.env.DEV
 
 // Rate limiting state
 const attempts = ref<number[]>([])
@@ -51,24 +50,7 @@ function checkRateLimit(): boolean {
 	return false
 }
 
-function injectTestData() {
-	email.value = 'admin@relogios.inc'
-	password.value = 'password'
-}
-
-function handleKeyDown(e: KeyboardEvent) {
-	if (e.ctrlKey && e.shiftKey && e.key.toLowerCase() === 'y') {
-		e.preventDefault()
-		injectTestData()
-	}
-}
-
-onMounted(() => {
-	window.addEventListener('keydown', handleKeyDown)
-})
-
 onUnmounted(() => {
-	window.removeEventListener('keydown', handleKeyDown)
 	if (cooldownTimer) clearInterval(cooldownTimer)
 })
 
@@ -269,19 +251,7 @@ async function handleLogin() {
 						</button>
 					</form>
 
-					<!-- Dev Helper -->
-					<div v-if="isDev" class="mt-6 pt-4 border-t border-white/5 flex justify-center">
-						<button
-							type="button"
-							@click="injectTestData"
-							class="text-xs text-k-main/60 hover:text-k-main transition duration-200 flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-white/5 hover:bg-white/10"
-						>
-							<svg class="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-								<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z" />
-							</svg>
-							Preencher dados de teste <span class="text-white/30 text-[10px] font-mono ml-1">(Ctrl+Shift+Y)</span>
-						</button>
-					</div>
+
 
 					<!-- Link registo -->
 					<p class="mt-6 text-center text-sm text-white/40">

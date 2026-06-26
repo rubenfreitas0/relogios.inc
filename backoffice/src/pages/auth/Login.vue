@@ -45,14 +45,16 @@
 </template>
 
 <script lang="ts" setup>
-import { reactive } from 'vue'
+import { reactive, ref } from 'vue'
 import { useRouter } from 'vue-router'
 import { useForm, useToast } from 'vuestic-ui'
 import { validators } from '../../services/utils'
+import { useAuthStore } from '../../stores/auth-store'
 
 const { validate } = useForm('form')
 const { push } = useRouter()
 const { init } = useToast()
+const authStore = useAuthStore()
 
 const formData = reactive({
   email: '',
@@ -60,10 +62,20 @@ const formData = reactive({
   keepLoggedIn: false,
 })
 
-const submit = () => {
-  if (validate()) {
-    init({ message: "You've successfully logged in", color: 'success' })
+const isLoading = ref(false)
+
+const submit = async () => {
+  if (!validate()) return
+
+  isLoading.value = true
+  const success = await authStore.login(formData.email, formData.password)
+  isLoading.value = false
+
+  if (success) {
+    init({ message: 'Login efetuado com sucesso!', color: 'success' })
     push({ name: 'dashboard' })
+  } else {
+    init({ message: authStore.error || 'Credenciais inválidas.', color: 'danger' })
   }
 }
 </script>

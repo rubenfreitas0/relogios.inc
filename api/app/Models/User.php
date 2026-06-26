@@ -51,9 +51,9 @@ class User extends Authenticatable implements MustVerifyEmail
         return $this->hasMany(CartItem::class);
     }
 
-    public function activityLogs()
+    public function tickets()
     {
-        return $this->hasMany(ActivityLog::class);
+        return $this->hasMany(Ticket::class);
     }
 
     public function payments()
