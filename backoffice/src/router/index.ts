@@ -1,8 +1,8 @@
 import { createRouter, createWebHistory, RouteRecordRaw } from 'vue-router'
-import { useAuthStore } from '../stores/auth-store'
 
 import AuthLayout from '../layouts/AuthLayout.vue'
 import AppLayout from '../layouts/AppLayout.vue'
+
 import RouteViewComponent from '../layouts/RouterBypass.vue'
 
 const routes: Array<RouteRecordRaw> = [
@@ -15,7 +15,6 @@ const routes: Array<RouteRecordRaw> = [
     path: '/',
     component: AppLayout,
     redirect: { name: 'dashboard' },
-    meta: { requiresAuth: true },
     children: [
       {
         name: 'dashboard',
@@ -23,59 +22,51 @@ const routes: Array<RouteRecordRaw> = [
         component: () => import('../pages/admin/dashboard/Dashboard.vue'),
       },
       {
-        name: 'products',
-        path: 'produtos',
-        component: () => import('../pages/products/ProductsPage.vue'),
+        name: 'settings',
+        path: 'settings',
+        component: () => import('../pages/settings/Settings.vue'),
       },
       {
-        name: 'product-create',
-        path: 'produtos/novo',
-        component: () => import('../pages/products/ProductForm.vue'),
+        name: 'preferences',
+        path: 'preferences',
+        component: () => import('../pages/preferences/Preferences.vue'),
       },
       {
-        name: 'product-edit',
-        path: 'produtos/:id/editar',
-        component: () => import('../pages/products/ProductForm.vue'),
-        props: true,
+        name: 'users',
+        path: 'users',
+        component: () => import('../pages/users/UsersPage.vue'),
       },
       {
-        name: 'orders',
-        path: 'encomendas',
-        component: () => import('../pages/orders/OrdersPage.vue'),
+        name: 'projects',
+        path: 'projects',
+        component: () => import('../pages/projects/ProjectsPage.vue'),
       },
       {
-        name: 'order-detail',
-        path: 'encomendas/:orderNumber',
-        component: () => import('../pages/orders/OrderDetail.vue'),
-        props: true,
-      },
-      {
-        name: 'brands',
-        path: 'marcas',
-        component: () => import('../pages/brands/BrandsPage.vue'),
-      },
-      {
-        name: 'categories',
-        path: 'categorias',
-        component: () => import('../pages/categories/CategoriesPage.vue'),
-      },
-      {
-        name: 'shipping',
-        path: 'envios',
+        name: 'payments',
+        path: '/payments',
         component: RouteViewComponent,
-        redirect: { name: 'shipping-methods' },
         children: [
           {
-            name: 'shipping-methods',
-            path: 'metodos',
-            component: () => import('../pages/shipping/ShippingMethodsPage.vue'),
+            name: 'payment-methods',
+            path: 'payment-methods',
+            component: () => import('../pages/payments/PaymentsPage.vue'),
           },
           {
-            name: 'shipping-zones',
-            path: 'zonas',
-            component: () => import('../pages/shipping/ShippingZonesPage.vue'),
+            name: 'billing',
+            path: 'billing',
+            component: () => import('../pages/billing/BillingPage.vue'),
+          },
+          {
+            name: 'pricing-plans',
+            path: 'pricing-plans',
+            component: () => import('../pages/pricing-plans/PricingPlans.vue'),
           },
         ],
+      },
+      {
+        name: 'faq',
+        path: '/faq',
+        component: () => import('../pages/faq/FaqPage.vue'),
       },
     ],
   },
@@ -87,6 +78,21 @@ const routes: Array<RouteRecordRaw> = [
         name: 'login',
         path: 'login',
         component: () => import('../pages/auth/Login.vue'),
+      },
+      {
+        name: 'signup',
+        path: 'signup',
+        component: () => import('../pages/auth/Signup.vue'),
+      },
+      {
+        name: 'recover-password',
+        path: 'recover-password',
+        component: () => import('../pages/auth/RecoverPassword.vue'),
+      },
+      {
+        name: 'recover-password-email',
+        path: 'recover-password-email',
+        component: () => import('../pages/auth/CheckTheEmail.vue'),
       },
       {
         path: '',
@@ -107,6 +113,7 @@ const router = createRouter({
     if (savedPosition) {
       return savedPosition
     }
+    // For some reason using documentation example doesn't scroll on page navigation.
     if (to.hash) {
       return { el: to.hash, behavior: 'smooth' }
     } else {
@@ -114,32 +121,6 @@ const router = createRouter({
     }
   },
   routes,
-})
-
-// — Navigation guard: proteger rotas admin —
-router.beforeEach((to, from, next) => {
-  const authStore = useAuthStore()
-
-  // Inicializar auth store a partir do localStorage
-  if (!authStore.isAuthenticated) {
-    authStore.init()
-  }
-
-  // Rotas que requerem autenticação
-  if (to.matched.some((record) => record.meta.requiresAuth)) {
-    if (!authStore.isAuthenticated) {
-      next({ name: 'login', query: { redirect: to.fullPath } })
-      return
-    }
-  }
-
-  // Se já está autenticado e vai para login, redirecionar para dashboard
-  if (to.name === 'login' && authStore.isAuthenticated) {
-    next({ name: 'dashboard' })
-    return
-  }
-
-  next()
 })
 
 export default router

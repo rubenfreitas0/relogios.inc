@@ -9,7 +9,7 @@
 
     <nav class="flex items-center">
       <VaBreadcrumbs>
-        <VaBreadcrumbsItem label="Início" :to="{ name: 'dashboard' }" />
+        <VaBreadcrumbsItem label="Home" :to="{ name: 'dashboard' }" />
         <VaBreadcrumbsItem
           v-for="item in items"
           :key="item.label"
@@ -24,6 +24,7 @@
 <script setup lang="ts">
 import { computed } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
+import { useI18n } from 'vue-i18n'
 import { useColors } from 'vuestic-ui'
 import VaIconMenuCollapsed from '../icons/VaIconMenuCollapsed.vue'
 import { storeToRefs } from 'pinia'
@@ -34,6 +35,7 @@ const { isSidebarMinimized } = storeToRefs(useGlobalStore())
 
 const router = useRouter()
 const route = useRoute()
+const { t } = useI18n()
 
 type BreadcrumbNavigationItem = {
   label: string
@@ -43,12 +45,12 @@ type BreadcrumbNavigationItem = {
 
 const findRouteName = (name: string) => {
   const traverse = (routers: any[]): string => {
-    for (const r of routers) {
-      if (r.name === name) {
-        return r.displayName
+    for (const router of routers) {
+      if (router.name === name) {
+        return router.displayName
       }
-      if (r.children) {
-        const result = traverse(r.children)
+      if (router.children) {
+        const result = traverse(router.children)
         if (result) {
           return result
         }
@@ -61,16 +63,16 @@ const findRouteName = (name: string) => {
 }
 
 const items = computed(() => {
-  const result: BreadcrumbNavigationItem[] = []
-  route.matched.forEach((r) => {
-    const label = findRouteName(r.name as string)
-    if (!label) {
+  const result: { label: string; to: string; hasChildren: boolean }[] = []
+  route.matched.forEach((route) => {
+    const labelKey = findRouteName(route.name as string)
+    if (!labelKey) {
       return
     }
     result.push({
-      label,
-      to: r.path,
-      hasChildren: r.children && r.children.length > 0,
+      label: t(labelKey),
+      to: route.path,
+      hasChildren: route.children && route.children.length > 0,
     })
   })
   return result

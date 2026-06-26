@@ -1,21 +1,41 @@
 <template>
-  <div class="min-h-screen w-full flex items-center justify-center bg-white p-4 font-sans">
-    <div class="w-full max-w-[360px] flex flex-col items-center">
-      <div class="flex flex-col items-center mb-8">
-        <RouterLink to="/" aria-label="Ir para o início" class="flex flex-col items-center">
-          <span class="text-3xl font-black tracking-tight text-black select-none">
-            RELOGIOS<span class="text-[#FFC700]">.inc</span>
-          </span>
-          <span class="text-[10px] tracking-widest uppercase text-gray-500 mt-1.5 select-none font-semibold">
-            Painel de Administração
-          </span>
-        </RouterLink>
+  <VaLayout v-if="breakpoint.lgUp" class="h-screen bg-[var(--va-background-secondary)]">
+    <template #left>
+      <RouterLink
+        class="bg-primary h-full flex items-center justify-center"
+        style="width: 35vw"
+        to="/"
+        aria-label="Visit homepage"
+      >
+        <VuesticLogo :height="28" start="#FFF" />
+      </RouterLink>
+    </template>
+    <template #content>
+      <main class="h-full flex items-center justify-center mx-auto max-w-[420px]">
+        <RouterView />
+      </main>
+    </template>
+  </VaLayout>
+
+  <VaLayout v-else class="h-screen bg-[var(--va-background-secondary)]">
+    <template #content>
+      <div class="p-4">
+        <main class="h-full flex flex-row items-center justify-start mx-auto max-w-[420px]">
+          <div class="flex flex-col items-start">
+            <RouterLink class="py-4" to="/" aria-label="Visit homepage">
+              <VuesticLogo class="mb-2" start="#0E41C9" />
+            </RouterLink>
+            <RouterView />
+          </div>
+        </main>
       </div>
-      <RouterView class="w-full" />
-    </div>
-  </div>
+    </template>
+  </VaLayout>
 </template>
 
 <script lang="ts" setup>
-// Layout centralizado minimalista com fundo branco.
+import { useBreakpoint } from 'vuestic-ui'
+import VuesticLogo from '../components/VuesticLogo.vue'
+
+const breakpoint = useBreakpoint()
 </script>
