@@ -390,8 +390,8 @@ function populateForm(product: Product) {
   form.features = product.features || ''
 
   // in_the_box é um array — converter para texto (uma linha por item)
-  if (Array.isArray(product.inthebox)) {
-    form.in_the_box = product.inthebox.join('\n')
+  if (Array.isArray(product.in_the_box)) {
+    form.in_the_box = product.in_the_box.join('\n')
   } else {
     form.in_the_box = ''
   }

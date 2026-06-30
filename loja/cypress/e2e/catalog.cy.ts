@@ -118,6 +118,24 @@ describe('Catalog — Desktop: Filters', () => {
 		cy.contains('Até €100').should('be.visible')
 	})
 
+	it('filtering by category in sidebar works', () => {
+		// Click on category "Mergulho"
+		cy.contains('button', 'Mergulho').click()
+		cy.wait('@fetchProducts')
+
+		// Category chip should appear
+		cy.contains('Categoria: Mergulho').should('be.visible')
+	})
+
+	it('filtering by color in sidebar works', () => {
+		// Click on color circle titled "Preto"
+		cy.get('button[title="Preto"]').click()
+		cy.wait('@fetchProducts')
+
+		// Color chip should appear
+		cy.contains('Cor: Preto').should('be.visible')
+	})
+
 	it('removing a filter chip updates results', () => {
 		// Apply brand filter
 		cy.contains('label', 'Rolex').click()
@@ -151,3 +169,73 @@ describe('Catalog — Mobile', () => {
 		cy.get('[data-test="cart-bubble"]').should('be.visible')
 	})
 })
+
+describe('Catalog — Mega Menu Filters', () => {
+	beforeEach(() => {
+		cy.viewport('macbook-15')
+		cy.intercept('GET', '/api/catalog/products*').as('fetchProducts')
+		cy.visit('/')
+		cy.wait(500)
+	})
+
+	it('navigates from mega menu and applies brand filter', () => {
+		// Hover on Homens link
+		cy.get('[data-test="nav-homens"]').trigger('mouseenter')
+		// Click Casio link under brand column
+		cy.contains('a', 'Casio').click()
+		cy.wait('@fetchProducts')
+
+		// URL should be /homens?brand=casio
+		cy.url().should('include', '/homens')
+		cy.url().should('include', 'brand=casio')
+
+		// The brand filter "Casio" chip should be visible
+		cy.contains('.rounded-full', 'Casio').should('be.visible')
+	})
+
+	it('navigates from mega menu and applies price filter', () => {
+		// Hover on Homens link
+		cy.get('[data-test="nav-homens"]').trigger('mouseenter')
+		// Click Price link
+		cy.contains('a', 'Até €100').click()
+		cy.wait('@fetchProducts')
+
+		// URL should contain price range
+		cy.url().should('include', 'min_price=0')
+		cy.url().should('include', 'max_price=100')
+
+		// Price range chip should appear
+		cy.contains('.rounded-full', 'Até €100').should('be.visible')
+	})
+
+	it('navigates from mega menu and applies clock type category filter', () => {
+		// Hover on Homens link
+		cy.get('[data-test="nav-homens"]').trigger('mouseenter')
+		// Click Mergulho link under clock type column
+		cy.contains('a', 'Mergulho').click()
+		cy.wait('@fetchProducts')
+
+		// URL should be /homens?category=mergulho
+		cy.url().should('include', '/homens')
+		cy.url().should('include', 'category=mergulho')
+
+		// The category filter chip should be visible
+		cy.contains('.rounded-full', 'Categoria: Mergulho').should('be.visible')
+	})
+
+	it('navigates from mega menu and applies mechanism category filter', () => {
+		// Hover on Homens link
+		cy.get('[data-test="nav-homens"]').trigger('mouseenter')
+		// Click Digital link under mechanism column
+		cy.contains('a', 'Digital').click()
+		cy.wait('@fetchProducts')
+
+		// URL should be /homens?category=digital
+		cy.url().should('include', '/homens')
+		cy.url().should('include', 'category=digital')
+
+		// The category filter chip should be visible
+		cy.contains('.rounded-full', 'Categoria: Digital').should('be.visible')
+	})
+})
+

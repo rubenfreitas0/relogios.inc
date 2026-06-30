@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import cartIcon from '/icons/cart-icon.svg'
 import Cart from './Cart/cart-modal.vue'
-import { computed, onBeforeUnmount, ref, onMounted } from 'vue'
+import { computed, ref, onMounted } from 'vue'
 import { useCartStore } from '../pinia/cartStore.ts'
 import { useAuthStore } from '../pinia/authStore.ts'
 import { useRouter, useRoute } from 'vue-router'
@@ -64,18 +64,25 @@ function keepMega() {
 }
 
 // ── Mega menu data ────────────────────────────────────────────────
+interface MegaPrice { label: string; min: number; max: number }
+
 const megaMenus: Record<string, {
 	brands: string[]
 	types: string[]
 	kind: string[]
-	prices: string[]
+	prices: MegaPrice[]
 	colors: { name: string; hex: string }[]
 }> = {
 	homens: {
 		brands: ['Casio', 'Seiko', 'Citizen', 'Orient', 'Tissot', 'Festina', 'G-Shock', 'Hugo Boss'],
 		types: ['Clássico', 'Desportivo', 'Casual', 'Mergulho', 'Aviador', 'Cronógrafo', 'Militar'],
 		kind: ['Analógico', 'Digital', 'Analógico-Digital', 'Smartwatch'],
-		prices: ['Até €100', '€100 – €250', '€250 – €500', 'Acima de €500'],
+		prices: [
+			{ label: 'Até €100', min: 0, max: 100 },
+			{ label: '€100 – €250', min: 100, max: 250 },
+			{ label: '€250 – €500', min: 250, max: 500 },
+			{ label: 'Acima de €500', min: 500, max: 999999 },
+		],
 		colors: [
 			{ name: 'Preto', hex: '#1a1a1a' },
 			{ name: 'Prata', hex: '#c0c0c0' },
@@ -89,7 +96,12 @@ const megaMenus: Record<string, {
 		brands: ['Casio', 'Citizen', 'Michael Kors', 'Anne Klein', 'Festina', 'Tissot', 'Cluse', 'Fossil'],
 		types: ['Clássico', 'Elegante', 'Casual', 'Desportivo', 'Minimalista', 'Cronógrafo'],
 		kind: ['Analógico', 'Digital', 'Smartwatch'],
-		prices: ['Até €80', '€80 – €200', '€200 – €450', 'Acima de €450'],
+		prices: [
+			{ label: 'Até €80', min: 0, max: 80 },
+			{ label: '€80 – €200', min: 80, max: 200 },
+			{ label: '€200 – €450', min: 200, max: 450 },
+			{ label: 'Acima de €450', min: 450, max: 999999 },
+		],
 		colors: [
 			{ name: 'Dourado', hex: '#c8a44a' },
 			{ name: 'Rosa Gold', hex: '#b76e79' },
@@ -103,7 +115,12 @@ const megaMenus: Record<string, {
 		brands: ['Casio', 'Swatch', 'Timex', 'Orient', 'Seiko', 'Garmin', 'Apple', 'Samsung'],
 		types: ['Casual', 'Desportivo', 'Smartwatch', 'Minimalista', 'Vintage', 'Outdoor'],
 		kind: ['Analógico', 'Digital', 'Smartwatch', 'Híbrido'],
-		prices: ['Até €80', '€80 – €200', '€200 – €500', 'Acima de €500'],
+		prices: [
+			{ label: 'Até €80', min: 0, max: 80 },
+			{ label: '€80 – €200', min: 80, max: 200 },
+			{ label: '€200 – €500', min: 200, max: 500 },
+			{ label: 'Acima de €500', min: 500, max: 999999 },
+		],
 		colors: [
 			{ name: 'Preto', hex: '#1a1a1a' },
 			{ name: 'Branco', hex: '#f0f0f0' },
@@ -121,9 +138,28 @@ onMounted(async () => {
 	}
 })
 
-onBeforeUnmount(() => {
-	if (megaLeaveTimeout) clearTimeout(megaLeaveTimeout)
-})
+const categorySlugMap: Record<string, string> = {
+	'Clássico': 'classicos',
+	'Desportivo': 'desporto',
+	'Casual': 'casual',
+	'Mergulho': 'mergulho',
+	'Aviador': 'aviador',
+	'Cronógrafo': 'cronografos',
+	'Militar': 'militar',
+	'Analógico': 'analogico',
+	'Digital': 'digital',
+	'Analógico-Digital': 'analogico-digital',
+	'Smartwatch': 'smartwatch',
+	'Minimalista': 'classicos', // fallback ou mapeamento aproximado
+	'Vintage': 'classicos',
+	'Outdoor': 'desporto',
+	'Híbrido': 'automaticos',
+	'Elegante': 'classicos',
+}
+
+function getCategorySlug(name: string): string {
+	return categorySlugMap[name] || name.toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g, '')
+}
 </script>
 
 <template>
@@ -374,7 +410,7 @@ onBeforeUnmount(() => {
 						<ul class="space-y-2">
 							<li v-for="t in megaMenus[activeMega!].types" :key="t">
 								<router-link
-									:to="`/${activeMega}?tipo=${t.toLowerCase()}`"
+									:to="`/${activeMega}?category=${getCategorySlug(t)}`"
 									class="text-sm text-white/60 hover:text-white hover:translate-x-1 transition-all duration-150 block"
 									@click="activeMega = null"
 								>
@@ -390,7 +426,7 @@ onBeforeUnmount(() => {
 						<ul class="space-y-2">
 							<li v-for="k in megaMenus[activeMega!].kind" :key="k">
 								<router-link
-									:to="`/${activeMega}?mecanismo=${k.toLowerCase()}`"
+									:to="`/${activeMega}?category=${getCategorySlug(k)}`"
 									class="text-sm text-white/60 hover:text-white hover:translate-x-1 transition-all duration-150 block"
 									@click="activeMega = null"
 								>
@@ -404,13 +440,13 @@ onBeforeUnmount(() => {
 					<div>
 						<p class="text-[0.6rem] font-bold tracking-[0.2em] uppercase text-[#FFC700] mb-4">Gama de Preço</p>
 						<ul class="space-y-2">
-							<li v-for="p in megaMenus[activeMega!].prices" :key="p">
+							<li v-for="p in megaMenus[activeMega!].prices" :key="p.label">
 								<router-link
-									:to="`/${activeMega}?preco=${encodeURIComponent(p)}`"
+									:to="`/${activeMega}?min_price=${p.min}&max_price=${p.max}`"
 									class="text-sm text-white/60 hover:text-white hover:translate-x-1 transition-all duration-150 block"
 									@click="activeMega = null"
 								>
-									{{ p }}
+									{{ p.label }}
 								</router-link>
 							</li>
 						</ul>

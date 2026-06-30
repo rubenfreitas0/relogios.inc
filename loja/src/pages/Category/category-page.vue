@@ -4,10 +4,13 @@ import Footer from '../../components/footer-global.vue'
 import ProductCard from './Components/product-card.vue'
 import { useCatalogStore } from '../../pinia/catalogStore'
 import type { Product } from '../../data/product-types'
-import { computed, ref, watch, onMounted } from 'vue'
+import { computed, ref, watch, onMounted, nextTick } from 'vue'
+import { useRoute, useRouter } from 'vue-router'
 
 const props = defineProps<{ category: string }>()
 const catalogStore = useCatalogStore()
+const route = useRoute()
+const router = useRouter()
 
 interface PriceRange {
 	label: string
@@ -20,6 +23,8 @@ interface CategoryFilterMeta {
 	subtitle: string
 	brands: string[]
 	priceRanges: PriceRange[]
+	categories: { slug: string; name: string }[]
+	colors: { name: string; hex: string }[]
 }
 
 // ── Static filter data (future: fetch from API) ──────────────────
@@ -34,6 +39,23 @@ const filterData: Record<string, CategoryFilterMeta> = {
 			{ label: '€250 – €500', min: 250, max: 500 },
 			{ label: 'Acima de €500', min: 500, max: 999999 },
 		],
+		categories: [
+			{ slug: 'classicos', name: 'Clássico' },
+			{ slug: 'desporto', name: 'Desportivo' },
+			{ slug: 'mergulho', name: 'Mergulho' },
+			{ slug: 'cronografos', name: 'Cronógrafo' },
+			{ slug: 'automaticos', name: 'Automático' },
+			{ slug: 'digital', name: 'Digital' },
+			{ slug: 'smartwatch', name: 'Smartwatch' }
+		],
+		colors: [
+			{ name: 'Preto', hex: '#1a1a1a' },
+			{ name: 'Prata', hex: '#c0c0c0' },
+			{ name: 'Dourado', hex: '#c8a44a' },
+			{ name: 'Azul', hex: '#1e3a5f' },
+			{ name: 'Verde', hex: '#2d5a3d' },
+			{ name: 'Branco', hex: '#f0f0f0' },
+		],
 	},
 	mulheres: {
 		label: 'Mulheres',
@@ -44,6 +66,21 @@ const filterData: Record<string, CategoryFilterMeta> = {
 			{ label: '€80 – €200', min: 80, max: 200 },
 			{ label: '€200 – €450', min: 200, max: 450 },
 			{ label: 'Acima de €450', min: 450, max: 999999 },
+		],
+		categories: [
+			{ slug: 'classicos', name: 'Clássico' },
+			{ slug: 'desporto', name: 'Desportivo' },
+			{ slug: 'automaticos', name: 'Automático' },
+			{ slug: 'analogico', name: 'Analógico' },
+			{ slug: 'smartwatch', name: 'Smartwatch' }
+		],
+		colors: [
+			{ name: 'Dourado', hex: '#c8a44a' },
+			{ name: 'Rosa Gold', hex: '#b76e79' },
+			{ name: 'Prata', hex: '#c0c0c0' },
+			{ name: 'Branco', hex: '#f0f0f0' },
+			{ name: 'Preto', hex: '#1a1a1a' },
+			{ name: 'Rose', hex: '#e8a0a0' },
 		],
 	},
 	unisexo: {
@@ -56,6 +93,21 @@ const filterData: Record<string, CategoryFilterMeta> = {
 			{ label: '€200 – €500', min: 200, max: 500 },
 			{ label: 'Acima de €500', min: 500, max: 999999 },
 		],
+		categories: [
+			{ slug: 'classicos', name: 'Clássico' },
+			{ slug: 'desporto', name: 'Desportivo' },
+			{ slug: 'automaticos', name: 'Automático' },
+			{ slug: 'digital', name: 'Digital' },
+			{ slug: 'smartwatch', name: 'Smartwatch' }
+		],
+		colors: [
+			{ name: 'Preto', hex: '#1a1a1a' },
+			{ name: 'Branco', hex: '#f0f0f0' },
+			{ name: 'Prata', hex: '#c0c0c0' },
+			{ name: 'Laranja', hex: '#d4621a' },
+			{ name: 'Verde', hex: '#2d5a3d' },
+			{ name: 'Azul', hex: '#1e3a5f' },
+		],
 	},
 }
 
@@ -64,6 +116,94 @@ const meta = computed(() => filterData[props.category] ?? filterData.homens)
 // ── Active filters ────────────────────────────────────────────────
 const selectedBrands = ref<string[]>([])
 const selectedPriceRange = ref<{ label: string; min: number; max: number } | null>(null)
+const selectedCategory = ref<string | null>(null)
+const selectedColor = ref<string | null>(null)
+
+const categoryNames: Record<string, string> = {
+	classicos: 'Clássico',
+	desporto: 'Desportivo',
+	casual: 'Casual',
+	mergulho: 'Mergulho',
+	aviador: 'Aviador',
+	cronografos: 'Cronógrafo',
+	militar: 'Militar',
+	automaticos: 'Automático',
+	analogico: 'Analógico',
+	digital: 'Digital',
+	'analogico-digital': 'Analógico-Digital',
+	smartwatch: 'Smartwatch'
+}
+
+// Flag to prevent circular updates between URL ↔ filters
+let syncing = false
+
+// ── Read query params and apply to filters ─────────────────────────
+function syncFiltersFromQuery() {
+	syncing = true
+	const q = route.query
+
+	// Brand: query has slug (lowercase), sidebar has display name
+	if (q.brand && typeof q.brand === 'string') {
+		const brandSlug = q.brand.toLowerCase()
+		const matched = meta.value.brands.find(b => b.toLowerCase() === brandSlug)
+		selectedBrands.value = matched ? [matched] : []
+	} else {
+		selectedBrands.value = []
+	}
+
+	// Price range: from min_price / max_price query params
+	if (q.min_price || q.max_price) {
+		const minP = q.min_price ? Number(q.min_price) : 0
+		const maxP = q.max_price ? Number(q.max_price) : 999999
+		const matched = meta.value.priceRanges.find(r => r.min === minP && r.max === maxP)
+		selectedPriceRange.value = matched ?? { label: `€${minP} – €${maxP}`, min: minP, max: maxP }
+	} else {
+		selectedPriceRange.value = null
+	}
+
+	// Category filter
+	if (q.category && typeof q.category === 'string') {
+		selectedCategory.value = q.category
+	} else {
+		selectedCategory.value = null
+	}
+
+	// Color filter
+	if (q.color && typeof q.color === 'string') {
+		selectedColor.value = q.color
+	} else {
+		selectedColor.value = null
+	}
+
+	nextTick(() => { syncing = false })
+}
+
+// ── Update URL query params when filters change ─────────────────────
+function syncQueryFromFilters() {
+	if (syncing) return
+
+	const query: Record<string, string> = {}
+
+	if (selectedBrands.value.length > 0) {
+		query.brand = selectedBrands.value[0].toLowerCase()
+	}
+
+	if (selectedPriceRange.value) {
+		query.min_price = String(selectedPriceRange.value.min)
+		query.max_price = String(selectedPriceRange.value.max)
+	}
+
+	if (selectedCategory.value) {
+		query.category = selectedCategory.value
+	}
+
+	if (selectedColor.value) {
+		query.color = selectedColor.value
+	}
+
+	// Replace URL without triggering navigation (silent update)
+	router.replace({ path: `/${props.category}`, query }).catch(() => {})
+}
 
 // ── Pagination & Data ──────────────────────────────────────────────
 const currentPage = ref(1)
@@ -79,12 +219,20 @@ const loadProducts = async () => {
 	}
 
 	if (selectedBrands.value.length > 0) {
-		params.brand = selectedBrands.value[0].toLowerCase() // A API atual suporta 1 brand por query via slug
+		params.brand = selectedBrands.value[0].toLowerCase()
 	}
 
 	if (selectedPriceRange.value) {
 		params.min_price = selectedPriceRange.value.min
 		params.max_price = selectedPriceRange.value.max
+	}
+
+	if (selectedCategory.value) {
+		params.category = selectedCategory.value
+	}
+
+	if (selectedColor.value) {
+		params.color = selectedColor.value
 	}
 
 	const res = await catalogStore.fetchProducts(params)
@@ -99,15 +247,38 @@ const loadProducts = async () => {
 	}
 }
 
+// ── Init: read URL query params on mount ──────────────────────────
 onMounted(() => {
-	loadProducts()
+	syncFiltersFromQuery()
+	nextTick(() => loadProducts())
 })
 
-watch([() => props.category, selectedBrands, selectedPriceRange], () => {
+// ── React to URL query changes (e.g. mega menu clicks) ────────────
+watch(() => route.query, () => {
+	if (!syncing) {
+		syncFiltersFromQuery()
+		currentPage.value = 1
+		nextTick(() => loadProducts())
+	}
+}, { deep: true })
+
+// ── React to category changes (different gender page) ─────────────
+watch(() => props.category, () => {
+	syncFiltersFromQuery()
 	currentPage.value = 1
 	products.value = []
-	loadProducts()
+	nextTick(() => loadProducts())
 })
+
+// ── React to sidebar filter changes → update URL + reload ─────────
+watch([selectedBrands, selectedPriceRange, selectedCategory, selectedColor], () => {
+	if (!syncing) {
+		syncQueryFromFilters()
+		currentPage.value = 1
+		products.value = []
+		loadProducts()
+	}
+}, { deep: true })
 
 watch(currentPage, () => {
 	loadProducts()
@@ -129,12 +300,16 @@ function setPriceRange(r: { label: string; min: number; max: number } | null) {
 function clearAllFilters() {
 	selectedBrands.value = []
 	selectedPriceRange.value = null
+	selectedCategory.value = null
+	selectedColor.value = null
 }
 
 const hasActiveFilters = computed(
 	() =>
 		selectedBrands.value.length > 0 ||
-		selectedPriceRange.value !== null,
+		selectedPriceRange.value !== null ||
+		selectedCategory.value !== null ||
+		selectedColor.value !== null,
 )
 </script>
 
@@ -258,26 +433,26 @@ const hasActiveFilters = computed(
 						<li v-for="range in meta.priceRanges" :key="range.label">
 							<button
 								@click="
-									setPriceRange(
-										selectedPriceRange?.label === range.label ? null : range,
-									)
+								setPriceRange(
+									selectedPriceRange?.label === range.label ? null : range,
+								)
 								"
 								class="group flex w-full items-center gap-2.5 text-left"
 							>
 								<span
 									class="h-4 w-4 flex-shrink-0 rounded-full border transition-all duration-300"
 									:class="
-										selectedPriceRange?.min === range.min
-											? 'border-[#FFC700] bg-[#FFC700]'
-											: 'border-white/20 group-hover:border-[#FFC700]'
+									selectedPriceRange?.min === range.min
+										? 'border-[#FFC700] bg-[#FFC700]'
+										: 'border-white/20 group-hover:border-[#FFC700]'
 									"
 								></span>
 								<span
 									class="text-sm transition-colors duration-300"
 									:class="
-										selectedPriceRange?.min === range.min
-											? 'font-semibold text-white'
-											: 'text-white/60 group-hover:text-[#FFC700]'
+									selectedPriceRange?.min === range.min
+										? 'font-semibold text-white'
+										: 'text-white/60 group-hover:text-[#FFC700]'
 									"
 								>
 									{{ range.label }}
@@ -285,6 +460,87 @@ const hasActiveFilters = computed(
 							</button>
 						</li>
 					</ul>
+				</div>
+
+				<!-- Tipo / Mecanismo -->
+				<div v-if="meta.categories && meta.categories.length > 0" class="border-white/10 border-t pt-5">
+					<p
+						class="mb-3 text-[0.6rem] font-bold uppercase tracking-[0.18em] text-[#FFC700]"
+					>
+						Categoria
+					</p>
+					<ul class="space-y-2">
+						<li v-for="cat in meta.categories" :key="cat.slug">
+							<button
+								@click="selectedCategory = selectedCategory === cat.slug ? null : cat.slug"
+								class="group flex w-full items-center gap-2.5 text-left"
+							>
+								<span
+									class="h-4 w-4 flex-shrink-0 rounded border transition-all duration-300 flex items-center justify-center"
+									:class="
+									selectedCategory === cat.slug
+										? 'border-[#FFC700] bg-[#FFC700]'
+										: 'border-white/20 group-hover:border-[#FFC700]'
+									"
+								>
+									<svg
+										v-if="selectedCategory === cat.slug"
+										class="h-2.5 w-2.5 text-black"
+										fill="none"
+										viewBox="0 0 24 24"
+										stroke="currentColor"
+										stroke-width="3"
+									>
+										<path
+											stroke-linecap="round"
+											stroke-linejoin="round"
+											d="M5 13l4 4L19 7"
+										/>
+									</svg>
+								</span>
+								<span
+									class="text-sm transition-colors duration-300"
+									:class="
+									selectedCategory === cat.slug
+										? 'font-semibold text-white'
+										: 'text-white/60 group-hover:text-[#FFC700]'
+									"
+								>
+									{{ cat.name }}
+								</span>
+							</button>
+						</li>
+					</ul>
+				</div>
+
+				<!-- Cores -->
+				<div v-if="meta.colors && meta.colors.length > 0" class="border-white/10 border-t pt-5">
+					<p
+						class="mb-3 text-[0.6rem] font-bold uppercase tracking-[0.18em] text-[#FFC700]"
+					>
+						Cores
+					</p>
+					<div class="flex flex-wrap gap-2.5 pt-1">
+						<button
+							v-for="color in meta.colors"
+							:key="color.name"
+							:title="color.name"
+							@click="selectedColor = selectedColor === color.name ? null : color.name"
+							class="relative flex h-7 w-7 items-center justify-center rounded-full border transition-all duration-200"
+							:class="
+							selectedColor === color.name
+								? 'border-[#FFC700] scale-110'
+								: 'border-white/10 hover:border-white/30'
+							"
+							:style="{ backgroundColor: color.hex }"
+						>
+							<span
+								v-if="selectedColor === color.name"
+								class="h-1.5 w-1.5 rounded-full"
+								:class="color.name === 'Branco' || color.name === 'Prata' ? 'bg-black' : 'bg-white'"
+							></span>
+						</button>
+					</div>
 				</div>
 
 			</aside>
@@ -315,6 +571,30 @@ const hasActiveFilters = computed(
 								{{ selectedPriceRange.label }}
 								<button
 									@click="setPriceRange(null)"
+									class="transition-colors hover:text-[#FFC700]"
+								>
+									×
+								</button>
+							</span>
+							<span
+								v-if="selectedCategory"
+								class="flex items-center gap-1.5 rounded-full border border-white/15 bg-white/5 px-3 py-1 text-xs font-semibold text-white/70"
+							>
+								Categoria: {{ categoryNames[selectedCategory] || selectedCategory }}
+								<button
+									@click="selectedCategory = null"
+									class="transition-colors hover:text-[#FFC700]"
+								>
+									×
+								</button>
+							</span>
+							<span
+								v-if="selectedColor"
+								class="flex items-center gap-1.5 rounded-full border border-white/15 bg-white/5 px-3 py-1 text-xs font-semibold text-white/70"
+							>
+								Cor: {{ selectedColor }}
+								<button
+									@click="selectedColor = null"
 									class="transition-colors hover:text-[#FFC700]"
 								>
 									×

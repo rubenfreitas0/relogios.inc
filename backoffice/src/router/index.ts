@@ -96,11 +96,6 @@ const routes: Array<RouteRecordRaw> = [
         component: () => import('../pages/users/UsersPage.vue'),
       },
       {
-        name: 'projects',
-        path: 'projects',
-        component: () => import('../pages/projects/ProjectsPage.vue'),
-      },
-      {
         name: 'payments',
         path: '/payments',
         component: RouteViewComponent,
@@ -121,11 +116,6 @@ const routes: Array<RouteRecordRaw> = [
             component: () => import('../pages/pricing-plans/PricingPlans.vue'),
           },
         ],
-      },
-      {
-        name: 'faq',
-        path: '/faq',
-        component: () => import('../pages/faq/FaqPage.vue'),
       },
     ],
   },

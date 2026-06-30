@@ -64,19 +64,11 @@ export default {
         },
       ],
     },
-    // — Vuestic demo pages —
     {
       name: 'users',
       displayName: 'menu.users',
       meta: {
         icon: 'group',
-      },
-    },
-    {
-      name: 'projects',
-      displayName: 'menu.projects',
-      meta: {
-        icon: 'folder_shared',
       },
     },
     {
@@ -99,13 +91,6 @@ export default {
           displayName: 'menu.billing',
         },
       ],
-    },
-    {
-      name: 'faq',
-      displayName: 'menu.faq',
-      meta: {
-        icon: 'quiz',
-      },
     },
     {
       name: 'preferences',

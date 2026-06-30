@@ -21,6 +21,9 @@ class CategoriesSeeder extends Seeder
             ['name' => 'Mergulho', 'slug' => 'mergulho', 'is_active' => true],
             ['name' => 'Desporto', 'slug' => 'desporto', 'is_active' => true],
             ['name' => 'Clássicos', 'slug' => 'classicos', 'is_active' => true],
+            ['name' => 'Analógico', 'slug' => 'analogico', 'is_active' => true],
+            ['name' => 'Digital', 'slug' => 'digital', 'is_active' => true],
+            ['name' => 'Smartwatch', 'slug' => 'smartwatch', 'is_active' => true],
             
             // Categorias especiais de sistema (protegidas no CategoryController)
             ['name' => 'Gama de preço', 'slug' => 'gama-de-preco', 'is_active' => true],

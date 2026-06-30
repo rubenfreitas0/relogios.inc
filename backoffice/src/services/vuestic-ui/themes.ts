@@ -1,6 +1,7 @@
 export default {
   presets: {
     light: {
+      primary: '#D5A100', // A readable gold/yellow for light theme
       backgroundPrimary: '#F4F6F8',
       backgroundSecondary: '#FFFFFF',
       backgroundCardPrimary: '#F7F9F9',
@@ -11,6 +12,7 @@ export default {
       warning: '#FFD43A',
     },
     dark: {
+      primary: '#FFC700', // Bright yellow/gold for dark theme
       backgroundCardPrimary: '#111827',
       backgroundCardSecondary: '#0f172a',
     },

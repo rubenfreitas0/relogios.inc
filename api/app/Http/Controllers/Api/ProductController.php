@@ -45,6 +45,15 @@ class ProductController extends Controller
             $query->where('gender', $gender);
         }
 
+        if ($request->filled('color')) {
+            $color = strtolower((string) $request->color);
+            $query->where(function ($q) use ($color) {
+                $q->whereRaw('LOWER(name) LIKE ?', ['%' . $color . '%'])
+                  ->orWhereRaw('LOWER(description) LIKE ?', ['%' . $color . '%'])
+                  ->orWhereRaw('LOWER(short_description) LIKE ?', ['%' . $color . '%']);
+            });
+        }
+
         if ($request->filled('min_price')) {
             $query->where('price', '>=', $request->min_price);
         }

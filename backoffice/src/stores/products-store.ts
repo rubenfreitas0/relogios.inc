@@ -22,7 +22,7 @@ export interface Product {
   is_featured: boolean
   gender: string
   features: string | null
-  inthebox: string[] | null
+  in_the_box: string[] | null
   brand: { id: number; name: string; slug: string; logo: string } | null
   category: { id: number; name: string; slug: string } | null
   images: ProductImage[]
