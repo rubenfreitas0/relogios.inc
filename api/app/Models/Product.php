@@ -25,6 +25,7 @@ class Product extends Model
         'features',
         'in_the_box',
         'price',
+        'discount_price',
         'stock',
         'weight',
         'is_active',
@@ -34,12 +35,13 @@ class Product extends Model
     protected function casts(): array
     {
         return [
-            'price'       => 'decimal:2',
-            'weight'      => 'decimal:3',
-            'stock'       => 'integer',
-            'is_active'   => 'boolean',
-            'is_featured' => 'boolean',
-            'in_the_box'  => 'array',
+            'price'          => 'decimal:2',
+            'discount_price' => 'decimal:2',
+            'weight'         => 'decimal:3',
+            'stock'          => 'integer',
+            'is_active'      => 'boolean',
+            'is_featured'    => 'boolean',
+            'in_the_box'     => 'array',
         ];
     }
 

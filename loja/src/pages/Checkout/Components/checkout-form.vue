@@ -20,7 +20,7 @@ onMounted(async () => {
 		await accountStore.fetchAddresses()
 
 		// Auto-selecionar a morada default se existir
-		const defaultAddr = accountStore.addresses.find(a => a.is_default)
+		const defaultAddr = accountStore.addresses.find((a) => a.is_default)
 		if (defaultAddr) {
 			applyAddress(defaultAddr)
 		}
@@ -31,7 +31,8 @@ function applyAddress(addr: Address) {
 	selectedAddressId.value = addr.id
 	formStore.name = `${addr.firstname} ${addr.lastname}`
 	formStore.phone = addr.phone || ''
-	formStore.address = addr.address_line1 + (addr.address_line2 ? `, ${addr.address_line2}` : '')
+	formStore.address =
+		addr.address_line1 + (addr.address_line2 ? `, ${addr.address_line2}` : '')
 	formStore.zip = addr.postal_code
 	formStore.city = addr.city
 	formStore.country = addr.country
@@ -53,7 +54,7 @@ function onSelectAddress(event: Event) {
 		clearSelection()
 		return
 	}
-	const addr = accountStore.addresses.find(a => a.id === id)
+	const addr = accountStore.addresses.find((a) => a.id === id)
 	if (addr) applyAddress(addr)
 }
 
@@ -73,7 +74,7 @@ watch(
 				formStore.shippingLoading = false
 			}
 		}, 300)
-	}
+	},
 )
 
 onBeforeUnmount(() => {
@@ -86,8 +87,12 @@ onBeforeUnmount(() => {
 		id="checkoutForm"
 	>
 		<h1 class="text-3xl font-bold uppercase text-black">Checkout</h1>
-		
-		<div v-if="formStore.apiError" class="mt-4 p-4 bg-red-100 border border-red-400 text-red-700 rounded relative" role="alert">
+
+		<div
+			v-if="formStore.apiError"
+			class="relative mt-4 rounded border border-red-400 bg-red-100 p-4 text-red-700"
+			role="alert"
+		>
 			<strong class="font-bold">Erro: </strong>
 			<span class="block sm:inline">{{ formStore.apiError }}</span>
 		</div>
@@ -145,17 +150,34 @@ onBeforeUnmount(() => {
 				v-if="isLoggedIn && accountStore.addresses.length > 0"
 				class="mb-5 rounded-lg border-2 border-dashed border-k-main/30 bg-k-main/5 p-4"
 			>
-				<div class="flex items-center gap-2 mb-3">
-					<svg class="h-4 w-4 text-k-main" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-						<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z" />
-						<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 11a3 3 0 11-6 0 3 3 0 016 0z" />
+				<div class="mb-3 flex items-center gap-2">
+					<svg
+						class="h-4 w-4 text-k-main"
+						fill="none"
+						viewBox="0 0 24 24"
+						stroke="currentColor"
+					>
+						<path
+							stroke-linecap="round"
+							stroke-linejoin="round"
+							stroke-width="2"
+							d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z"
+						/>
+						<path
+							stroke-linecap="round"
+							stroke-linejoin="round"
+							stroke-width="2"
+							d="M15 11a3 3 0 11-6 0 3 3 0 016 0z"
+						/>
 					</svg>
-					<span class="text-xs font-bold uppercase tracking-wider text-k-main">Moradas Guardadas</span>
+					<span class="text-xs font-bold uppercase tracking-wider text-k-main"
+						>Moradas Guardadas</span
+					>
 				</div>
 				<select
 					:value="selectedAddressId || 0"
 					@change="onSelectAddress"
-					class="w-full rounded-lg border border-black/20 bg-white px-4 py-3 font-Manrope text-sm font-semibold text-black outline-none transition-colors hover:border-k-main focus:border-k-main cursor-pointer"
+					class="w-full cursor-pointer rounded-lg border border-black/20 bg-white px-4 py-3 font-Manrope text-sm font-semibold text-black outline-none transition-colors hover:border-k-main focus:border-k-main"
 				>
 					<option :value="0">✏️ Introduzir morada manualmente</option>
 					<option
@@ -163,7 +185,9 @@ onBeforeUnmount(() => {
 						:key="addr.id"
 						:value="addr.id"
 					>
-						{{ addr.is_default ? '⭐ ' : '' }}{{ addr.firstname }} {{ addr.lastname }} — {{ addr.address_line1 }}, {{ addr.postal_code }} {{ addr.city }}
+						{{ addr.is_default ? '⭐ ' : '' }}{{ addr.firstname }}
+						{{ addr.lastname }} — {{ addr.address_line1 }},
+						{{ addr.postal_code }} {{ addr.city }}
 					</option>
 				</select>
 			</div>
@@ -225,10 +249,16 @@ onBeforeUnmount(() => {
 				Método de Envio
 			</p>
 			<div class="flex w-full flex-col gap-4 lg:grid lg:grid-cols-2">
-				<div v-if="formStore.shippingLoading" class="col-span-2 text-gray-500 italic">
+				<div
+					v-if="formStore.shippingLoading"
+					class="col-span-2 italic text-gray-500"
+				>
 					A carregar métodos de envio...
 				</div>
-				<div v-else-if="formStore.shippingMethods.length === 0" class="col-span-2 text-gray-500 italic">
+				<div
+					v-else-if="formStore.shippingMethods.length === 0"
+					class="col-span-2 italic text-gray-500"
+				>
 					Nenhum método de envio disponível para este destino.
 				</div>
 				<button
@@ -236,7 +266,10 @@ onBeforeUnmount(() => {
 					:key="method.id"
 					type="button"
 					class="group flex w-full cursor-pointer flex-row items-center gap-4 rounded border border-black border-opacity-60 p-3 transition-all active:translate-y-0.5"
-					:class="{ 'bg-k-main border-opacity-100': formStore.shipping_method_id === method.id }"
+					:class="{
+						'border-opacity-100 bg-k-main':
+							formStore.shipping_method_id === method.id,
+					}"
 					@click="formStore.shipping_method_id = method.id"
 				>
 					<div
@@ -245,8 +278,14 @@ onBeforeUnmount(() => {
 					></div>
 					<div class="flex flex-col items-start">
 						<span class="font-semibold text-black">{{ method.name }}</span>
-						<span class="text-xs text-gray-600">{{ method.carrier }} — €{{ Number(method.price).toFixed(2) }}</span>
-						<span v-if="method.estimated_days" class="text-xs text-gray-400">{{ method.estimated_days }}</span>
+						<span class="text-xs text-gray-600"
+							>{{ method.carrier }} — €{{
+								Number(method.price).toFixed(2)
+							}}</span
+						>
+						<span v-if="method.estimated_days" class="text-xs text-gray-400">{{
+							method.estimated_days
+						}}</span>
 					</div>
 				</button>
 			</div>
@@ -363,4 +402,3 @@ onBeforeUnmount(() => {
 		</div>
 	</form>
 </template>
-

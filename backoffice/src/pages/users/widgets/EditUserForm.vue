@@ -3,7 +3,6 @@ import { PropType, computed, ref, watch } from 'vue'
 import { useForm } from 'vuestic-ui'
 import { User, UserRole } from '../types'
 import UserAvatar from './UserAvatar.vue'
-import { useProjects } from '../../projects/composables/useProjects'
 import { validators } from '../../../services/utils'
 
 const props = defineProps({
@@ -25,14 +24,13 @@ const defaultNewUser: Omit<User, 'id'> = {
   notes: '',
   email: '',
   active: true,
-  projects: [],
 }
 
 const newUser = ref<User>({ ...defaultNewUser } as User)
 
 const isFormHasUnsavedChanges = computed(() => {
   return Object.keys(newUser.value).some((key) => {
-    if (key === 'avatar' || key === 'projects') {
+    if (key === 'avatar') {
       return false
     }
 
@@ -46,10 +44,8 @@ defineExpose({
   isFormHasUnsavedChanges,
 })
 
-const { projects } = useProjects({ pagination: ref({ page: 1, perPage: 9999, total: 10 }) })
-
 watch(
-  [() => props.user, projects],
+  () => props.user,
   () => {
     if (!props.user) {
       return
@@ -57,7 +53,6 @@ watch(
 
     newUser.value = {
       ...props.user,
-      projects: props.user.projects.filter((projectId) => projects.value.find(({ id }) => id === projectId)),
       avatar: props.user.avatar || '',
     }
   },
@@ -135,18 +130,6 @@ const roleSelectOptions: { text: Capitalize<Lowercase<UserRole>>; value: UserRol
           class="w-full sm:w-1/2"
           :rules="[validators.required, validators.email]"
           name="email"
-        />
-        <VaSelect
-          v-model="newUser.projects"
-          label="Projects"
-          class="w-full sm:w-1/2"
-          :options="projects"
-          value-by="id"
-          text-by="project_name"
-          :rules="[validators.required]"
-          name="projects"
-          multiple
-          :max-visible-options="2"
         />
       </div>
 

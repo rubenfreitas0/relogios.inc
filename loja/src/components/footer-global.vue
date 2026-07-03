@@ -65,11 +65,14 @@ import instagramIcon from '/icons/instagram.svg'
 				class="flex flex-col items-center justify-between md:flex-row md:items-start"
 			>
 				<p
-					class="mb-10 text-center tracking-wide opacity-70 md:mb-0 md:w-2/3 md:text-left">
-					
-					A RELOGIOS.inc representa o mais alto padrão em relojoaria. Cada peça <br />
-					da nossa coleção é criteriosamente selecionada para quem exige precisão, <br />
-					sofisticação e durabilidade. O tempo é o teu bem mais precioso — usa-o com estilo.
+					class="mb-10 text-center tracking-wide opacity-70 md:mb-0 md:w-2/3 md:text-left"
+				>
+					A RELOGIOS.inc representa o mais alto padrão em relojoaria. Cada peça
+					<br />
+					da nossa coleção é criteriosamente selecionada para quem exige
+					precisão, <br />
+					sofisticação e durabilidade. O tempo é o teu bem mais precioso — usa-o
+					com estilo.
 				</p>
 				<nav class="flex flex-row gap-4 md:self-end">
 					<a class="transition duration-300 hover:-translate-y-0.5" href="">

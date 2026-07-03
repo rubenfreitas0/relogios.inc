@@ -20,16 +20,34 @@ const props = defineProps<{
 		<div class="flex h-full w-full flex-row gap-6">
 			<img
 				class="aspect-square w-20 rounded-lg bg-black object-contain p-2 shadow-md lg:w-24"
-				:src="resolveProductImageUrl(props.cartItem.primary_image?.url, props.cartItem.id) || '/images/placeholder.png'"
+				:src="
+					resolveProductImageUrl(
+						props.cartItem.primary_image?.url,
+						props.cartItem.id,
+					) || '/images/placeholder.png'
+				"
 				:alt="props.cartItem.name"
 			/>
 			<div class="flex flex-col justify-center">
 				<p class="text-lg font-bold text-k-black lg:text-xl">
 					{{ props.cartItem.name }}
 				</p>
-				<p class="lg:text-md text-sm font-bold text-k-black opacity-80">
-					€ {{ Number(props.cartItem.price).toFixed(2).replace('.', ',') }}
-				</p>
+				<div class="flex flex-col leading-tight">
+					<span
+						v-if="props.cartItem.discount_price"
+						class="text-k-black/45 text-[0.7rem] line-through"
+					>
+						€ {{ Number(props.cartItem.price).toFixed(2).replace('.', ',') }}
+					</span>
+					<p class="lg:text-md text-sm font-bold text-k-black opacity-80">
+						€
+						{{
+							Number(props.cartItem.discount_price || props.cartItem.price)
+								.toFixed(2)
+								.replace('.', ',')
+						}}
+					</p>
+				</div>
 			</div>
 		</div>
 		<ButtonCount

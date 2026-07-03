@@ -128,7 +128,7 @@ export const useAccountStore = defineStore('account', () => {
 			const res = await handleResponse(
 				await fetch(`${API_BASE}/orders?page=${page}&per_page=10`, {
 					headers: getAuthHeaders(),
-				})
+				}),
 			)
 			const data = await res.json()
 			orders.value = data.data ?? []
@@ -156,7 +156,7 @@ export const useAccountStore = defineStore('account', () => {
 			const res = await handleResponse(
 				await fetch(`${API_BASE}/orders/${encodeURIComponent(orderNumber)}`, {
 					headers: getAuthHeaders(),
-				})
+				}),
 			)
 			if (res.ok) {
 				const data = await res.json()
@@ -183,7 +183,7 @@ export const useAccountStore = defineStore('account', () => {
 			const res = await handleResponse(
 				await fetch(`${API_BASE}/addresses`, {
 					headers: getAuthHeaders(),
-				})
+				}),
 			)
 			const data = await res.json()
 			addresses.value = data.data ?? data
@@ -197,7 +197,9 @@ export const useAccountStore = defineStore('account', () => {
 		}
 	}
 
-	async function createAddress(payload: Omit<Address, 'id' | 'is_default'>): Promise<boolean> {
+	async function createAddress(
+		payload: Omit<Address, 'id' | 'is_default'>,
+	): Promise<boolean> {
 		error.value = null
 		try {
 			const res = await handleResponse(
@@ -205,7 +207,7 @@ export const useAccountStore = defineStore('account', () => {
 					method: 'POST',
 					headers: getAuthHeaders(),
 					body: JSON.stringify(payload),
-				})
+				}),
 			)
 			const data = await res.json()
 			if (res.ok) {
@@ -222,7 +224,10 @@ export const useAccountStore = defineStore('account', () => {
 		}
 	}
 
-	async function updateAddress(id: number, payload: Partial<Address>): Promise<boolean> {
+	async function updateAddress(
+		id: number,
+		payload: Partial<Address>,
+	): Promise<boolean> {
 		error.value = null
 		try {
 			const res = await handleResponse(
@@ -230,7 +235,7 @@ export const useAccountStore = defineStore('account', () => {
 					method: 'PUT',
 					headers: getAuthHeaders(),
 					body: JSON.stringify(payload),
-				})
+				}),
 			)
 			const data = await res.json()
 			if (res.ok) {
@@ -254,7 +259,7 @@ export const useAccountStore = defineStore('account', () => {
 				await fetch(`${API_BASE}/addresses/${id}`, {
 					method: 'DELETE',
 					headers: getAuthHeaders(),
-				})
+				}),
 			)
 			if (res.ok || res.status === 204) {
 				await fetchAddresses()
@@ -278,7 +283,7 @@ export const useAccountStore = defineStore('account', () => {
 				await fetch(`${API_BASE}/addresses/${id}/default`, {
 					method: 'PATCH',
 					headers: getAuthHeaders(),
-				})
+				}),
 			)
 			if (res.ok) {
 				await fetchAddresses()
@@ -290,7 +295,11 @@ export const useAccountStore = defineStore('account', () => {
 		}
 	}
 
-	async function updateProfile(payload: { firstname?: string; lastname?: string; phone?: string }): Promise<boolean> {
+	async function updateProfile(payload: {
+		firstname?: string
+		lastname?: string
+		phone?: string
+	}): Promise<boolean> {
 		error.value = null
 		try {
 			const res = await handleResponse(
@@ -298,7 +307,7 @@ export const useAccountStore = defineStore('account', () => {
 					method: 'PATCH',
 					headers: getAuthHeaders(),
 					body: JSON.stringify(payload),
-				})
+				}),
 			)
 			const data = await res.json()
 			if (res.ok) {

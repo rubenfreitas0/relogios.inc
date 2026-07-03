@@ -88,7 +88,6 @@ export const useFormStore = defineStore('form', {
 			this.bannerState = 'hide'
 		},
 
-
 		/**
 		 * Busca métodos de envio disponíveis com base no país e código postal.
 		 * Usa o endpoint /api/shipping/calculate que filtra por zona + peso.
@@ -97,7 +96,9 @@ export const useFormStore = defineStore('form', {
 			const token = localStorage.getItem('auth_token')
 			if (!token) return
 
-			const country = (countryCode || this.country || 'PT').substring(0, 2).toUpperCase()
+			const country = (countryCode || this.country || 'PT')
+				.substring(0, 2)
+				.toUpperCase()
 			if (country.length !== 2) return
 
 			this.shippingLoading = true
@@ -121,8 +122,13 @@ export const useFormStore = defineStore('form', {
 
 					// Auto-selecionar o mais barato se nenhum está selecionado
 					// ou se o selecionado já não existe nos novos métodos
-					const currentExists = this.shippingMethods.some(m => m.id === this.shipping_method_id)
-					if (this.shippingMethods.length > 0 && (!this.shipping_method_id || !currentExists)) {
+					const currentExists = this.shippingMethods.some(
+						(m) => m.id === this.shipping_method_id,
+					)
+					if (
+						this.shippingMethods.length > 0 &&
+						(!this.shipping_method_id || !currentExists)
+					) {
 						this.shipping_method_id = this.shippingMethods[0].id
 					} else if (this.shippingMethods.length === 0) {
 						this.shipping_method_id = null
@@ -214,7 +220,7 @@ export const useFormStore = defineStore('form', {
 				city: this.city,
 				postal_code: this.zip,
 				country: this.country.substring(0, 2).toUpperCase() || 'PT',
-				notes: this.comment
+				notes: this.comment,
 			}
 
 			if (this.payment === 'mbway') {
@@ -234,9 +240,9 @@ export const useFormStore = defineStore('form', {
 					headers: {
 						'Content-Type': 'application/json',
 						Accept: 'application/json',
-						Authorization: `Bearer ${token}`
+						Authorization: `Bearer ${token}`,
 					},
-					body: JSON.stringify(payload)
+					body: JSON.stringify(payload),
 				})
 
 				const data = await res.json()
@@ -267,7 +273,9 @@ export const useFormStore = defineStore('form', {
 		isValidPaymentPhone(state: FormState) {
 			if (state.payment !== 'mbway') return 'true'
 			if (state.paymentPhone === '') return 'empty'
-			return /^[0-9()+\-\s]+$/.test(state.paymentPhone) === true ? 'true' : 'false'
+			return /^[0-9()+\-\s]+$/.test(state.paymentPhone) === true
+				? 'true'
+				: 'false'
 		},
 		isValidName(state: FormState) {
 			if (state.name === '') return 'empty'
@@ -287,7 +295,10 @@ export const useFormStore = defineStore('form', {
 		},
 		isValidAddress(state: FormState) {
 			if (state.address === '') return 'empty'
-			return new RegExp('^[a-zA-ZÀ-ÿ0-9\\s,.\'/ -]+$').test(state.address) === true ? 'true' : 'false'
+			return new RegExp("^[a-zA-ZÀ-ÿ0-9\\s,.'/ -]+$").test(state.address) ===
+				true
+				? 'true'
+				: 'false'
 		},
 		isValidZip(state: FormState) {
 			if (state.zip === '') return 'empty'
@@ -304,7 +315,9 @@ export const useFormStore = defineStore('form', {
 			return /^[a-zA-Z]{2}$/.test(state.country) === true ? 'true' : 'false'
 		},
 		selectedShippingPrice(state: FormState): number {
-			const method = state.shippingMethods.find((m) => m.id === state.shipping_method_id)
+			const method = state.shippingMethods.find(
+				(m) => m.id === state.shipping_method_id,
+			)
 			return method ? Number(method.price) : 0
 		},
 		taxAmount(state: FormState): number {

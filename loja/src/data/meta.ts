@@ -53,13 +53,15 @@ export const fofPageMeta: meta = {
 
 export const loginPageMeta: meta = {
 	title: 'Entrar | RELOGIOS.inc',
-	description: 'Entra na tua conta RELOGIOS.inc para acederes às tuas encomendas e moradas guardadas.',
+	description:
+		'Entra na tua conta RELOGIOS.inc para acederes às tuas encomendas e moradas guardadas.',
 	image: bannerImage,
 }
 
 export const registerPageMeta: meta = {
 	title: 'Criar Conta | RELOGIOS.inc',
-	description: 'Cria a tua conta RELOGIOS.inc e junta-te à nossa comunidade de amantes de relojoaria.',
+	description:
+		'Cria a tua conta RELOGIOS.inc e junta-te à nossa comunidade de amantes de relojoaria.',
 	image: bannerImage,
 }
 
@@ -77,6 +79,7 @@ export const resetPasswordPageMeta: meta = {
 
 export const accountPageMeta: meta = {
 	title: 'A Minha Conta | RELOGIOS.inc',
-	description: 'Gere o teu perfil, consulta as tuas encomendas e administra as tuas moradas de envio.',
+	description:
+		'Gere o teu perfil, consulta as tuas encomendas e administra as tuas moradas de envio.',
 	image: bannerImage,
 }

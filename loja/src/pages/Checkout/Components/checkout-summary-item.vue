@@ -4,6 +4,7 @@ interface CartItemProduct {
 	name?: string
 	primary_image?: { url: string }
 	price: number | string
+	discount_price?: number | string | null
 }
 
 const props = defineProps<{
@@ -22,7 +23,12 @@ import { resolveProductImageUrl } from '../../../utils/utilities'
 		<div class="basis-1/4 justify-self-start overflow-hidden rounded-lg">
 			<img
 				class="aspect-square h-fit w-fit bg-black object-contain p-2 shadow-md"
-				:src="resolveProductImageUrl(props.cartItem.primary_image?.url, props.cartItem.id) || '/images/placeholder.png'"
+				:src="
+					resolveProductImageUrl(
+						props.cartItem.primary_image?.url,
+						props.cartItem.id,
+					) || '/images/placeholder.png'
+				"
 				:alt="props.cartItem.name"
 			/>
 		</div>
@@ -30,9 +36,22 @@ import { resolveProductImageUrl } from '../../../utils/utilities'
 			<p class="text-start text-lg font-bold text-k-black">
 				{{ props.cartItem.name }}
 			</p>
-			<p class="text-md text-start font-bold text-k-black opacity-80">
-				€ {{ Number(props.cartItem.price).toFixed(2).replace('.', ',') }}
-			</p>
+			<div class="flex flex-col leading-tight">
+				<span
+					v-if="props.cartItem.discount_price"
+					class="text-k-black/45 text-[0.7rem] line-through"
+				>
+					€ {{ Number(props.cartItem.price).toFixed(2).replace('.', ',') }}
+				</span>
+				<p class="text-md text-start font-bold text-k-black opacity-80">
+					€
+					{{
+						Number(props.cartItem.discount_price || props.cartItem.price)
+							.toFixed(2)
+							.replace('.', ',')
+					}}
+				</p>
+			</div>
 		</div>
 
 		<div

@@ -33,6 +33,17 @@ class ProductController extends Controller
                 fn($q) => $q->where('category_id', $request->category_id)
             )
             ->when(
+                $request->filled('stock_status'),
+                function ($q) use ($request) {
+                    return match ($request->stock_status) {
+                        'out_of_stock' => $q->where('stock', 0),
+                        'low_stock' => $q->where('stock', '>', 0)->where('stock', '<=', 5),
+                        'in_stock' => $q->where('stock', '>', 5),
+                        default => $q
+                    };
+                }
+            )
+            ->when(
                 $request->has('is_active'),
                 fn($q) => $q->where('is_active', $request->boolean('is_active'))
             )

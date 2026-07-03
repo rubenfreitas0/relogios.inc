@@ -57,27 +57,32 @@ const routes = [
 			{
 				path: 'perfil',
 				name: 'AccountProfile',
-				component: () => import('../pages/Account/Components/AccountProfileTab.vue'),
+				component: () =>
+					import('../pages/Account/Components/AccountProfileTab.vue'),
 			},
 			{
 				path: 'encomendas',
 				name: 'AccountOrders',
-				component: () => import('../pages/Account/Components/AccountOrdersTab.vue'),
+				component: () =>
+					import('../pages/Account/Components/AccountOrdersTab.vue'),
 			},
 			{
 				path: 'encomendas/:orderNumber',
 				name: 'AccountOrderDetail',
-				component: () => import('../pages/Account/Components/AccountOrderDetailTab.vue'),
+				component: () =>
+					import('../pages/Account/Components/AccountOrderDetailTab.vue'),
 			},
 			{
 				path: 'moradas',
 				name: 'AccountAddresses',
-				component: () => import('../pages/Account/Components/AccountAddressesTab.vue'),
+				component: () =>
+					import('../pages/Account/Components/AccountAddressesTab.vue'),
 			},
 			{
 				path: 'ajuda',
 				name: 'AccountHelp',
-				component: () => import('../pages/Account/Components/AccountHelpTab.vue'),
+				component: () =>
+					import('../pages/Account/Components/AccountHelpTab.vue'),
 			},
 		],
 	},

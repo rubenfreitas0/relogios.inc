@@ -12,19 +12,22 @@ import watchHeroImage from '/display/about-craft.png'
 			<div
 				class="flex h-full flex-col items-center justify-center text-center md:w-4/5 md:items-start md:text-start"
 			>
-				<h3 class="text-4xl font-semibold uppercase text-k-black md:text-5xl text-justify">
+				<h3
+					class="text-justify text-4xl font-semibold uppercase text-k-black md:text-5xl"
+				>
 					TRAZEMOS OS <br class="hidden xl:inline" />
 					<span class="text-k-main">MELHORES</span> RELÓGIOS
 				</h3>
-				<p class="mt-10 tracking-wide text-black opacity-70 md:mt-6 text-justify">
-					No coração de Portugal, a RELOGIOS.inc é a referência 
-					em relojoaria de qualidade. Dispomos de uma vasta seleção 
-					de relógios clássicos, digitais e braceletes das melhores 
-					marcas do mercado. <br />
+				<p
+					class="mt-10 text-justify tracking-wide text-black opacity-70 md:mt-6"
+				>
+					No coração de Portugal, a RELOGIOS.inc é a referência em relojoaria de
+					qualidade. Dispomos de uma vasta seleção de relógios clássicos,
+					digitais e braceletes das melhores marcas do mercado. <br />
 					<br />
-					Visita a nossa loja online e descobre peças únicas 
-					que combinam precisão, durabilidade e estilo. 
-					Na RELOGIOS.inc o tempo é levado a sério.
+					Visita a nossa loja online e descobre peças únicas que combinam
+					precisão, durabilidade e estilo. Na RELOGIOS.inc o tempo é levado a
+					sério.
 				</p>
 			</div>
 			<div

@@ -17,11 +17,12 @@ class CartResource extends JsonResource
                 'name' => $this->product->name,
                 'slug' => $this->product->slug,
                 'price' => $this->product->price,
+                'discount_price' => $this->product->discount_price,
                 'stock' => $this->product->stock,
                 'image' => $this->product->primaryImage ? $this->product->primaryImage->full_url : null // Garante que devolve a URL completa da imagem
             ],
 
-            'line_total' => round($this->quantity * $this->product->price, 2),
+            'line_total' => round($this->quantity * ($this->product->discount_price ?? $this->product->price), 2),
             'created_at' => $this->created_at,
             'updated_at' => $this->updated_at,
         ];

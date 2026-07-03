@@ -5,24 +5,18 @@ import UserAvatar from './UserAvatar.vue'
 import { PropType, computed, toRef } from 'vue'
 import { Pagination, Sorting } from '../../../data/pages/users'
 import { useVModel } from '@vueuse/core'
-import { Project } from '../../projects/types'
 
 const columns = defineVaDataTableColumns([
   { label: 'Full Name', key: 'fullname', sortable: true },
   { label: 'Email', key: 'email', sortable: true },
   { label: 'Username', key: 'username', sortable: true },
   { label: 'Role', key: 'role', sortable: true },
-  { label: 'Projects', key: 'projects', sortable: true },
   { label: ' ', key: 'actions', align: 'right' },
 ])
 
 const props = defineProps({
   users: {
     type: Array as PropType<User[]>,
-    required: true,
-  },
-  projects: {
-    type: Array as PropType<Project[]>,
     required: true,
   },
   loading: { type: Boolean, default: false },
@@ -66,32 +60,6 @@ const onUserDelete = async (user: User) => {
     emit('delete-user', user)
   }
 }
-
-const formatProjectNames = (projects: Project['id'][]) => {
-  const names = projects.reduce((acc, p) => {
-    const project = props.projects?.find(({ id }) => p === id)
-
-    if (project) {
-      acc.push(project.project_name)
-    }
-
-    return acc
-  }, [] as string[])
-  if (names.length === 0) return 'No projects'
-  if (names.length <= 2) {
-    return names.map((name) => name).join(', ')
-  }
-
-  return (
-    names
-      .slice(0, 2)
-      .map((name) => name)
-      .join(', ') +
-    ' + ' +
-    (names.length - 2) +
-    ' more'
-  )
-}
 </script>
 
 <template>
@@ -123,12 +91,6 @@ const formatProjectNames = (projects: Project['id'][]) => {
 
     <template #cell(role)="{ rowData }">
       <VaBadge :text="rowData.role" :color="roleColors[rowData.role as UserRole]" />
-    </template>
-
-    <template #cell(projects)="{ rowData }">
-      <div class="ellipsis max-w-[300px] lg:max-w-[450px]">
-        {{ formatProjectNames(rowData.projects) }}
-      </div>
     </template>
 
     <template #cell(actions)="{ rowData }">

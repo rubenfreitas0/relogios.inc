@@ -31,6 +31,9 @@ use App\Http\Controllers\Api\OrderController;
 use App\Http\Controllers\Api\SupportController;
 use App\Http\Controllers\Api\Admin\OrderController as AdminOrderController;
 use App\Http\Controllers\Api\Admin\DashboardController as AdminDashboardController;
+use App\Http\Controllers\Api\Admin\UserController as AdminUserController;
+use App\Http\Controllers\Api\Admin\ReportController;
+use App\Http\Controllers\Api\Admin\TicketController as AdminTicketController;
 
 
 
@@ -95,6 +98,7 @@ Route::middleware('auth:sanctum')->group(function () {
 
     Route::middleware(['admin', 'verified'])->prefix('admin')->group(function () {
         Route::get('dashboard/stats', [AdminDashboardController::class, 'stats']);
+        Route::get('reports',          [ReportController::class, 'index']);
 
         Route::apiResource('brands', AdminBrandController::class);
         Route::apiResource('categories', AdminCategoryController::class);
@@ -110,10 +114,15 @@ Route::middleware('auth:sanctum')->group(function () {
 
         Route::apiResource('shipping-methods', AdminShippingMethodController::class);
         Route::apiResource('shipping-zones', AdminShippingZoneController::class);
+        Route::apiResource('users', AdminUserController::class);
 
         // Encomendas — admin
         Route::patch('orders/{orderNumber}/status', [AdminOrderController::class, 'updateStatus']);
         Route::get('orders',              [AdminOrderController::class, 'index']);
         Route::get('orders/{orderNumber}', [AdminOrderController::class, 'show']);
+
+        // Tickets — admin
+        Route::patch('tickets/{ticket}/status', [AdminTicketController::class, 'updateStatus']);
+        Route::apiResource('tickets', AdminTicketController::class)->except(['store', 'update']);
     });
 });

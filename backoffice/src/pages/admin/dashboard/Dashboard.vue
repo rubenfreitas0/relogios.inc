@@ -1,32 +1,48 @@
 <script lang="ts" setup>
+import { onMounted } from 'vue'
+import { useDashboardStore } from '../../../stores/dashboard-store'
 import RevenueUpdates from './cards/RevenueReport.vue'
-import ProjectTable from './cards/ProjectTable.vue'
-import RevenueByLocationMap from './cards/RevenueByLocationMap.vue'
+import LatestOrdersTable from './cards/LatestOrdersTable.vue'
 import DataSection from './DataSection.vue'
 import YearlyBreakup from './cards/YearlyBreakup.vue'
 import MonthlyEarnings from './cards/MonthlyEarnings.vue'
-import RegionRevenue from './cards/RegionRevenue.vue'
-import Timeline from './cards/Timeline.vue'
+
+const store = useDashboardStore()
+
+onMounted(() => {
+  store.fetchStats()
+})
 </script>
 
 <template>
   <h1 class="page-title font-bold">Dashboard</h1>
-  <section class="flex flex-col gap-4">
-    <div class="flex flex-col sm:flex-row gap-4">
-      <RevenueUpdates class="w-full sm:w-[70%]" />
-      <div class="flex flex-col gap-4 w-full sm:w-[30%]">
-        <YearlyBreakup class="h-full" />
-        <MonthlyEarnings />
+
+  <div v-if="store.loading && !store.stats" class="flex justify-center items-center py-24">
+    <VaProgressCircle indeterminate size="large" />
+  </div>
+
+  <section v-else-if="store.stats" class="flex flex-col gap-4">
+    <!-- Bloco Principal: Faturação e Resumos rápidos -->
+    <div class="flex flex-col lg:flex-row gap-4">
+      <RevenueUpdates :revenue="store.stats.revenue" class="w-full lg:w-[70%]" />
+      <div class="flex flex-col gap-4 w-full lg:w-[30%]">
+        <YearlyBreakup :orders="store.stats.orders" class="h-full" />
+        <MonthlyEarnings :revenue="store.stats.revenue" />
       </div>
     </div>
-    <DataSection />
-    <div class="flex flex-col md:flex-row gap-4">
-      <RevenueByLocationMap class="w-full md:w-4/6" />
-      <RegionRevenue class="w-full md:w-2/6" />
-    </div>
-    <div class="flex flex-col md:flex-row gap-4">
-      <ProjectTable class="w-full md:w-1/2" />
-      <Timeline class="w-full md:w-1/2" />
+
+    <!-- Métricas -->
+    <DataSection :stats="store.stats" />
+
+    <!-- Últimas Encomendas -->
+    <div class="flex flex-col gap-4">
+      <LatestOrdersTable :orders="store.stats.latest_orders" class="w-full" />
     </div>
   </section>
+
+  <div v-else-if="store.error" class="p-4">
+    <VaAlert color="danger">
+      {{ store.error }}
+    </VaAlert>
+  </div>
 </template>

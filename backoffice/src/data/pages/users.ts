@@ -18,60 +18,44 @@ export type Filters = {
 }
 
 export const getUsers = async (filters: Partial<Filters & Pagination & Sorting>) => {
-  const { isActive, search } = filters
-  let filteredUsers: User[] = await fetch(api.allUsers()).then((r) => r.json())
+  const { isActive, search, page = 1, sortBy, sortingOrder } = filters
 
-  filteredUsers = filteredUsers.filter((user) => user.active === isActive)
-
-  if (search) {
-    filteredUsers = filteredUsers.filter((user) => user.fullname.toLowerCase().includes(search.toLowerCase()))
-  }
-
-  const { page = 1, perPage = 10 } = filters || {}
-  return {
-    data: filteredUsers,
-    pagination: {
+  const response = await api.get('/admin/users', {
+    params: {
+      isActive: isActive !== undefined ? isActive : undefined,
+      search,
       page,
-      perPage,
-      total: filteredUsers.length,
+      sortBy,
+      sortingOrder,
+    },
+  })
+
+  return {
+    data: response.data.data,
+    pagination: {
+      page: response.data.pagination.page,
+      perPage: response.data.pagination.perPage,
+      total: response.data.pagination.total,
     },
   }
 }
 
 export const addUser = async (user: User) => {
-  const headers = new Headers()
-  headers.append('Content-Type', 'application/json')
-
-  const result = await fetch(api.allUsers(), { method: 'POST', body: JSON.stringify(user), headers }).then((r) =>
-    r.json(),
-  )
-
-  if (!result.error) {
-    return result
-  }
-
-  throw new Error(result.error)
+  const response = await api.post('/admin/users', user)
+  return [response.data]
 }
 
 export const updateUser = async (user: User) => {
-  const headers = new Headers()
-  headers.append('Content-Type', 'application/json')
-
-  const result = await fetch(api.user(user.id), { method: 'PUT', body: JSON.stringify(user), headers }).then((r) =>
-    r.json(),
-  )
-
-  if (!result.error) {
-    return result
-  }
-
-  throw new Error(result.error)
+  const response = await api.put(`/admin/users/${user.id}`, user)
+  return [response.data]
 }
 
 export const removeUser = async (user: User) => {
-  return fetch(api.user(user.id), { method: 'DELETE' })
+  await api.delete(`/admin/users/${user.id}`)
+  return true
 }
 
 export const uploadAvatar = async (body: FormData) => {
-  return fetch(api.avatars(), { method: 'POST', body, redirect: 'follow' }).then((r) => r.json())
+  // Retorna um link simulado para o avatar por enquanto
+  return { publicUrl: '' }
 }

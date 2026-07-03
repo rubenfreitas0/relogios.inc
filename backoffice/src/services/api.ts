@@ -54,6 +54,17 @@ export const dashboardApi = {
   stats: () => api.get('/admin/dashboard/stats'),
 }
 
+export const reportsApi = {
+  get: () => api.get('/admin/reports'),
+}
+
+export const ticketsApi = {
+  list: (params?: Record<string, unknown>) => api.get('/admin/tickets', { params }),
+  show: (id: number) => api.get(`/admin/tickets/${id}`),
+  updateStatus: (id: number, status: string) => api.patch(`/admin/tickets/${id}/status`, { status }),
+  destroy: (id: number) => api.delete(`/admin/tickets/${id}`),
+}
+
 export const productsApi = {
   list: (params?: Record<string, unknown>) => api.get('/admin/products', { params }),
   show: (id: number) => api.get(`/admin/products/${id}`),

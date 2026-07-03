@@ -16,6 +16,7 @@ export interface Product {
   short_description: string | null
   description: string | null
   price: string
+  discount_price: string | null
   stock: number
   weight?: string | null
   is_active: boolean

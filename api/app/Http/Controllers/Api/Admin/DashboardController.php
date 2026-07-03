@@ -6,6 +6,8 @@ use App\Http\Controllers\Controller;
 use App\Models\Order;
 use App\Models\Product;
 use App\Models\User;
+use App\Enums\OrderStatus;
+use App\Enums\PaymentStatus;
 use Carbon\Carbon;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Support\Facades\DB;
@@ -25,9 +27,9 @@ class DashboardController extends Controller
         // — Produtos
         $productStats = Product::query()
             ->selectRaw('COUNT(*) as total')
-            ->selectRaw('SUM(CASE WHEN is_active = 1 THEN 1 ELSE 0 END) as active')
-            ->selectRaw('SUM(CASE WHEN is_active = 1 AND stock = 0 THEN 1 ELSE 0 END) as out_of_stock')
-            ->selectRaw('SUM(CASE WHEN is_active = 1 AND stock > 0 AND stock <= 5 THEN 1 ELSE 0 END) as low_stock')
+            ->selectRaw('SUM(CASE WHEN is_active = true THEN 1 ELSE 0 END) as active')
+            ->selectRaw('SUM(CASE WHEN is_active = true AND stock = 0 THEN 1 ELSE 0 END) as out_of_stock')
+            ->selectRaw('SUM(CASE WHEN is_active = true AND stock > 0 AND stock <= 5 THEN 1 ELSE 0 END) as low_stock')
             ->first();
 
         // — Encomendas
@@ -36,6 +38,10 @@ class DashboardController extends Controller
             ->selectRaw('SUM(CASE WHEN created_at >= ? AND created_at <= ? THEN 1 ELSE 0 END) as last_month', [$startOfLastMonth, $endOfLastMonth])
             ->selectRaw('SUM(CASE WHEN DATE(created_at) = ? THEN 1 ELSE 0 END) as today', [$now->toDateString()])
             ->first();
+
+        $pendingOrdersCount = Order::where('payment_status', PaymentStatus::PAID)
+            ->whereIn('status', [OrderStatus::PENDING, OrderStatus::PROCESSING, OrderStatus::SHIPPED])
+            ->count();
 
         $ordersByStatus = Order::select('status', DB::raw('COUNT(*) as count'))
             ->groupBy('status')
@@ -112,10 +118,11 @@ class DashboardController extends Controller
                 'low_stock'    => (int) $productStats->low_stock,
             ],
             'orders' => [
-                'today'      => (int) $orderStats->today,
-                'this_month' => (int) $orderStats->this_month,
-                'last_month' => (int) $orderStats->last_month,
-                'by_status'  => $ordersByStatus,
+                'today'         => (int) $orderStats->today,
+                'this_month'    => (int) $orderStats->this_month,
+                'last_month'    => (int) $orderStats->last_month,
+                'pending_count' => $pendingOrdersCount,
+                'by_status'     => $ordersByStatus,
             ],
             'revenue' => [
                 'this_month' => $revenueThisMonth,

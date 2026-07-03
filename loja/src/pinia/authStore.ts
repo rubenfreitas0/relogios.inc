@@ -43,7 +43,10 @@ export const useAuthStore = defineStore('auth', () => {
 		try {
 			const res = await fetch(`${API_BASE}/login`, {
 				method: 'POST',
-				headers: { 'Content-Type': 'application/json', Accept: 'application/json' },
+				headers: {
+					'Content-Type': 'application/json',
+					Accept: 'application/json',
+				},
 				body: JSON.stringify({ email, password }),
 			})
 			const data = await res.json()
@@ -53,7 +56,7 @@ export const useAuthStore = defineStore('auth', () => {
 			}
 			setToken(data.token)
 			user.value = data.user
-			
+
 			// Sync cart when user logs in
 			const cartStore = useCartStore()
 			await cartStore.syncLocalCartToApi()
@@ -80,15 +83,22 @@ export const useAuthStore = defineStore('auth', () => {
 		try {
 			const res = await fetch(`${API_BASE}/register`, {
 				method: 'POST',
-				headers: { 'Content-Type': 'application/json', Accept: 'application/json' },
+				headers: {
+					'Content-Type': 'application/json',
+					Accept: 'application/json',
+				},
 				body: JSON.stringify(payload),
 			})
 			const data = await res.json()
 			if (!res.ok) {
 				// Laravel devolve erros de validação em data.errors
 				if (data.errors) {
-					const firstError = Object.values(data.errors as Record<string, string[]>)[0]
-					error.value = Array.isArray(firstError) ? firstError[0] : String(firstError)
+					const firstError = Object.values(
+						data.errors as Record<string, string[]>,
+					)[0]
+					error.value = Array.isArray(firstError)
+						? firstError[0]
+						: String(firstError)
 				} else {
 					error.value = data.message ?? 'Erro ao criar conta.'
 				}
@@ -117,7 +127,10 @@ export const useAuthStore = defineStore('auth', () => {
 		try {
 			const res = await fetch(`${API_BASE}/forgot-password`, {
 				method: 'POST',
-				headers: { 'Content-Type': 'application/json', Accept: 'application/json' },
+				headers: {
+					'Content-Type': 'application/json',
+					Accept: 'application/json',
+				},
 				body: JSON.stringify({ email }),
 			})
 			const data = await res.json()
@@ -125,7 +138,8 @@ export const useAuthStore = defineStore('auth', () => {
 				error.value = data.message ?? 'Erro ao enviar email.'
 				return false
 			}
-			successMessage.value = data.message ?? 'Se o e-mail existir, enviámos o link de recuperação.'
+			successMessage.value =
+				data.message ?? 'Se o e-mail existir, enviámos o link de recuperação.'
 			return true
 		} catch {
 			error.value = 'Sem ligação ao servidor. Tenta novamente.'
@@ -146,14 +160,21 @@ export const useAuthStore = defineStore('auth', () => {
 		try {
 			const res = await fetch(`${API_BASE}/reset-password`, {
 				method: 'POST',
-				headers: { 'Content-Type': 'application/json', Accept: 'application/json' },
+				headers: {
+					'Content-Type': 'application/json',
+					Accept: 'application/json',
+				},
 				body: JSON.stringify(payload),
 			})
 			const data = await res.json()
 			if (!res.ok) {
 				if (data.errors) {
-					const firstError = Object.values(data.errors as Record<string, string[]>)[0]
-					error.value = Array.isArray(firstError) ? firstError[0] : String(firstError)
+					const firstError = Object.values(
+						data.errors as Record<string, string[]>,
+					)[0]
+					error.value = Array.isArray(firstError)
+						? firstError[0]
+						: String(firstError)
 				} else {
 					error.value = data.message ?? 'Erro ao redefinir password.'
 				}
@@ -182,8 +203,8 @@ export const useAuthStore = defineStore('auth', () => {
 			})
 		} finally {
 			clearAuth()
-			
-			// Opcional: Limpar o carrinho local ao fazer logout? 
+
+			// Opcional: Limpar o carrinho local ao fazer logout?
 			// A maioria das lojas mantém o carrinho anonimo ou limpa-o.
 			const cartStore = useCartStore()
 			cartStore.cart = {}

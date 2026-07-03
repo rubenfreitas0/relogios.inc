@@ -11,20 +11,22 @@ const props = defineProps<{
 </script>
 <template>
 	<section
-		class="mt-16 flex w-4/5 max-w-6xl flex-col lg:mt-32 lg:grid lg:grid-cols-2 lg:grid-rows-1 text-black"
+		class="mt-16 flex w-4/5 max-w-6xl flex-col text-black lg:mt-32 lg:grid lg:grid-cols-2 lg:grid-rows-1"
 	>
 		<div class="flex h-full w-full flex-col">
-			<h2 class="mb-8 text-2xl font-bold tracking-wide uppercase">Características</h2>
-			<p class="tracking-wide text-black/60 whitespace-pre-line text-justify leading-relaxed">
+			<h2 class="mb-8 text-2xl font-bold uppercase tracking-wide">
+				Características
+			</h2>
+			<p
+				class="whitespace-pre-line text-justify leading-relaxed tracking-wide text-black/60"
+			>
 				{{ props.features }}
 			</p>
 		</div>
 		<div class="mt-16 flex h-full w-full flex-col lg:ml-24 lg:mt-0">
-			<h2 class="mb-8 text-2xl font-bold tracking-wide uppercase">
-				Na Caixa
-			</h2>
+			<h2 class="mb-8 text-2xl font-bold uppercase tracking-wide">Na Caixa</h2>
 			<div
-				class="flex flex-row items-baseline gap-4 mb-3 border-b border-black/5 pb-2"
+				class="mb-3 flex flex-row items-baseline gap-4 border-b border-black/5 pb-2"
 				v-for="(item, index) of props.inthebox"
 				:key="index"
 			>

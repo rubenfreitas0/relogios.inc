@@ -46,7 +46,7 @@ const filterData: Record<string, CategoryFilterMeta> = {
 			{ slug: 'cronografos', name: 'Cronógrafo' },
 			{ slug: 'automaticos', name: 'Automático' },
 			{ slug: 'digital', name: 'Digital' },
-			{ slug: 'smartwatch', name: 'Smartwatch' }
+			{ slug: 'smartwatch', name: 'Smartwatch' },
 		],
 		colors: [
 			{ name: 'Preto', hex: '#1a1a1a' },
@@ -72,7 +72,7 @@ const filterData: Record<string, CategoryFilterMeta> = {
 			{ slug: 'desporto', name: 'Desportivo' },
 			{ slug: 'automaticos', name: 'Automático' },
 			{ slug: 'analogico', name: 'Analógico' },
-			{ slug: 'smartwatch', name: 'Smartwatch' }
+			{ slug: 'smartwatch', name: 'Smartwatch' },
 		],
 		colors: [
 			{ name: 'Dourado', hex: '#c8a44a' },
@@ -98,7 +98,7 @@ const filterData: Record<string, CategoryFilterMeta> = {
 			{ slug: 'desporto', name: 'Desportivo' },
 			{ slug: 'automaticos', name: 'Automático' },
 			{ slug: 'digital', name: 'Digital' },
-			{ slug: 'smartwatch', name: 'Smartwatch' }
+			{ slug: 'smartwatch', name: 'Smartwatch' },
 		],
 		colors: [
 			{ name: 'Preto', hex: '#1a1a1a' },
@@ -115,7 +115,11 @@ const meta = computed(() => filterData[props.category] ?? filterData.homens)
 
 // ── Active filters ────────────────────────────────────────────────
 const selectedBrands = ref<string[]>([])
-const selectedPriceRange = ref<{ label: string; min: number; max: number } | null>(null)
+const selectedPriceRange = ref<{
+	label: string
+	min: number
+	max: number
+} | null>(null)
 const selectedCategory = ref<string | null>(null)
 const selectedColor = ref<string | null>(null)
 
@@ -131,7 +135,7 @@ const categoryNames: Record<string, string> = {
 	analogico: 'Analógico',
 	digital: 'Digital',
 	'analogico-digital': 'Analógico-Digital',
-	smartwatch: 'Smartwatch'
+	smartwatch: 'Smartwatch',
 }
 
 // Flag to prevent circular updates between URL ↔ filters
@@ -145,7 +149,7 @@ function syncFiltersFromQuery() {
 	// Brand: query has slug (lowercase), sidebar has display name
 	if (q.brand && typeof q.brand === 'string') {
 		const brandSlug = q.brand.toLowerCase()
-		const matched = meta.value.brands.find(b => b.toLowerCase() === brandSlug)
+		const matched = meta.value.brands.find((b) => b.toLowerCase() === brandSlug)
 		selectedBrands.value = matched ? [matched] : []
 	} else {
 		selectedBrands.value = []
@@ -155,8 +159,14 @@ function syncFiltersFromQuery() {
 	if (q.min_price || q.max_price) {
 		const minP = q.min_price ? Number(q.min_price) : 0
 		const maxP = q.max_price ? Number(q.max_price) : 999999
-		const matched = meta.value.priceRanges.find(r => r.min === minP && r.max === maxP)
-		selectedPriceRange.value = matched ?? { label: `€${minP} – €${maxP}`, min: minP, max: maxP }
+		const matched = meta.value.priceRanges.find(
+			(r) => r.min === minP && r.max === maxP,
+		)
+		selectedPriceRange.value = matched ?? {
+			label: `€${minP} – €${maxP}`,
+			min: minP,
+			max: maxP,
+		}
 	} else {
 		selectedPriceRange.value = null
 	}
@@ -175,7 +185,9 @@ function syncFiltersFromQuery() {
 		selectedColor.value = null
 	}
 
-	nextTick(() => { syncing = false })
+	nextTick(() => {
+		syncing = false
+	})
 }
 
 // ── Update URL query params when filters change ─────────────────────
@@ -215,7 +227,7 @@ const loadProducts = async () => {
 	const params: Record<string, string | number> = {
 		gender: props.category,
 		page: currentPage.value,
-		per_page: 20
+		per_page: 20,
 	}
 
 	if (selectedBrands.value.length > 0) {
@@ -254,31 +266,42 @@ onMounted(() => {
 })
 
 // ── React to URL query changes (e.g. mega menu clicks) ────────────
-watch(() => route.query, () => {
-	if (!syncing) {
-		syncFiltersFromQuery()
-		currentPage.value = 1
-		nextTick(() => loadProducts())
-	}
-}, { deep: true })
+watch(
+	() => route.query,
+	() => {
+		if (!syncing) {
+			syncFiltersFromQuery()
+			currentPage.value = 1
+			nextTick(() => loadProducts())
+		}
+	},
+	{ deep: true },
+)
 
 // ── React to category changes (different gender page) ─────────────
-watch(() => props.category, () => {
-	syncFiltersFromQuery()
-	currentPage.value = 1
-	products.value = []
-	nextTick(() => loadProducts())
-})
-
-// ── React to sidebar filter changes → update URL + reload ─────────
-watch([selectedBrands, selectedPriceRange, selectedCategory, selectedColor], () => {
-	if (!syncing) {
-		syncQueryFromFilters()
+watch(
+	() => props.category,
+	() => {
+		syncFiltersFromQuery()
 		currentPage.value = 1
 		products.value = []
-		loadProducts()
-	}
-}, { deep: true })
+		nextTick(() => loadProducts())
+	},
+)
+
+// ── React to sidebar filter changes → update URL + reload ─────────
+watch(
+	[selectedBrands, selectedPriceRange, selectedCategory, selectedColor],
+	() => {
+		if (!syncing) {
+			syncQueryFromFilters()
+			currentPage.value = 1
+			products.value = []
+			loadProducts()
+		}
+	},
+	{ deep: true },
+)
 
 watch(currentPage, () => {
 	loadProducts()
@@ -318,10 +341,12 @@ const hasActiveFilters = computed(
 		<Navigation color="k-black" />
 
 		<!-- ── Hero Banner ─────────────────────────────────────────── -->
-		<header class="bg-k-black border-b border-white/5">
+		<header class="border-b border-white/5 bg-k-black">
 			<div class="mx-auto flex max-w-6xl items-end gap-6 px-6 py-14">
 				<div class="flex items-start gap-5">
-					<div class="mt-1.5 h-14 w-[3px] flex-shrink-0 rounded-full bg-[#FFC700]"></div>
+					<div
+						class="mt-1.5 h-14 w-[3px] flex-shrink-0 rounded-full bg-[#FFC700]"
+					></div>
 					<div>
 						<p
 							class="mb-2 text-[0.6rem] font-bold uppercase tracking-[0.22em] text-[#FFC700]"
@@ -369,7 +394,7 @@ const hasActiveFilters = computed(
 				</div>
 
 				<!-- Marca -->
-				<div class="border-white/10 border-t pt-5">
+				<div class="border-t border-white/10 pt-5">
 					<p
 						class="mb-3 text-[0.6rem] font-bold uppercase tracking-[0.18em] text-[#FFC700]"
 					>
@@ -423,7 +448,7 @@ const hasActiveFilters = computed(
 				</div>
 
 				<!-- Gama de Preço -->
-				<div class="border-white/10 border-t pt-5">
+				<div class="border-t border-white/10 pt-5">
 					<p
 						class="mb-3 text-[0.6rem] font-bold uppercase tracking-[0.18em] text-[#FFC700]"
 					>
@@ -433,26 +458,26 @@ const hasActiveFilters = computed(
 						<li v-for="range in meta.priceRanges" :key="range.label">
 							<button
 								@click="
-								setPriceRange(
-									selectedPriceRange?.label === range.label ? null : range,
-								)
+									setPriceRange(
+										selectedPriceRange?.label === range.label ? null : range,
+									)
 								"
 								class="group flex w-full items-center gap-2.5 text-left"
 							>
 								<span
 									class="h-4 w-4 flex-shrink-0 rounded-full border transition-all duration-300"
 									:class="
-									selectedPriceRange?.min === range.min
-										? 'border-[#FFC700] bg-[#FFC700]'
-										: 'border-white/20 group-hover:border-[#FFC700]'
+										selectedPriceRange?.min === range.min
+											? 'border-[#FFC700] bg-[#FFC700]'
+											: 'border-white/20 group-hover:border-[#FFC700]'
 									"
 								></span>
 								<span
 									class="text-sm transition-colors duration-300"
 									:class="
-									selectedPriceRange?.min === range.min
-										? 'font-semibold text-white'
-										: 'text-white/60 group-hover:text-[#FFC700]'
+										selectedPriceRange?.min === range.min
+											? 'font-semibold text-white'
+											: 'text-white/60 group-hover:text-[#FFC700]'
 									"
 								>
 									{{ range.label }}
@@ -463,7 +488,10 @@ const hasActiveFilters = computed(
 				</div>
 
 				<!-- Tipo / Mecanismo -->
-				<div v-if="meta.categories && meta.categories.length > 0" class="border-white/10 border-t pt-5">
+				<div
+					v-if="meta.categories && meta.categories.length > 0"
+					class="border-t border-white/10 pt-5"
+				>
 					<p
 						class="mb-3 text-[0.6rem] font-bold uppercase tracking-[0.18em] text-[#FFC700]"
 					>
@@ -472,15 +500,18 @@ const hasActiveFilters = computed(
 					<ul class="space-y-2">
 						<li v-for="cat in meta.categories" :key="cat.slug">
 							<button
-								@click="selectedCategory = selectedCategory === cat.slug ? null : cat.slug"
+								@click="
+									selectedCategory =
+										selectedCategory === cat.slug ? null : cat.slug
+								"
 								class="group flex w-full items-center gap-2.5 text-left"
 							>
 								<span
-									class="h-4 w-4 flex-shrink-0 rounded border transition-all duration-300 flex items-center justify-center"
+									class="flex h-4 w-4 flex-shrink-0 items-center justify-center rounded border transition-all duration-300"
 									:class="
-									selectedCategory === cat.slug
-										? 'border-[#FFC700] bg-[#FFC700]'
-										: 'border-white/20 group-hover:border-[#FFC700]'
+										selectedCategory === cat.slug
+											? 'border-[#FFC700] bg-[#FFC700]'
+											: 'border-white/20 group-hover:border-[#FFC700]'
 									"
 								>
 									<svg
@@ -501,9 +532,9 @@ const hasActiveFilters = computed(
 								<span
 									class="text-sm transition-colors duration-300"
 									:class="
-									selectedCategory === cat.slug
-										? 'font-semibold text-white'
-										: 'text-white/60 group-hover:text-[#FFC700]'
+										selectedCategory === cat.slug
+											? 'font-semibold text-white'
+											: 'text-white/60 group-hover:text-[#FFC700]'
 									"
 								>
 									{{ cat.name }}
@@ -514,7 +545,10 @@ const hasActiveFilters = computed(
 				</div>
 
 				<!-- Cores -->
-				<div v-if="meta.colors && meta.colors.length > 0" class="border-white/10 border-t pt-5">
+				<div
+					v-if="meta.colors && meta.colors.length > 0"
+					class="border-t border-white/10 pt-5"
+				>
 					<p
 						class="mb-3 text-[0.6rem] font-bold uppercase tracking-[0.18em] text-[#FFC700]"
 					>
@@ -525,24 +559,29 @@ const hasActiveFilters = computed(
 							v-for="color in meta.colors"
 							:key="color.name"
 							:title="color.name"
-							@click="selectedColor = selectedColor === color.name ? null : color.name"
+							@click="
+								selectedColor = selectedColor === color.name ? null : color.name
+							"
 							class="relative flex h-7 w-7 items-center justify-center rounded-full border transition-all duration-200"
 							:class="
-							selectedColor === color.name
-								? 'border-[#FFC700] scale-110'
-								: 'border-white/10 hover:border-white/30'
+								selectedColor === color.name
+									? 'scale-110 border-[#FFC700]'
+									: 'border-white/10 hover:border-white/30'
 							"
 							:style="{ backgroundColor: color.hex }"
 						>
 							<span
 								v-if="selectedColor === color.name"
 								class="h-1.5 w-1.5 rounded-full"
-								:class="color.name === 'Branco' || color.name === 'Prata' ? 'bg-black' : 'bg-white'"
+								:class="
+									color.name === 'Branco' || color.name === 'Prata'
+										? 'bg-black'
+										: 'bg-white'
+								"
 							></span>
 						</button>
 					</div>
 				</div>
-
 			</aside>
 
 			<!-- ── Product Grid ─────────────────────────────────────── -->
@@ -566,7 +605,7 @@ const hasActiveFilters = computed(
 							</span>
 							<span
 								v-if="selectedPriceRange"
-								class="flex items-center gap-1.5 rounded-full border border-white/15 bg-white/5 px-3 py-1 text-xs font-semibold text-white/70"
+								class="border-white/15 flex items-center gap-1.5 rounded-full border bg-white/5 px-3 py-1 text-xs font-semibold text-white/70"
 							>
 								{{ selectedPriceRange.label }}
 								<button
@@ -578,9 +617,10 @@ const hasActiveFilters = computed(
 							</span>
 							<span
 								v-if="selectedCategory"
-								class="flex items-center gap-1.5 rounded-full border border-white/15 bg-white/5 px-3 py-1 text-xs font-semibold text-white/70"
+								class="border-white/15 flex items-center gap-1.5 rounded-full border bg-white/5 px-3 py-1 text-xs font-semibold text-white/70"
 							>
-								Categoria: {{ categoryNames[selectedCategory] || selectedCategory }}
+								Categoria:
+								{{ categoryNames[selectedCategory] || selectedCategory }}
 								<button
 									@click="selectedCategory = null"
 									class="transition-colors hover:text-[#FFC700]"
@@ -590,7 +630,7 @@ const hasActiveFilters = computed(
 							</span>
 							<span
 								v-if="selectedColor"
-								class="flex items-center gap-1.5 rounded-full border border-white/15 bg-white/5 px-3 py-1 text-xs font-semibold text-white/70"
+								class="border-white/15 flex items-center gap-1.5 rounded-full border bg-white/5 px-3 py-1 text-xs font-semibold text-white/70"
 							>
 								Cor: {{ selectedColor }}
 								<button
@@ -604,9 +644,7 @@ const hasActiveFilters = computed(
 						<span v-else class="text-xs text-white/25">Sem filtros ativos</span>
 					</div>
 					<span class="flex-shrink-0 text-xs text-white/40">
-						{{ totalProducts }} resultado{{
-							totalProducts !== 1 ? 's' : ''
-						}}
+						{{ totalProducts }} resultado{{ totalProducts !== 1 ? 's' : '' }}
 					</span>
 				</div>
 
@@ -666,7 +704,7 @@ const hasActiveFilters = computed(
 					<button
 						@click="currentPage--"
 						:disabled="currentPage === 1"
-						class="flex h-9 w-9 items-center justify-center rounded-lg border border-white/15 text-white/40 transition-all duration-300 hover:border-[#FFC700] hover:text-[#FFC700] disabled:cursor-not-allowed disabled:opacity-25 disabled:hover:border-white/15 disabled:hover:text-white/40"
+						class="border-white/15 disabled:hover:border-white/15 flex h-9 w-9 items-center justify-center rounded-lg border text-white/40 transition-all duration-300 hover:border-[#FFC700] hover:text-[#FFC700] disabled:cursor-not-allowed disabled:opacity-25 disabled:hover:text-white/40"
 					>
 						<svg
 							class="h-4 w-4"
@@ -691,7 +729,7 @@ const hasActiveFilters = computed(
 						:class="
 							currentPage === page
 								? 'bg-[#FFC700] text-black'
-								: 'border border-white/15 text-white/40 hover:border-[#FFC700] hover:text-[#FFC700]'
+								: 'border-white/15 border text-white/40 hover:border-[#FFC700] hover:text-[#FFC700]'
 						"
 					>
 						{{ page }}
@@ -700,7 +738,7 @@ const hasActiveFilters = computed(
 					<button
 						@click="currentPage++"
 						:disabled="currentPage === totalPages"
-						class="flex h-9 w-9 items-center justify-center rounded-lg border border-white/15 text-white/40 transition-all duration-300 hover:border-[#FFC700] hover:text-[#FFC700] disabled:cursor-not-allowed disabled:opacity-25 disabled:hover:border-white/15 disabled:hover:text-white/40"
+						class="border-white/15 disabled:hover:border-white/15 flex h-9 w-9 items-center justify-center rounded-lg border text-white/40 transition-all duration-300 hover:border-[#FFC700] hover:text-[#FFC700] disabled:cursor-not-allowed disabled:opacity-25 disabled:hover:text-white/40"
 					>
 						<svg
 							class="h-4 w-4"
@@ -723,4 +761,3 @@ const hasActiveFilters = computed(
 		<Footer />
 	</div>
 </template>
-

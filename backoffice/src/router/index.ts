@@ -23,6 +23,16 @@ const routes: Array<RouteRecordRaw> = [
         path: 'dashboard',
         component: () => import('../pages/admin/dashboard/Dashboard.vue'),
       },
+      {
+        name: 'reports',
+        path: 'relatorios',
+        component: () => import('../pages/reports/ReportsPage.vue'),
+      },
+      {
+        name: 'tickets',
+        path: 'tickets',
+        component: () => import('../pages/tickets/TicketsPage.vue'),
+      },
       // — Custom pages (relogios.inc) —
       {
         name: 'products',
@@ -95,28 +105,6 @@ const routes: Array<RouteRecordRaw> = [
         path: 'users',
         component: () => import('../pages/users/UsersPage.vue'),
       },
-      {
-        name: 'payments',
-        path: '/payments',
-        component: RouteViewComponent,
-        children: [
-          {
-            name: 'payment-methods',
-            path: 'payment-methods',
-            component: () => import('../pages/payments/PaymentsPage.vue'),
-          },
-          {
-            name: 'billing',
-            path: 'billing',
-            component: () => import('../pages/billing/BillingPage.vue'),
-          },
-          {
-            name: 'pricing-plans',
-            path: 'pricing-plans',
-            component: () => import('../pages/pricing-plans/PricingPlans.vue'),
-          },
-        ],
-      },
     ],
   },
   {
@@ -129,19 +117,9 @@ const routes: Array<RouteRecordRaw> = [
         component: () => import('../pages/auth/Login.vue'),
       },
       {
-        name: 'signup',
-        path: 'signup',
-        component: () => import('../pages/auth/Signup.vue'),
-      },
-      {
         name: 'recover-password',
         path: 'recover-password',
         component: () => import('../pages/auth/RecoverPassword.vue'),
-      },
-      {
-        name: 'recover-password-email',
-        path: 'recover-password-email',
-        component: () => import('../pages/auth/CheckTheEmail.vue'),
       },
       {
         path: '',

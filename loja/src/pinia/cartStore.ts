@@ -35,7 +35,7 @@ export const useCartStore = defineStore('cart', {
 		cart: useStorage('cart', {} as cart) as unknown as cart,
 		showCart: false,
 		showQuickAdd: true,
-		
+
 		lastAddedItem: null,
 		showToast: false,
 		toastTimeout: null,
@@ -80,6 +80,7 @@ export const useCartStore = defineStore('cart', {
 								name: item.product.name,
 								primary_image: { url: item.product.image || '' },
 								price: item.product.price,
+								discount_price: item.product.discount_price,
 							},
 						}
 					}
@@ -105,7 +106,10 @@ export const useCartStore = defineStore('cart', {
 								Accept: 'application/json',
 								Authorization: `Bearer ${token}`,
 							},
-							body: JSON.stringify({ product_id: item.product.id, quantity: item.amount }),
+							body: JSON.stringify({
+								product_id: item.product.id,
+								quantity: item.amount,
+							}),
 						})
 					} catch (e) {
 						console.error('Erro ao sincronizar item local:', e)
@@ -228,7 +232,11 @@ export const useCartStore = defineStore('cart', {
 		cartValue(state: CartState) {
 			let total = 0
 			for (const id of Object.keys(state.cart)) {
-				total += state.cart[id].amount * Number(state.cart[id].product.price)
+				const product = state.cart[id].product
+				const priceToUse = product.discount_price
+					? Number(product.discount_price)
+					: Number(product.price)
+				total += state.cart[id].amount * priceToUse
 			}
 			return total
 		},

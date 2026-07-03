@@ -20,7 +20,7 @@ export default defineConfig({
     },
   },
   plugins: [
-    vuestic(),
+    vuestic({ devtools: false }),
     vue(),
     VueI18nPlugin({
       include: resolve(dirname(fileURLToPath(import.meta.url)), './src/i18n/locales/**'),

@@ -30,9 +30,21 @@ const principles = [
 ]
 
 const stores = [
-	{ city: 'Braga', address: 'Rua do Souto, 142', hours: 'Seg–Sex 10h–19h · Sáb 10h–17h' },
-	{ city: 'Porto', address: 'Rua de Santa Catarina, 87', hours: 'Seg–Sex 10h–19h · Sáb 10h–17h' },
-	{ city: 'Lisboa', address: 'Av. da Liberdade, 230', hours: 'Seg–Sex 10h–20h · Sáb 10h–18h' },
+	{
+		city: 'Braga',
+		address: 'Rua do Souto, 142',
+		hours: 'Seg–Sex 10h–19h · Sáb 10h–17h',
+	},
+	{
+		city: 'Porto',
+		address: 'Rua de Santa Catarina, 87',
+		hours: 'Seg–Sex 10h–19h · Sáb 10h–17h',
+	},
+	{
+		city: 'Lisboa',
+		address: 'Av. da Liberdade, 230',
+		hours: 'Seg–Sex 10h–20h · Sáb 10h–18h',
+	},
 ]
 
 const stats = [
@@ -43,11 +55,23 @@ const stats = [
 ]
 
 const timeline = [
-	{ year: '2013', text: 'Fundação em Braga com 14 referências cuidadosamente escolhidas.' },
-	{ year: '2016', text: 'Abertura da segunda loja no Porto, na icónica Rua de Santa Catarina.' },
+	{
+		year: '2013',
+		text: 'Fundação em Braga com 14 referências cuidadosamente escolhidas.',
+	},
+	{
+		year: '2016',
+		text: 'Abertura da segunda loja no Porto, na icónica Rua de Santa Catarina.',
+	},
 	{ year: '2019', text: 'Expansão para Lisboa e lançamento da loja online.' },
-	{ year: '2023', text: 'Marco de 28 000 clientes ativos e parcerias com mais de 40 marcas.' },
-	{ year: '2025', text: 'Renovação da plataforma digital com foco em experiência premium.' },
+	{
+		year: '2023',
+		text: 'Marco de 28 000 clientes ativos e parcerias com mais de 40 marcas.',
+	},
+	{
+		year: '2025',
+		text: 'Renovação da plataforma digital com foco em experiência premium.',
+	},
 ]
 </script>
 

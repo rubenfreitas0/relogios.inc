@@ -47,10 +47,6 @@ export const useUsers = (options?: {
 
   const users = computed(() => {
     const getSortItem = (obj: any, sortBy: string) => {
-      if (sortBy === 'projects') {
-        return obj.projects.map((project: any) => project).join(', ')
-      }
-
       return obj[sortBy]
     }
 

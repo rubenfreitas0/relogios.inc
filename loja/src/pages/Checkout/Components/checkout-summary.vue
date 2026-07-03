@@ -28,7 +28,9 @@ const formStore = useFormStore()
 			<p class="font-semibold tracking-wide text-black text-opacity-60">
 				SUBTOTAL
 			</p>
-			<p class="text-lg font-bold text-black">€{{ cartStore.cartValue.toFixed(2) }}</p>
+			<p class="text-lg font-bold text-black">
+				€{{ cartStore.cartValue.toFixed(2) }}
+			</p>
 		</div>
 		<div class="flex flex-row justify-between">
 			<p class="font-semibold tracking-wide text-black text-opacity-60">
@@ -42,11 +44,21 @@ const formStore = useFormStore()
 			<p class="font-semibold tracking-wide text-black text-opacity-60">
 				{{ formStore.taxRateName }} ({{ formStore.taxRatePercent }}%)
 			</p>
-			<p class="text-lg font-bold text-black">€{{ formStore.taxAmount.toFixed(2) }}</p>
+			<p class="text-lg font-bold text-black">
+				€{{ formStore.taxAmount.toFixed(2) }}
+			</p>
 		</div>
 		<div class="mt-4 flex flex-row justify-between">
 			<p class="font-black tracking-wide text-black">TOTAL</p>
-			<p class="text-lg font-bold text-black">€{{ (cartStore.cartValue + formStore.selectedShippingPrice + formStore.taxAmount).toFixed(2) }}</p>
+			<p class="text-lg font-bold text-black">
+				€{{
+					(
+						cartStore.cartValue +
+						formStore.selectedShippingPrice +
+						formStore.taxAmount
+					).toFixed(2)
+				}}
+			</p>
 		</div>
 		<ButtonSolid
 			content="Confirmar e Pagar"

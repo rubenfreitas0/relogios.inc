@@ -12,7 +12,6 @@ const email = ref('')
 const password = ref('')
 const showPassword = ref(false)
 
-
 // Rate limiting state
 const attempts = ref<number[]>([])
 const cooldownSeconds = ref(0)
@@ -58,8 +57,12 @@ async function handleLogin() {
 	if (isRateLimited.value) return
 
 	// Fallback to DOM values if browser autofill didn't trigger Vue's input events
-	const emailEl = document.getElementById('login-email') as HTMLInputElement | null
-	const passwordEl = document.getElementById('login-password') as HTMLInputElement | null
+	const emailEl = document.getElementById(
+		'login-email',
+	) as HTMLInputElement | null
+	const passwordEl = document.getElementById(
+		'login-password',
+	) as HTMLInputElement | null
 	if (emailEl && emailEl.value && !email.value) {
 		email.value = emailEl.value
 	}
@@ -247,11 +250,15 @@ async function handleLogin() {
 									d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z"
 								/>
 							</svg>
-							{{ isRateLimited ? `Bloqueado (${cooldownSeconds}s)` : auth.isLoading ? 'A entrar...' : 'Entrar' }}
+							{{
+								isRateLimited
+									? `Bloqueado (${cooldownSeconds}s)`
+									: auth.isLoading
+									? 'A entrar...'
+									: 'Entrar'
+							}}
 						</button>
 					</form>
-
-
 
 					<!-- Link registo -->
 					<p class="mt-6 text-center text-sm text-white/40">

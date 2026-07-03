@@ -8,13 +8,8 @@
     <!-- Filtros -->
     <VaCard class="mb-4">
       <VaCardContent>
-        <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
-          <VaInput
-            v-model="filters.search"
-            placeholder="Pesquisar por nome..."
-            clearable
-            @update:modelValue="debouncedFetch"
-          >
+        <div class="grid grid-cols-1 sm:grid-cols-3 lg:grid-cols-6 gap-4">
+          <VaInput v-model="filters.search" placeholder="Pesquisar..." clearable @update:modelValue="debouncedFetch">
             <template #prependInner>
               <VaIcon name="search" size="small" color="secondary" />
             </template>
@@ -23,7 +18,27 @@
           <VaSelect
             v-model="filters.brand_id"
             :options="store.brandOptions"
-            placeholder="Todas as marcas"
+            placeholder="Marcas"
+            clearable
+            text-by="text"
+            value-by="value"
+            @update:modelValue="applyFilters"
+          />
+
+          <VaSelect
+            v-model="filters.category_id"
+            :options="store.categoryOptions"
+            placeholder="Categorias"
+            clearable
+            text-by="text"
+            value-by="value"
+            @update:modelValue="applyFilters"
+          />
+
+          <VaSelect
+            v-model="filters.stock_status"
+            :options="stockOptions"
+            placeholder="Nível de Stock"
             clearable
             text-by="text"
             value-by="value"
@@ -33,7 +48,7 @@
           <VaSelect
             v-model="filters.is_active"
             :options="statusOptions"
-            placeholder="Todos os estados"
+            placeholder="Estados"
             clearable
             text-by="text"
             value-by="value"
@@ -43,7 +58,7 @@
           <VaSelect
             v-model="filters.gender"
             :options="genderOptions"
-            placeholder="Todos os géneros"
+            placeholder="Géneros"
             clearable
             text-by="text"
             value-by="value"
@@ -88,8 +103,15 @@
             </template>
 
             <!-- Preço -->
-            <template #cell(price)="{ value }">
-              <span class="font-mono">{{ formatCurrency(value) }}</span>
+            <template #cell(price)="{ rowData }">
+              <div class="flex flex-col font-mono text-sm leading-tight">
+                <span :class="{ 'line-through text-xs text-[var(--va-secondary)]': rowData.discount_price }">
+                  {{ formatCurrency(rowData.price) }}
+                </span>
+                <span v-if="rowData.discount_price" class="font-semibold text-success">
+                  {{ formatCurrency(rowData.discount_price) }}
+                </span>
+              </div>
             </template>
 
             <!-- Stock -->
@@ -227,10 +249,19 @@ const genderOptions = [
   { value: 'unisexo', text: 'Unisexo' },
 ]
 
+const stockOptions = [
+  { value: 'all', text: 'Todos' },
+  { value: 'out_of_stock', text: 'Sem Stock (0)' },
+  { value: 'low_stock', text: 'Stock Baixo (<= 5)' },
+  { value: 'in_stock', text: 'Disponível (> 5)' },
+]
+
 // — Filtros —
 const filters = reactive<Record<string, any>>({
   search: '',
   brand_id: null,
+  category_id: null,
+  stock_status: null,
   is_active: null,
   gender: null,
 })
@@ -246,6 +277,8 @@ function applyFilters() {
   const params: Record<string, unknown> = {}
   if (filters.search) params.search = filters.search
   if (filters.brand_id !== null && filters.brand_id !== undefined) params.brand_id = filters.brand_id
+  if (filters.category_id !== null && filters.category_id !== undefined) params.category_id = filters.category_id
+  if (filters.stock_status && filters.stock_status !== 'all') params.stock_status = filters.stock_status
   if (filters.is_active !== null && filters.is_active !== undefined) params.is_active = filters.is_active
   if (filters.gender) params.gender = filters.gender
   store.fetchProducts(params)
@@ -344,6 +377,7 @@ async function toggleActive(product: Product) {
 onMounted(() => {
   store.fetchProducts()
   store.fetchBrandOptions()
+  store.fetchCategoryOptions()
 })
 
 onBeforeUnmount(() => {

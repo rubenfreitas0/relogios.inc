@@ -33,7 +33,7 @@ const cartStore = useCartStore()
 					</p>
 					<button
 						@click="cartStore.cartOff()"
-						class="cursor-pointer font-semibold text-black opacity-60 hover:opacity-100 transition"
+						class="cursor-pointer font-semibold text-black opacity-60 transition hover:opacity-100"
 						data-test="cart-close-button"
 					>
 						✕ Close
@@ -43,7 +43,7 @@ const cartStore = useCartStore()
 				<div class="mb-4 mt-2 px-6 lg:px-10">
 					<p
 						@click="cartStore.clearCart()"
-						class="cursor-pointer text-sm text-k-dark-grey underline opacity-70 transition hover:opacity-100 active:translate-y-0.5 inline-block"
+						class="inline-block cursor-pointer text-sm text-k-dark-grey underline opacity-70 transition hover:opacity-100 active:translate-y-0.5"
 						data-test="cart-delete-all"
 					>
 						Delete All
@@ -73,7 +73,7 @@ const cartStore = useCartStore()
 				</div>
 
 				<!-- Fixed footer with total and checkout button -->
-				<div class="border-t border-zinc-100 p-6 bg-zinc-50/50 lg:p-10">
+				<div class="border-t border-zinc-100 bg-zinc-50/50 p-6 lg:p-10">
 					<div
 						class="mb-6 flex w-full flex-row justify-between"
 						data-test="cart-total-section"
@@ -88,7 +88,7 @@ const cartStore = useCartStore()
 					<ButtonSolid
 						v-if="!(cartStore.cartLength === 0)"
 						to="/checkout"
-						class="w-full flex justify-center"
+						class="flex w-full justify-center"
 						add="font-bold w-full py-4"
 						color="light"
 						content="Checkout"

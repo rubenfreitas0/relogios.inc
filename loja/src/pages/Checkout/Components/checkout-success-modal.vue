@@ -52,7 +52,7 @@ onBeforeUnmount(() => {
 				class="absolute h-screen w-full bg-black opacity-40"
 			></router-link>
 			<div
-				class="relative z-10 mx-4 mt-6 flex flex-col rounded-md bg-white p-10 md:mt-20 md:p-12 w-full max-w-xl overflow-y-auto max-h-[90vh]"
+				class="relative z-10 mx-4 mt-6 flex max-h-[90vh] w-full max-w-xl flex-col overflow-y-auto rounded-md bg-white p-10 md:mt-20 md:p-12"
 			>
 				<div
 					class="absolute right-10 flex h-10 w-10 flex-shrink-0 flex-row items-center justify-center rounded-full bg-k-main md:static lg:h-20 lg:w-20"
@@ -78,7 +78,9 @@ onBeforeUnmount(() => {
 					thank you <br />
 					for your order
 				</h2>
-				<p class="mt-2 text-sm font-bold text-k-main uppercase">Order #{{ order.order_number }}</p>
+				<p class="mt-2 text-sm font-bold uppercase text-k-main">
+					Order #{{ order.order_number }}
+				</p>
 				<p
 					class="text-md mt-4 font-semibold text-black opacity-60 lg:mt-4 lg:text-lg"
 				>
@@ -86,19 +88,53 @@ onBeforeUnmount(() => {
 				</p>
 
 				<!-- MB Way payment info -->
-				<div v-if="payment?.method?.value === 'mbway'" class="mt-4 p-4 bg-k-main/10 border border-dashed border-k-main rounded-md text-sm text-black">
+				<div
+					v-if="payment?.method?.value === 'mbway'"
+					class="mt-4 rounded-md border border-dashed border-k-main bg-k-main/10 p-4 text-sm text-black"
+				>
 					<p class="font-bold">Pagamento MB Way pendente</p>
-					<p class="mt-1">Por favor autorize o pagamento de <span class="font-bold">€{{ order.total }}</span> na aplicação MB Way associada ao telemóvel <span class="font-bold">{{ (payment.payment_data as any)?.phone }}</span>.</p>
+					<p class="mt-1">
+						Por favor autorize o pagamento de
+						<span class="font-bold">€{{ order.total }}</span> na aplicação MB
+						Way associada ao telemóvel
+						<span class="font-bold">{{
+							(payment.payment_data as any)?.phone
+						}}</span
+						>.
+					</p>
 				</div>
 
 				<!-- Multibanco payment info -->
-				<div v-if="payment?.method?.value === 'multibanco' && payment.payment_data" class="mt-4 p-4 bg-k-grey border border-black/10 rounded-md text-sm text-black">
-					<p class="font-bold uppercase tracking-wider text-black mb-2 text-xs">Dados de Pagamento Multibanco</p>
-					<div class="space-y-1 bg-white p-3 rounded border border-black/15">
-						<div class="flex justify-between border-b border-black/5 pb-1"><span class="opacity-60 text-xs">Entidade:</span> <span class="font-mono font-bold text-xs">{{ (payment.payment_data as any).entity }}</span></div>
-						<div class="flex justify-between border-b border-black/5 pb-1"><span class="opacity-60 text-xs">Referência:</span> <span class="font-mono font-bold text-xs">{{ formatReference((payment.payment_data as any).reference) }}</span></div>
-						<div class="flex justify-between border-b border-black/5 pb-1"><span class="opacity-60 text-xs">Montante:</span> <span class="font-bold text-xs">€{{ order.total }}</span></div>
-						<div class="flex justify-between pt-1"><span class="opacity-40 text-[10px]">Expira a:</span> <span class="text-[10px] opacity-60">{{ formatDate((payment.payment_data as any).expires_at) }}</span></div>
+				<div
+					v-if="payment?.method?.value === 'multibanco' && payment.payment_data"
+					class="mt-4 rounded-md border border-black/10 bg-k-grey p-4 text-sm text-black"
+				>
+					<p class="mb-2 text-xs font-bold uppercase tracking-wider text-black">
+						Dados de Pagamento Multibanco
+					</p>
+					<div class="border-black/15 space-y-1 rounded border bg-white p-3">
+						<div class="flex justify-between border-b border-black/5 pb-1">
+							<span class="text-xs opacity-60">Entidade:</span>
+							<span class="font-mono text-xs font-bold">{{
+								(payment.payment_data as any).entity
+							}}</span>
+						</div>
+						<div class="flex justify-between border-b border-black/5 pb-1">
+							<span class="text-xs opacity-60">Referência:</span>
+							<span class="font-mono text-xs font-bold">{{
+								formatReference((payment.payment_data as any).reference)
+							}}</span>
+						</div>
+						<div class="flex justify-between border-b border-black/5 pb-1">
+							<span class="text-xs opacity-60">Montante:</span>
+							<span class="text-xs font-bold">€{{ order.total }}</span>
+						</div>
+						<div class="flex justify-between pt-1">
+							<span class="text-[10px] opacity-40">Expira a:</span>
+							<span class="text-[10px] opacity-60">{{
+								formatDate((payment.payment_data as any).expires_at)
+							}}</span>
+						</div>
 					</div>
 				</div>
 				<div
@@ -107,7 +143,10 @@ onBeforeUnmount(() => {
 					<div
 						class="flex h-full w-full flex-col justify-center bg-k-grey px-4 py-6 lg:basis-4/6"
 					>
-						<div v-if="firstItem" class="flex h-full w-full flex-row items-center">
+						<div
+							v-if="firstItem"
+							class="flex h-full w-full flex-row items-center"
+						>
 							<img
 								class="aspect-square h-24"
 								:src="resolveProductImageUrl(firstItem.product_image)"
@@ -144,11 +183,11 @@ onBeforeUnmount(() => {
 					>
 						<div>
 							<p
-								class="text-md font-semibold uppercase tracking-wide opacity-90 text-white"
+								class="text-md font-semibold uppercase tracking-wide text-white opacity-90"
 							>
 								Grand Total
 							</p>
-							<p class="text-md font-semibold lg:text-lg text-white">
+							<p class="text-md font-semibold text-white lg:text-lg">
 								$ {{ order.total }}
 							</p>
 						</div>
@@ -166,4 +205,3 @@ onBeforeUnmount(() => {
 		</div>
 	</Transition>
 </template>
-

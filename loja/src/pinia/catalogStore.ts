@@ -90,7 +90,8 @@ export const useCatalogStore = defineStore('catalog', () => {
 		if (!product || !product.slug) return
 		// Filter out duplicate if it already exists (checking slug and stringified id for safety)
 		const filtered = recentlyViewed.value.filter(
-			p => p && p.slug !== product.slug && String(p.id) !== String(product.id)
+			(p) =>
+				p && p.slug !== product.slug && String(p.id) !== String(product.id),
 		)
 		// Limit to 5 items to show up to 4 other items (filtering out the current one)
 		recentlyViewed.value = [product, ...filtered].slice(0, 5)

@@ -27,20 +27,30 @@ import watchBraceletsFlatImage from '/display/watch-hero.png'
 						class="relative flex h-full w-full flex-col items-center justify-center overflow-hidden md:col-span-4 md:px-10"
 					>
 						<!-- Glow dourado que aparece no hover -->
-						<div class="absolute z-10 h-48 w-48 rounded-full bg-black opacity-0 blur-3xl transition duration-700 group-hover:opacity-30 md:h-72 md:w-72"></div>
+						<div
+							class="absolute z-10 h-48 w-48 rounded-full bg-black opacity-0 blur-3xl transition duration-700 group-hover:opacity-30 md:h-72 md:w-72"
+						></div>
 
 						<!-- Relógio: escala suave + ligeiro float no hover -->
 						<img
 							:src="watchFrontImage"
 							alt="Relógio em destaque"
-							class="relative z-20 my-5 aspect-auto drop-shadow-2xl md:my-0 md:scale-[180%] md:transition md:duration-700 md:group-hover:scale-[200%] md:group-hover:-translate-y-3 max-h-[24rem] object-contain"
+							class="relative z-20 my-5 aspect-auto max-h-[24rem] object-contain drop-shadow-2xl md:my-0 md:scale-[180%] md:transition md:duration-700 md:group-hover:-translate-y-3 md:group-hover:scale-[200%]"
 						/>
 
 						<!-- Anéis decorativos — respiram no hover -->
-						<div class="absolute h-[12rem] w-[12rem] rounded-full border border-black opacity-30 transition duration-700 group-hover:scale-110 group-hover:opacity-50 md:h-[18rem] md:w-[18rem]"></div>
-						<div class="absolute h-[20rem] w-[20rem] rounded-full border border-black opacity-20 transition duration-1000 group-hover:scale-105 group-hover:opacity-40 md:h-[26rem] md:w-[26rem]"></div>
-						<div class="absolute h-[26rem] w-[26rem] rounded-full border border-black opacity-10 transition duration-1000 group-hover:scale-100 group-hover:opacity-30 md:h-[36rem] md:w-[36rem]"></div>
-						<div class="absolute h-[32rem] w-[32rem] rounded-full border border-black opacity-10 transition duration-700 group-hover:scale-95 md:h-[46rem] md:w-[46rem]"></div>
+						<div
+							class="absolute h-[12rem] w-[12rem] rounded-full border border-black opacity-30 transition duration-700 group-hover:scale-110 group-hover:opacity-50 md:h-[18rem] md:w-[18rem]"
+						></div>
+						<div
+							class="absolute h-[20rem] w-[20rem] rounded-full border border-black opacity-20 transition duration-1000 group-hover:scale-105 group-hover:opacity-40 md:h-[26rem] md:w-[26rem]"
+						></div>
+						<div
+							class="absolute h-[26rem] w-[26rem] rounded-full border border-black opacity-10 transition duration-1000 group-hover:scale-100 group-hover:opacity-30 md:h-[36rem] md:w-[36rem]"
+						></div>
+						<div
+							class="absolute h-[32rem] w-[32rem] rounded-full border border-black opacity-10 transition duration-700 group-hover:scale-95 md:h-[46rem] md:w-[46rem]"
+						></div>
 					</router-link>
 
 					<div
@@ -53,9 +63,10 @@ import watchBraceletsFlatImage from '/display/watch-hero.png'
 							MTP-1274
 						</h2>
 						<p
-							class="mb-8 mt-4 text-center tracking-wide md:mb-10 md:text-start line-clamp-3"
+							class="mb-8 mt-4 line-clamp-3 text-center tracking-wide md:mb-10 md:text-start"
 						>
-							Precisão japonesa num design atemporal. Aço inoxidável, mostrador elegante e resistência para o dia-a-dia.
+							Precisão japonesa num design atemporal. Aço inoxidável, mostrador
+							elegante e resistência para o dia-a-dia.
 						</p>
 						<ButtonSolid
 							to="/homens"
@@ -79,10 +90,7 @@ import watchBraceletsFlatImage from '/display/watch-hero.png'
 				/>
 				<div class="flex flex-col items-center gap-4 p-6 md:items-start">
 					<h2 class="text-3xl font-semibold uppercase">Relógios</h2>
-					<ButtonEmpty
-						:to="{ path: '/homens' }"
-						content="ver coleção"
-					/>
+					<ButtonEmpty :to="{ path: '/homens' }" content="ver coleção" />
 				</div>
 			</div>
 
@@ -92,7 +100,7 @@ import watchBraceletsFlatImage from '/display/watch-hero.png'
 				class="order-2 flex h-64 flex-col items-center justify-center overflow-hidden rounded-md bg-k-grey text-black md:order-none md:col-span-4 md:row-span-2 md:block md:h-full"
 			>
 				<img
-					class="h-full w-full scale-110 object-cover grayscale duration-300 hover:grayscale-0 hover:scale-105 transition"
+					class="h-full w-full scale-110 object-cover grayscale transition duration-300 hover:scale-105 hover:grayscale-0"
 					:src="watchDetailImage"
 					alt="Detalhe de relógio premium"
 				/>

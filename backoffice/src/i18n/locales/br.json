@@ -91,19 +91,19 @@
     "persian": "Persa"
   },
   "menu": {
-    "auth": "Autenticação",
-    "buttons": "Botões",
-    "timelines": "Linhas do Tempo",
     "dashboard": "Painel de Controle",
-    "billing": "Cobrança",
-    "login": "Entrar",
-    "signUp": "Cadastrar-se",
+    "users": "Usuários",
+    "products": "Produtos",
+    "orders": "Encomendas",
+    "brands": "Marcas",
+    "categories": "Categorias",
+    "shipping": "Envios",
+    "shippingMethods": "Métodos",
+    "shippingZones": "Zonas",
+    "reports": "Relatórios",
+    "tickets": "Suporte",
     "preferences": "Preferências",
-    "payments": "Pagamentos",
-    "pricing-plans": "Planos de Preços",
-    "login-singup": "Entrar/Cadastrar",
-    "404": "Páginas 404",
-    "faq": "FAQ"
+    "settings": "Configurações"
   },
   "messages": {
     "all": "Ver todas as mensagens",

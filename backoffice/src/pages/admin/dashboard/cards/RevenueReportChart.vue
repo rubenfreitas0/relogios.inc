@@ -5,62 +5,46 @@
 </template>
 
 <script lang="ts" setup>
-import { ref, onMounted, nextTick } from 'vue'
+import { ref, onMounted, watch } from 'vue'
 import { Chart, registerables } from 'chart.js'
+import type { DashboardStats } from '../../../../stores/dashboard-store'
 
-import type { Revenues } from '../../../../data/charts/revenueChartData'
-import { earningsColor, expensesColor, formatMoney } from '../../../../data/charts/revenueChartData'
-
-const { revenues, months } = defineProps<{
-  months: string[]
-  revenues: Revenues[]
+const { byMonth } = defineProps<{
+  byMonth: DashboardStats['revenue']['by_month']
 }>()
 
 Chart.register(...registerables)
 
-const BR_THICKNESS = 4
-
-Chart.register([
-  {
-    id: 'background-color',
-    beforeDatasetDraw: function (chart) {
-      const ctx = chart.ctx
-      const config = chart.config
-
-      config.data.datasets.forEach(function (dataset, datasetIndex) {
-        const meta = chart.getDatasetMeta(datasetIndex)
-        if (meta.type === 'bar') {
-          const bgColor = earningsColor
-
-          // Loop through each bar in the dataset
-          meta.data.forEach(function (bar) {
-            ctx.fillStyle = bgColor
-            ctx.fillRect(bar.x - BR_THICKNESS / 2, 0, BR_THICKNESS, chart.chartArea.bottom)
-          })
-        }
-      })
-    },
-  },
-])
-
 const canvas = ref<HTMLCanvasElement | null>(null)
+let chartInstance: Chart | null = null
 
-const doShowChart = ref(false)
+const formatMoney = (amount: number) => {
+  return new Intl.NumberFormat('pt-PT', {
+    style: 'currency',
+    currency: 'EUR',
+    maximumFractionDigits: 0,
+  }).format(amount)
+}
 
-onMounted(() => {
+const renderChart = () => {
+  if (chartInstance) {
+    chartInstance.destroy()
+  }
+
   if (canvas.value) {
     const ctx = canvas.value.getContext('2d')
     if (ctx) {
-      new Chart(ctx, {
+      chartInstance = new Chart(ctx, {
         type: 'bar',
         data: {
-          labels: months,
+          labels: byMonth.map((d) => d.label),
           datasets: [
             {
-              // Show relative expenses ratio
-              data: revenues.map(({ earning, expenses }) => (expenses / earning) * 100),
-              backgroundColor: expensesColor,
-              barThickness: BR_THICKNESS,
+              label: 'Faturação (€)',
+              data: byMonth.map((d) => d.total),
+              backgroundColor: '#154EC1',
+              borderRadius: 6,
+              barThickness: 24,
             },
           ],
         },
@@ -70,10 +54,16 @@ onMounted(() => {
             legend: {
               display: false,
             },
+            tooltip: {
+              callbacks: {
+                label: function (context) {
+                  return `Faturação: ${formatMoney(Number(context.raw))}`
+                },
+              },
+            },
           },
           scales: {
             x: {
-              stacked: true,
               grid: {
                 display: false,
               },
@@ -82,7 +72,6 @@ onMounted(() => {
               },
             },
             y: {
-              display: false,
               beginAtZero: true,
               ticks: {
                 callback: function (value) {
@@ -95,11 +84,19 @@ onMounted(() => {
       })
     }
   }
+}
 
-  nextTick(() => {
-    doShowChart.value = true
-  })
+onMounted(() => {
+  renderChart()
 })
+
+watch(
+  () => byMonth,
+  () => {
+    renderChart()
+  },
+  { deep: true },
+)
 </script>
 
 <style lang="scss" scoped>

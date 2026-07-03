@@ -71,7 +71,8 @@ class CheckoutService
                     throw new CheckoutException("O produto '{$item->product->name}' já não está disponível.");
                 }
 
-                $subtotal    += $item->quantity * $item->product->price;
+                $itemPrice = $item->product->discount_price ?? $item->product->price;
+                $subtotal    += $item->quantity * $itemPrice;
                 $totalWeight += ($item->product->weight ?? 0) * $item->quantity;
             }
 
@@ -157,14 +158,15 @@ class CheckoutService
             // ─── 10. Snapshot dos items (bulk insert) ───
             $orderItemsData = [];
             foreach ($cartItems as $item) {
+                $itemPrice = $item->product->discount_price ?? $item->product->price;
                 $orderItemsData[] = [
                     'order_id'      => $order->id,
                     'product_id'    => $item->product->id,
                     'product_name'  => $item->product->name,
                     'product_image' => $item->product->primaryImage?->url ?? null,
-                    'unit_price'    => $item->product->price,
+                    'unit_price'    => $itemPrice,
                     'quantity'      => $item->quantity,
-                    'item_total'    => round($item->quantity * $item->product->price, 2),
+                    'item_total'    => round($item->quantity * $itemPrice, 2),
                     'created_at'    => now(),
                     'updated_at'    => now(),
                 ];

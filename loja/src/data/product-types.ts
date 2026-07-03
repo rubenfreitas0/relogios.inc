@@ -30,11 +30,12 @@ export interface Product {
 	short_description?: string
 	description?: string
 	price: number | string
+	discount_price?: number | string | null
 	stock: number
 	is_active: boolean
 	is_featured: boolean
 	gender: string
-	
+
 	brand?: Brand
 	category?: Category
 	images?: ProductImage[]

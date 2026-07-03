@@ -114,12 +114,17 @@ async function handleReset() {
 	if (isRateLimited.value) return
 
 	const emEl = document.getElementById('reset-email') as HTMLInputElement | null
-	const pwEl = document.getElementById('reset-password') as HTMLInputElement | null
-	const coEl = document.getElementById('reset-confirm') as HTMLInputElement | null
+	const pwEl = document.getElementById(
+		'reset-password',
+	) as HTMLInputElement | null
+	const coEl = document.getElementById(
+		'reset-confirm',
+	) as HTMLInputElement | null
 
 	if (emEl && emEl.value && !email.value) email.value = emEl.value
 	if (pwEl && pwEl.value && !password.value) password.value = pwEl.value
-	if (coEl && coEl.value && !passwordConfirmation.value) passwordConfirmation.value = coEl.value
+	if (coEl && coEl.value && !passwordConfirmation.value)
+		passwordConfirmation.value = coEl.value
 
 	if (checkRateLimit()) return
 
@@ -490,21 +495,43 @@ async function handleReset() {
 											d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z"
 										/>
 									</svg>
-									{{ isRateLimited ? `Bloqueado (${cooldownSeconds}s)` : auth.isLoading ? 'A guardar...' : 'Guardar nova password' }}
+									{{
+										isRateLimited
+											? `Bloqueado (${cooldownSeconds}s)`
+											: auth.isLoading
+											? 'A guardar...'
+											: 'Guardar nova password'
+									}}
 								</button>
 							</form>
 
 							<!-- Dev Helper -->
-							<div v-if="isDev" class="mt-6 pt-4 border-t border-white/5 flex justify-center">
+							<div
+								v-if="isDev"
+								class="mt-6 flex justify-center border-t border-white/5 pt-4"
+							>
 								<button
 									type="button"
 									@click="injectTestData"
-									class="text-xs text-k-main/60 hover:text-k-main transition duration-200 flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-white/5 hover:bg-white/10"
+									class="flex items-center gap-1.5 rounded-lg bg-white/5 px-3 py-1.5 text-xs text-k-main/60 transition duration-200 hover:bg-white/10 hover:text-k-main"
 								>
-									<svg class="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-										<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z" />
+									<svg
+										class="h-3.5 w-3.5"
+										fill="none"
+										viewBox="0 0 24 24"
+										stroke="currentColor"
+									>
+										<path
+											stroke-linecap="round"
+											stroke-linejoin="round"
+											stroke-width="2"
+											d="M13 10V3L4 14h7v7l9-11h-7z"
+										/>
 									</svg>
-									Preencher dados de teste <span class="text-white/30 text-[10px] font-mono ml-1">(Ctrl+Shift+Y)</span>
+									Preencher dados de teste
+									<span class="ml-1 font-mono text-[10px] text-white/30"
+										>(Ctrl+Shift+Y)</span
+									>
 								</button>
 							</div>
 

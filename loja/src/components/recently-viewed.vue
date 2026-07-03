@@ -113,9 +113,23 @@ const formatPrice = (price?: number | string) => {
 					<div class="mt-auto"></div>
 
 					<!-- Price -->
-					<p class="mt-2 text-sm font-bold tracking-tight text-white">
-						{{ formatPrice(item.price) }}
-					</p>
+					<div class="mt-2 flex flex-col leading-tight">
+						<span
+							v-if="item.discount_price"
+							class="text-[0.7rem] text-white/40 line-through"
+						>
+							{{ formatPrice(item.price) }}
+						</span>
+						<span
+							class="text-sm font-bold tracking-tight text-[#FFC700]"
+							v-if="item.discount_price"
+						>
+							{{ formatPrice(item.discount_price) }}
+						</span>
+						<span v-else class="text-sm font-bold tracking-tight text-white">
+							{{ formatPrice(item.price) }}
+						</span>
+					</div>
 					<!-- Stock status -->
 					<div class="flex items-center gap-1.5">
 						<template v-if="item.stock > 0">

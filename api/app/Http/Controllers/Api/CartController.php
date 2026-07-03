@@ -21,7 +21,7 @@ class CartController extends Controller
         $cartItems = $request->user()->cartItems()->with(['product.primaryImage'])->get();
 
         $total = $cartItems->sum(function ($item) {
-            return $item->quantity * $item->product->price;
+            return $item->quantity * ($item->product->discount_price ?? $item->product->price);
         });
 
         return response()->json([

@@ -65,7 +65,7 @@
           <VaCard>
             <VaCardTitle class="font-semibold">Preço e Stock</VaCardTitle>
             <VaCardContent>
-              <div class="grid grid-cols-1 sm:grid-cols-3 gap-4">
+              <div class="grid grid-cols-1 sm:grid-cols-4 gap-4">
                 <VaInput
                   v-model="form.price"
                   label="Preço (€)"
@@ -73,6 +73,16 @@
                   step="0.01"
                   min="0"
                   :rules="[required, minZero]"
+                />
+
+                <VaInput
+                  v-model="form.discount_price"
+                  label="Preço de Desconto (€)"
+                  type="number"
+                  step="0.01"
+                  min="0"
+                  placeholder="Opcional"
+                  :rules="[lessThanPrice]"
                 />
 
                 <VaInput
@@ -317,6 +327,7 @@ const form = reactive({
   short_description: '',
   description: '',
   price: '',
+  discount_price: '',
   stock: 0,
   weight: '',
   brand_id: null as number | null,
@@ -344,6 +355,8 @@ const genderOptions = [
 // — Validators —
 const required = (v: any) => !!v || v === 0 || 'Este campo é obrigatório'
 const minZero = (v: any) => Number(v) >= 0 || 'O valor não pode ser negativo'
+const lessThanPrice = (v: any) =>
+  !v || !form.price || Number(v) < Number(form.price) || 'O desconto deve ser menor que o preço original'
 
 // — Helpers —
 function formatDate(iso: string): string {
@@ -380,6 +393,7 @@ function populateForm(product: Product) {
   form.short_description = product.short_description || ''
   form.description = product.description || ''
   form.price = String(product.price)
+  form.discount_price = product.discount_price ? String(product.discount_price) : ''
   form.stock = product.stock
   form.weight = product.weight ? String(product.weight) : ''
   form.brand_id = product.brand?.id ?? null
@@ -410,6 +424,11 @@ function buildFormData(): FormData {
   fd.append('short_description', form.short_description || '')
   fd.append('description', form.description || '')
   fd.append('price', form.price)
+  if (form.discount_price !== null && form.discount_price !== '') {
+    fd.append('discount_price', form.discount_price)
+  } else {
+    fd.append('discount_price', '')
+  }
   fd.append('stock', String(form.stock))
   if (form.weight) fd.append('weight', form.weight)
   if (form.brand_id) fd.append('brand_id', String(form.brand_id))

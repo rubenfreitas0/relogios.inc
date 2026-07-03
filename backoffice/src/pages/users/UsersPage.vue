@@ -5,12 +5,10 @@ import EditUserForm from './widgets/EditUserForm.vue'
 import { User } from './types'
 import { useUsers } from './composables/useUsers'
 import { useModal, useToast } from 'vuestic-ui'
-import { useProjects } from '../projects/composables/useProjects'
 
 const doShowEditUserModal = ref(false)
 
 const { users, isLoading, filters, sorting, pagination, error, ...usersApi } = useUsers()
-const { projects } = useProjects()
 
 const userToEdit = ref<User | null>(null)
 
@@ -119,7 +117,6 @@ const beforeEditFormModalClose = async (hide: () => unknown) => {
         v-model:sort-by="sorting.sortBy"
         v-model:sorting-order="sorting.sortingOrder"
         :users="users"
-        :projects="projects"
         :loading="isLoading"
         :pagination="pagination"
         @editUser="showEditUserModal"

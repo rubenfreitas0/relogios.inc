@@ -1,7 +1,7 @@
 export interface INavigationRoute {
   name: string
   displayName: string
-  meta: { icon: string }
+  meta?: { icon: string }
   children?: INavigationRoute[]
 }
 
@@ -18,52 +18,6 @@ export default {
         icon: 'vuestic-iconset-dashboard',
       },
     },
-    // — Relogios.inc custom pages —
-    {
-      name: 'products',
-      displayName: 'Produtos',
-      meta: {
-        icon: 'watch',
-      },
-    },
-    {
-      name: 'orders',
-      displayName: 'Encomendas',
-      meta: {
-        icon: 'shopping_cart',
-      },
-    },
-    {
-      name: 'brands',
-      displayName: 'Marcas',
-      meta: {
-        icon: 'sell',
-      },
-    },
-    {
-      name: 'categories',
-      displayName: 'Categorias',
-      meta: {
-        icon: 'category',
-      },
-    },
-    {
-      name: 'shipping',
-      displayName: 'Envios',
-      meta: {
-        icon: 'local_shipping',
-      },
-      children: [
-        {
-          name: 'shipping-methods',
-          displayName: 'Métodos',
-        },
-        {
-          name: 'shipping-zones',
-          displayName: 'Zonas',
-        },
-      ],
-    },
     {
       name: 'users',
       displayName: 'menu.users',
@@ -72,25 +26,63 @@ export default {
       },
     },
     {
-      name: 'payments',
-      displayName: 'menu.payments',
+      name: 'products',
+      displayName: 'menu.products',
       meta: {
-        icon: 'credit_card',
+        icon: 'watch',
+      },
+    },
+    {
+      name: 'orders',
+      displayName: 'menu.orders',
+      meta: {
+        icon: 'shopping_cart',
+      },
+    },
+    {
+      name: 'brands',
+      displayName: 'menu.brands',
+      meta: {
+        icon: 'sell',
+      },
+    },
+    {
+      name: 'categories',
+      displayName: 'menu.categories',
+      meta: {
+        icon: 'category',
+      },
+    },
+    {
+      name: 'shipping',
+      displayName: 'menu.shipping',
+      meta: {
+        icon: 'local_shipping',
       },
       children: [
         {
-          name: 'payment-methods',
-          displayName: 'menu.payment-methods',
+          name: 'shipping-methods',
+          displayName: 'menu.shippingMethods',
         },
         {
-          name: 'pricing-plans',
-          displayName: 'menu.pricing-plans',
-        },
-        {
-          name: 'billing',
-          displayName: 'menu.billing',
+          name: 'shipping-zones',
+          displayName: 'menu.shippingZones',
         },
       ],
+    },
+    {
+      name: 'reports',
+      displayName: 'menu.reports',
+      meta: {
+        icon: 'bar_chart',
+      },
+    },
+    {
+      name: 'tickets',
+      displayName: 'menu.tickets',
+      meta: {
+        icon: 'forum',
+      },
     },
     {
       name: 'preferences',
