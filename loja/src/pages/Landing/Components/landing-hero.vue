@@ -1,6 +1,44 @@
-<script lang="ts" setup>
+<script setup lang="ts">
+import { ref, onMounted } from 'vue'
 import ButtonSolid from '../../../components/Buttons/button-solid.vue'
-import watchImage from '/products/keyboards/relogio2.png'
+import defaultWatchImage from '/products/keyboards/relogio2.png'
+
+const heroData = ref({
+	hero_subtitle: 'nova coleção',
+	hero_title: 'CASIO MTP-1274 \n DARK EDITION \n COLEÇÃO PREMIUM',
+	hero_description: 'Na RELOGIOS.inc selecionamos apenas o que resiste ao tempo.\nO Casio MTP-1274 combina aço inoxidável, precisão e um\ndesign atemporal que se adapta a qualquer ocasião.',
+	hero_image: defaultWatchImage,
+	hero_link: '/homens',
+	hero_button_text: 'ver relógio',
+})
+
+onMounted(async () => {
+	try {
+		const res = await fetch('/api/site-settings/hero')
+		if (res.ok) {
+			const data = await res.json()
+			if (data.hero_subtitle) heroData.value.hero_subtitle = data.hero_subtitle
+			if (data.hero_title) heroData.value.hero_title = data.hero_title
+			if (data.hero_description) heroData.value.hero_description = data.hero_description
+			if (data.hero_image) {
+				// Se a imagem for caminho do Laravel (ex: site/imagem.png), formatar a url
+				if (!data.hero_image.startsWith('http') && !data.hero_image.startsWith('/')) {
+					heroData.value.hero_image = `/api/storage/${data.hero_image}`
+				} else {
+					heroData.value.hero_image = data.hero_image
+				}
+			}
+			if (data.hero_link) heroData.value.hero_link = data.hero_link
+			if (data.hero_button_text) heroData.value.hero_button_text = data.hero_button_text
+		}
+	} catch (e) {
+		console.error('Erro ao buscar definições do Hero:', e)
+	}
+})
+
+const formatText = (text: string) => {
+	return text.replace(/\n/g, '<br />')
+}
 </script>
 
 <template>
@@ -14,26 +52,19 @@ import watchImage from '/products/keyboards/relogio2.png'
 				class="relative z-10 flex flex-col items-center justify-center pb-6 sm:ml-0 md:ml-10 md:items-start lg:ml-0"
 			>
 				<p class="md:text-md text-sm font-light uppercase tracking-broad">
-					nova coleção
+					{{ heroData.hero_subtitle }}
 				</p>
 				<h1
 					class="relative mt-4 text-5xl font-semibold uppercase text-white md:text-6xl"
-				>
-					CASIO MTP-1274 <br class="hidden md:block lg:hidden" />
-					DARK EDITION
-					<br />
-					COLEÇÃO PREMIUM
-				</h1>
-				<p class="mb-10 mt-5 md:opacity-90">
-					Na RELOGIOS.inc selecionamos apenas o que resiste ao tempo.
-					<br class="hidden md:inline" />
-					O Casio MTP-1274 combina aço inoxidável, precisão e um
-					<br class="hidden md:inline" />
-					design atemporal que se adapta a qualquer ocasião.
-				</p>
+					v-html="formatText(heroData.hero_title)"
+				></h1>
+				<p 
+					class="mb-10 mt-5 md:opacity-90"
+					v-html="formatText(heroData.hero_description)"
+				></p>
 				<ButtonSolid
-					to="/homens"
-					content="ver relógio"
+					:to="heroData.hero_link"
+					:content="heroData.hero_button_text"
 					color="light"
 					add="font-bold mb-20"
 				/>
@@ -43,8 +74,8 @@ import watchImage from '/products/keyboards/relogio2.png'
 			>
 				<img
 					class="relative top-12 scale-[175%] md:top-20 md:scale-[175%] lg:top-12 lg:scale-150"
-					:src="watchImage"
-					alt="Casio MTP-1274 Dark Edition"
+					:src="heroData.hero_image"
+					:alt="heroData.hero_title"
 				/>
 			</div>
 		</div>

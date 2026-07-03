@@ -1,10 +1,43 @@
 <script setup lang="ts">
+import { ref, onMounted } from 'vue'
 import ButtonEmpty from '../../../components/Buttons/button-empty.vue'
 import ButtonSolid from '../../../components/Buttons/button-solid.vue'
-import watchFrontImage from '/products/categories/relogiocontainer1.png'
+import defaultWatchFrontImage from '/products/categories/relogiocontainer1.png'
 import watchDetailImage from '/display/watch-detail.png'
 import watchBraceletsImage from '/display/about-movement.png'
 import watchBraceletsFlatImage from '/display/watch-hero.png'
+
+const gridHeroData = ref({
+	grid_hero_title: 'Casio \nMTP-1274',
+	grid_hero_description: 'Precisão japonesa num design atemporal. Aço inoxidável, mostrador elegante e resistência para o dia-a-dia.',
+	grid_hero_image: defaultWatchFrontImage,
+	grid_hero_link: '/homens',
+})
+
+onMounted(async () => {
+	try {
+		const res = await fetch('/api/site-settings/hero')
+		if (res.ok) {
+			const data = await res.json()
+			if (data.grid_hero_title) gridHeroData.value.grid_hero_title = data.grid_hero_title
+			if (data.grid_hero_description) gridHeroData.value.grid_hero_description = data.grid_hero_description
+			if (data.grid_hero_image) {
+				if (!data.grid_hero_image.startsWith('http') && !data.grid_hero_image.startsWith('/')) {
+					gridHeroData.value.grid_hero_image = `/api/storage/${data.grid_hero_image}`
+				} else {
+					gridHeroData.value.grid_hero_image = data.grid_hero_image
+				}
+			}
+			if (data.grid_hero_link) gridHeroData.value.grid_hero_link = data.grid_hero_link
+		}
+	} catch (e) {
+		console.error('Erro ao buscar definições do Grid Hero:', e)
+	}
+})
+
+const formatText = (text: string) => {
+	return text.replace(/\n/g, '<br />')
+}
 </script>
 
 <template>
@@ -23,7 +56,7 @@ import watchBraceletsFlatImage from '/display/watch-hero.png'
 					class="group order-1 flex h-full w-full flex-col items-center justify-center md:order-none md:grid md:grid-cols-7"
 				>
 					<router-link
-						to="/homens"
+						:to="gridHeroData.grid_hero_link"
 						class="relative flex h-full w-full flex-col items-center justify-center overflow-hidden md:col-span-4 md:px-10"
 					>
 						<!-- Glow dourado que aparece no hover -->
@@ -33,7 +66,7 @@ import watchBraceletsFlatImage from '/display/watch-hero.png'
 
 						<!-- Relógio: escala suave + ligeiro float no hover -->
 						<img
-							:src="watchFrontImage"
+							:src="gridHeroData.grid_hero_image"
 							alt="Relógio em destaque"
 							class="relative z-20 my-5 aspect-auto max-h-[24rem] object-contain drop-shadow-2xl md:my-0 md:scale-[180%] md:transition md:duration-700 md:group-hover:-translate-y-3 md:group-hover:scale-[200%]"
 						/>
@@ -58,18 +91,14 @@ import watchBraceletsFlatImage from '/display/watch-hero.png'
 					>
 						<h2
 							class="text-center text-5xl font-semibold uppercase md:text-start lg:text-6xl"
-						>
-							Casio <br />
-							MTP-1274
-						</h2>
+							v-html="formatText(gridHeroData.grid_hero_title)"
+						></h2>
 						<p
 							class="mb-8 mt-4 line-clamp-3 text-center tracking-wide md:mb-10 md:text-start"
-						>
-							Precisão japonesa num design atemporal. Aço inoxidável, mostrador
-							elegante e resistência para o dia-a-dia.
-						</p>
+							v-html="formatText(gridHeroData.grid_hero_description)"
+						></p>
 						<ButtonSolid
-							to="/homens"
+							:to="gridHeroData.grid_hero_link"
 							content="VER RELÓGIO"
 							add="font-semibold"
 							class="mb-10 self-center md:mb-0 md:self-start"

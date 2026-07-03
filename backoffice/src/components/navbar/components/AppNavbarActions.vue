@@ -1,7 +1,8 @@
 <template>
   <div class="app-navbar-actions">
     <NotificationDropdown class="app-navbar-actions__item" />
-    <ProfileDropdown class="app-navbar-actions__item app-navbar-actions__item--profile mr-1" />
+    <div class="app-navbar-actions__divider"></div>
+    <ProfileDropdown class="app-navbar-actions__item app-navbar-actions__item--profile" />
   </div>
 </template>
 
@@ -18,16 +19,23 @@ defineProps({
 .app-navbar-actions {
   display: flex;
   align-items: center;
+  gap: 4px;
+  margin-right: 8px;
 
   .va-dropdown__anchor {
-    color: var(--va-primary);
-    fill: var(--va-primary);
+    color: var(--va-text-primary);
+    fill: var(--va-text-primary);
+  }
+
+  &__divider {
+    width: 1px;
+    height: 20px;
+    background: rgba(0, 0, 0, 0.08);
+    margin: 0 4px;
   }
 
   &__item {
     padding: 0;
-    margin-left: 0.25rem;
-    margin-right: 0.25rem;
 
     svg {
       height: 20px;
@@ -40,15 +48,6 @@ defineProps({
 
     .va-dropdown-content {
       background-color: var(--va-white);
-    }
-
-    @media screen and (max-width: 640px) {
-      margin-left: 0;
-      margin-right: 0;
-
-      &:first-of-type {
-        margin-left: 0;
-      }
     }
   }
 

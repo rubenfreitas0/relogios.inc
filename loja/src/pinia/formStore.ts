@@ -295,7 +295,7 @@ export const useFormStore = defineStore('form', {
 		},
 		isValidAddress(state: FormState) {
 			if (state.address === '') return 'empty'
-			return new RegExp("^[a-zA-ZÀ-ÿ0-9\\s,.'/ -]+$").test(state.address) ===
+			return new RegExp('^[a-zA-ZÀ-ÿ0-9\\s,.\'/  -]+$').test(state.address) ===
 				true
 				? 'true'
 				: 'false'

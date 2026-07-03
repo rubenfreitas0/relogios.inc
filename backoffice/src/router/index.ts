@@ -105,6 +105,11 @@ const routes: Array<RouteRecordRaw> = [
         path: 'users',
         component: () => import('../pages/users/UsersPage.vue'),
       },
+      {
+        name: 'vitrine',
+        path: 'vitrine',
+        component: () => import('../pages/vitrine/VitrinePage.vue'),
+      },
     ],
   },
   {

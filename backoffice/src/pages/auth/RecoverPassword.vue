@@ -13,13 +13,7 @@
       {{ errorMessage }}
     </VaAlert>
 
-    <VaInput
-      v-model="email"
-      :rules="[validators.required, validators.email]"
-      class="mb-4"
-      label="Email"
-      type="email"
-    />
+    <VaInput v-model="email" :rules="[validators.required, validators.email]" class="mb-4" label="Email" type="email" />
     <VaButton class="w-full mb-2" :loading="isLoading" @click="submit">Enviar email</VaButton>
     <VaButton :to="{ name: 'login' }" class="w-full" preset="secondary">Voltar ao login</VaButton>
   </VaForm>

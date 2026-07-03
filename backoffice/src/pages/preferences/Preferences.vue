@@ -1,9 +1,10 @@
 <template>
-  <h1 class="page-title">Preferences</h1>
-  <div class="flex flex-col p-4 space-y-10 bg-backgroundSecondary rounded-lg">
-    <div class="flex space-x-5">
+  <h1 class="page-title font-bold">Perfil</h1>
+  <div class="flex flex-col p-6 space-y-8 bg-backgroundSecondary rounded-lg">
+    <div class="flex items-center space-x-5">
       <PreferencesHeader />
     </div>
+    <VaDivider />
     <div class="space-y-4 md:space-y-6">
       <Settings @openNameModal="isEditNameModalOpen = true" @openResetPasswordModal="isResetPasswordModalOpen = true" />
     </div>

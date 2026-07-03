@@ -98,5 +98,12 @@ export default {
         icon: 'settings',
       },
     },
+    {
+      name: 'vitrine',
+      displayName: 'menu.vitrine',
+      meta: {
+        icon: 'storefront',
+      },
+    },
   ] as INavigationRoute[],
 }

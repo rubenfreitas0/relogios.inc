@@ -34,6 +34,7 @@ use App\Http\Controllers\Api\Admin\DashboardController as AdminDashboardControll
 use App\Http\Controllers\Api\Admin\UserController as AdminUserController;
 use App\Http\Controllers\Api\Admin\ReportController;
 use App\Http\Controllers\Api\Admin\TicketController as AdminTicketController;
+use App\Http\Controllers\Api\Admin\SiteSettingController;
 
 
 
@@ -61,6 +62,7 @@ Route::prefix('catalog')->group(function () {
 });
 
 Route::get('/shipping', [ShippingController::class, 'index']);
+Route::get('/site-settings/hero', [SiteSettingController::class, 'publicIndex']);
 
 Route::post('/payments/webhook', [PaymentController::class, 'webhook']);
 
@@ -124,5 +126,10 @@ Route::middleware('auth:sanctum')->group(function () {
         // Tickets — admin
         Route::patch('tickets/{ticket}/status', [AdminTicketController::class, 'updateStatus']);
         Route::apiResource('tickets', AdminTicketController::class)->except(['store', 'update']);
+
+        // Definições do site (Vitrine) — admin
+        Route::get('site-settings', [SiteSettingController::class, 'index']);
+        Route::put('site-settings', [SiteSettingController::class, 'update']);
+        Route::post('site-settings/image', [SiteSettingController::class, 'uploadImage']);
     });
 });

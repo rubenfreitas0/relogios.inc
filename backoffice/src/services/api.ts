@@ -140,3 +140,16 @@ export const productImagesApi = {
   setPrimary: (productId: number, imageId: number) =>
     api.patch(`/admin/products/${productId}/images/${imageId}/primary`),
 }
+
+export const siteSettingsApi = {
+  get: () => api.get('/admin/site-settings'),
+  update: (settings: Record<string, unknown>) => api.put('/admin/site-settings', { settings }),
+  uploadImage: (image: File, key: string) => {
+    const formData = new FormData()
+    formData.append('image', image)
+    formData.append('key', key)
+    return api.post('/admin/site-settings/image', formData, {
+      headers: { 'Content-Type': 'multipart/form-data' },
+    })
+  },
+}

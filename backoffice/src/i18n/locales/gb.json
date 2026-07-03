@@ -48,8 +48,9 @@
     "shippingZones": "Zonas",
     "reports": "Relatórios",
     "tickets": "Suporte",
-    "preferences": "Preferências",
-    "settings": "Definições"
+    "preferences": "Perfil",
+    "settings": "Definições",
+    "vitrine": "Vitrine"
   },
   "messages": {
     "all": "See all messages",
