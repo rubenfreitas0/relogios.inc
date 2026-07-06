@@ -2,14 +2,14 @@
 import arrowIcon from '/icons/right-arrow.svg'
 
 const props = defineProps<{
-	src: string
-	category: string
-	imgClass: string | string[]
+  src: string
+  category: string
+  imgClass: string | string[]
 }>()
 </script>
 
 <template>
-	<router-link
+	<RouterLink
 		:to="`/${props.category}`"
 		class="group grid max-h-[14rem] w-full grid-cols-1 grid-rows-3 lg:max-h-[16rem]"
 	>
@@ -36,5 +36,5 @@ const props = defineProps<{
 				<img :src="arrowIcon" alt="arrow icon" />
 			</div>
 		</div>
-	</router-link>
+	</RouterLink>
 </template>

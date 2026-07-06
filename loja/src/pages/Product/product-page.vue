@@ -11,30 +11,30 @@ import type { Product } from '../../data/product-types'
 import { ref, onMounted, watch } from 'vue'
 
 const props = defineProps<{
-	category: string
-	productSlug: string
+  category: string
+  productSlug: string
 }>()
 
 const catalogStore = useCatalogStore()
 const item = ref<Product | null>(null)
 
 const loadProduct = async () => {
-	const data = await catalogStore.fetchProductDetail(props.productSlug)
-	if (data) {
-		item.value = data
-		catalogStore.addToRecentlyViewed(data)
-	}
+  const data = await catalogStore.fetchProductDetail(props.productSlug)
+  if (data) {
+    item.value = data
+    catalogStore.addToRecentlyViewed(data)
+  }
 }
 
 onMounted(() => {
-	loadProduct()
+  loadProduct()
 })
 
 watch(
-	() => props.productSlug,
-	() => {
-		loadProduct()
-	},
+  () => props.productSlug,
+  () => {
+    loadProduct()
+  },
 )
 </script>
 
@@ -52,8 +52,8 @@ watch(
 		<div
 			class="flex w-full flex-col items-center border-t border-white/5 bg-k-black py-12 text-white"
 		>
-			<RecentlyViewed :currentSlug="item.slug" />
-			<Ymal :productSlug="item.slug" />
+			<RecentlyViewed :current-slug="item.slug" />
+			<Ymal :product-slug="item.slug" />
 		</div>
 
 		<Footer />

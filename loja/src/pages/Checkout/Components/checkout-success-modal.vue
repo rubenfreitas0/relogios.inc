@@ -7,7 +7,7 @@ import { resolveProductImageUrl } from '../../../utils/utilities'
 const formStore = useFormStore()
 
 const handleClose = () => {
-	formStore.bannerOff()
+  formStore.bannerOff()
 }
 
 const order = computed(() => formStore.lastOrder)
@@ -15,28 +15,28 @@ const firstItem = computed(() => order.value?.items?.[0])
 const payment = computed(() => order.value?.payments?.[0])
 
 function formatReference(ref: string | number): string {
-	const str = String(ref)
-	return `${str.substring(0, 3)} ${str.substring(3, 6)} ${str.substring(6, 9)}`
+  const str = String(ref)
+  return `${str.substring(0, 3)} ${str.substring(3, 6)} ${str.substring(6, 9)}`
 }
 
 function formatDate(iso: string): string {
-	return new Date(iso).toLocaleDateString('pt-PT', {
-		day: '2-digit',
-		month: '2-digit',
-		year: 'numeric',
-		hour: '2-digit',
-		minute: '2-digit',
-	})
+  return new Date(iso).toLocaleDateString('pt-PT', {
+    day: '2-digit',
+    month: '2-digit',
+    year: 'numeric',
+    hour: '2-digit',
+    minute: '2-digit',
+  })
 }
 
 onBeforeMount(() => {
-	if (formStore.showBanner) {
-		document.body.classList.add('overflow-y-hidden')
-	}
+  if (formStore.showBanner) {
+    document.body.classList.add('overflow-y-hidden')
+  }
 })
 
 onBeforeUnmount(() => {
-	document.body.classList.remove('overflow-y-hidden')
+  document.body.classList.remove('overflow-y-hidden')
 })
 </script>
 <template>
@@ -46,11 +46,11 @@ onBeforeUnmount(() => {
 			class="fixed z-40 flex h-full w-full flex-col items-center backdrop-blur-sm"
 			data-test="checkout-success-modal"
 		>
-			<router-link
+			<RouterLink
 				to="/"
-				@click="handleClose()"
 				class="absolute h-screen w-full bg-black opacity-40"
-			></router-link>
+				@click="handleClose()"
+			></RouterLink>
 			<div
 				class="relative z-10 mx-4 mt-6 flex max-h-[90vh] w-full max-w-xl flex-col overflow-y-auto rounded-md bg-white p-10 md:mt-20 md:p-12"
 			>
@@ -195,11 +195,11 @@ onBeforeUnmount(() => {
 				</div>
 				<ButtonSolid
 					to="/"
-					@click="handleClose()"
 					color="light"
 					content="back to home"
 					class="mt-6 self-center font-bold"
 					data-test="checkout-success-modal-button"
+					@click="handleClose()"
 				/>
 			</div>
 		</div>

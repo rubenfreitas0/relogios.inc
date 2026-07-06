@@ -3,24 +3,24 @@
 import type { RouteLocationRaw } from 'vue-router'
 
 interface Props {
-	content?: string
-	add?: string
-	to?: RouteLocationRaw
+  content?: string
+  add?: string
+  to?: RouteLocationRaw
 }
 
 const props = withDefaults(defineProps<Props>(), {
-	content: 'to product',
-	to: '/',
+  content: 'to product',
+  to: '/',
 })
 </script>
 
 <template>
-	<router-link :to="props.to">
+	<RouterLink :to="props.to">
 		<button
 			class="w-52 border-2 border-k-black px-10 py-3 font-bold uppercase tracking-wide text-k-black transition duration-100 hover:translate-y-0.5 hover:shadow-md active:translate-y-1"
 			:class="props.add"
 		>
 			{{ props.content }}
 		</button>
-	</router-link>
+	</RouterLink>
 </template>

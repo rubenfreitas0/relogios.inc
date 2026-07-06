@@ -4,9 +4,9 @@ import cartIcon from '/icons/cart-icon.svg'
 
 <template>
 	<button
-		@click="$emit('addToCart')"
 		class="flex aspect-square h-full cursor-pointer flex-row items-center justify-center transition hover:translate-y-0.5"
 		data-test="button-quick-add"
+		@click="$emit('addToCart')"
 	>
 		<img
 			loading="lazy"

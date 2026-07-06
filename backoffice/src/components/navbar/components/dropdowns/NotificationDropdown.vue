@@ -25,12 +25,7 @@
       <!-- Tickets List -->
       <div class="notification-dropdown__body">
         <div v-if="openTickets.length > 0" class="notification-dropdown__list">
-          <a
-            v-for="item in openTickets"
-            :key="item.id"
-            class="notification-dropdown__ticket"
-            @click="goToTicket"
-          >
+          <a v-for="item in openTickets" :key="item.id" class="notification-dropdown__ticket" @click="goToTicket">
             <div class="notification-dropdown__ticket-dot"></div>
             <div class="notification-dropdown__ticket-info">
               <div class="notification-dropdown__ticket-subject">{{ item.subject }}</div>

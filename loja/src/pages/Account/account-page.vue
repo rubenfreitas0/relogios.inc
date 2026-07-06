@@ -10,28 +10,28 @@ const router = useRouter()
 const route = useRoute()
 
 onMounted(() => {
-	if (!authStore.token) {
-		router.push('/login')
-	}
+  if (!authStore.token) {
+    router.push('/login')
+  }
 })
 
 const tabs = [
-	{ label: 'Perfil', path: '/conta/perfil', icon: 'user' },
-	{ label: 'Encomendas', path: '/conta/encomendas', icon: 'orders' },
-	{ label: 'Moradas', path: '/conta/moradas', icon: 'address' },
-	{ label: 'Ajuda & Suporte', path: '/conta/ajuda', icon: 'help' },
+  { label: 'Perfil', path: '/conta/perfil', icon: 'user' },
+  { label: 'Encomendas', path: '/conta/encomendas', icon: 'orders' },
+  { label: 'Moradas', path: '/conta/moradas', icon: 'address' },
+  { label: 'Ajuda & Suporte', path: '/conta/ajuda', icon: 'help' },
 ]
 
 const activeTab = computed(() => {
-	if (route.path.startsWith('/conta/encomendas')) return '/conta/encomendas'
-	if (route.path.startsWith('/conta/moradas')) return '/conta/moradas'
-	if (route.path.startsWith('/conta/ajuda')) return '/conta/ajuda'
-	return '/conta/perfil'
+  if (route.path.startsWith('/conta/encomendas')) return '/conta/encomendas'
+  if (route.path.startsWith('/conta/moradas')) return '/conta/moradas'
+  if (route.path.startsWith('/conta/ajuda')) return '/conta/ajuda'
+  return '/conta/perfil'
 })
 
 async function handleLogout() {
-	await authStore.logout()
-	router.push('/')
+  await authStore.logout()
+  router.push('/')
 }
 </script>
 
@@ -56,7 +56,7 @@ async function handleLogout() {
 				<nav
 					class="flex flex-row gap-2 overflow-x-auto lg:w-56 lg:flex-shrink-0 lg:flex-col lg:gap-1"
 				>
-					<router-link
+					<RouterLink
 						v-for="tab in tabs"
 						:key="tab.path"
 						:to="tab.path"
@@ -134,15 +134,15 @@ async function handleLogout() {
 							/>
 						</svg>
 						{{ tab.label }}
-					</router-link>
+					</RouterLink>
 
 					<!-- Divider (Desktop) -->
 					<div class="my-3 hidden h-px bg-white/10 lg:block"></div>
 
 					<!-- Logout Button (Desktop) -->
 					<button
-						@click="handleLogout"
 						class="hidden items-center gap-3 whitespace-nowrap rounded-lg border border-transparent px-4 py-3 text-sm font-semibold text-red-400/80 transition-all duration-200 hover:bg-red-500/10 hover:text-red-400 lg:flex"
+						@click="handleLogout"
 					>
 						<svg
 							class="h-4 w-4 flex-shrink-0"
@@ -163,7 +163,7 @@ async function handleLogout() {
 
 				<!-- Content area -->
 				<div class="min-w-0 flex-1">
-					<router-view />
+					<RouterView />
 				</div>
 			</div>
 		</div>

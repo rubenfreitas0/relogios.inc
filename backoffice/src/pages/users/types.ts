@@ -9,4 +9,5 @@ export type User = {
   avatar: string
   notes: string
   active: boolean
+  password?: string
 }

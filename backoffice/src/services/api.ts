@@ -1,6 +1,5 @@
 import axios from 'axios'
 import type { AxiosInstance, InternalAxiosRequestConfig, AxiosResponse } from 'axios'
-import router from '../router'
 
 /**
  * Axios client configurado para a API da loja.
@@ -33,7 +32,9 @@ api.interceptors.response.use(
     if (error.response?.status === 401) {
       localStorage.removeItem('backoffice_auth_token')
       localStorage.removeItem('backoffice_auth_user')
-      router.push({ name: 'login' })
+      import('../router').then((m) => {
+        m.default.push({ name: 'login' })
+      })
     }
     return Promise.reject(error)
   },

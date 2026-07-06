@@ -8,35 +8,35 @@ import watchBraceletsImage from '/display/about-movement.png'
 import watchBraceletsFlatImage from '/display/watch-hero.png'
 
 const gridHeroData = ref({
-	grid_hero_title: 'Casio \nMTP-1274',
-	grid_hero_description: 'Precisão japonesa num design atemporal. Aço inoxidável, mostrador elegante e resistência para o dia-a-dia.',
-	grid_hero_image: defaultWatchFrontImage,
-	grid_hero_link: '/homens',
+  grid_hero_title: 'Casio \nMTP-1274',
+  grid_hero_description: 'Precisão japonesa num design atemporal. Aço inoxidável, mostrador elegante e resistência para o dia-a-dia.',
+  grid_hero_image: defaultWatchFrontImage,
+  grid_hero_link: '/homens',
 })
 
 onMounted(async () => {
-	try {
-		const res = await fetch('/api/site-settings/hero')
-		if (res.ok) {
-			const data = await res.json()
-			if (data.grid_hero_title) gridHeroData.value.grid_hero_title = data.grid_hero_title
-			if (data.grid_hero_description) gridHeroData.value.grid_hero_description = data.grid_hero_description
-			if (data.grid_hero_image) {
-				if (!data.grid_hero_image.startsWith('http') && !data.grid_hero_image.startsWith('/')) {
-					gridHeroData.value.grid_hero_image = `/api/storage/${data.grid_hero_image}`
-				} else {
-					gridHeroData.value.grid_hero_image = data.grid_hero_image
-				}
-			}
-			if (data.grid_hero_link) gridHeroData.value.grid_hero_link = data.grid_hero_link
-		}
-	} catch (e) {
-		console.error('Erro ao buscar definições do Grid Hero:', e)
-	}
+  try {
+    const res = await fetch('/api/site-settings/hero')
+    if (res.ok) {
+      const data = await res.json()
+      if (data.grid_hero_title) gridHeroData.value.grid_hero_title = data.grid_hero_title
+      if (data.grid_hero_description) gridHeroData.value.grid_hero_description = data.grid_hero_description
+      if (data.grid_hero_image) {
+        if (!data.grid_hero_image.startsWith('http') && !data.grid_hero_image.startsWith('/')) {
+          gridHeroData.value.grid_hero_image = `/api/storage/${data.grid_hero_image}`
+        } else {
+          gridHeroData.value.grid_hero_image = data.grid_hero_image
+        }
+      }
+      if (data.grid_hero_link) gridHeroData.value.grid_hero_link = data.grid_hero_link
+    }
+  } catch (e) {
+    console.error('Erro ao buscar definições do Grid Hero:', e)
+  }
 })
 
 const formatText = (text: string) => {
-	return text.replace(/\n/g, '<br />')
+  return text.replace(/\n/g, '<br />')
 }
 </script>
 
@@ -55,7 +55,7 @@ const formatText = (text: string) => {
 				<div
 					class="group order-1 flex h-full w-full flex-col items-center justify-center md:order-none md:grid md:grid-cols-7"
 				>
-					<router-link
+					<RouterLink
 						:to="gridHeroData.grid_hero_link"
 						class="relative flex h-full w-full flex-col items-center justify-center overflow-hidden md:col-span-4 md:px-10"
 					>
@@ -84,7 +84,7 @@ const formatText = (text: string) => {
 						<div
 							class="absolute h-[32rem] w-[32rem] rounded-full border border-black opacity-10 transition duration-700 group-hover:scale-95 md:h-[46rem] md:w-[46rem]"
 						></div>
-					</router-link>
+					</RouterLink>
 
 					<div
 						class="relative z-10 col-span-3 flex h-full w-full flex-col justify-center bg-k-main md:pl-4 md:pr-20 lg:pl-6 lg:pr-24"
@@ -124,7 +124,7 @@ const formatText = (text: string) => {
 			</div>
 
 			<!-- Bloco imagem — detalhe do relógio (grayscale estilo editorial) -->
-			<router-link
+			<RouterLink
 				:to="{ path: '/homens' }"
 				class="order-2 flex h-64 flex-col items-center justify-center overflow-hidden rounded-md bg-k-grey text-black md:order-none md:col-span-4 md:row-span-2 md:block md:h-full"
 			>
@@ -133,7 +133,7 @@ const formatText = (text: string) => {
 					:src="watchDetailImage"
 					alt="Detalhe de relógio premium"
 				/>
-			</router-link>
+			</RouterLink>
 
 			<!-- Bloco imagem — mecanismo de relógio -->
 			<div

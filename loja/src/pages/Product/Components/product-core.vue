@@ -4,8 +4,8 @@ import ButtonGoBack from '../../../components/Buttons/button-go-back.vue'
 import type { Product } from '../../../data/product-types.ts'
 import { useCartStore } from '../../../pinia/cartStore.ts'
 import {
-	resolveProductImageUrl,
-	getProductImageStyle,
+  resolveProductImageUrl,
+  getProductImageStyle,
 } from '../../../utils/utilities'
 import { computed, ref } from 'vue'
 
@@ -13,18 +13,18 @@ const cartStore = useCartStore()
 const selectedQuantity = ref(1)
 
 const props = defineProps<{
-	item: Product
+  item: Product
 }>()
 
 const productImage = computed(() => {
-	const item = props.item
-	if (!item) return ''
-	return (
-		item.primary_image?.url ||
-		item.images?.find((img) => img.is_primary)?.url ||
-		item.images?.[0]?.url ||
-		''
-	)
+  const item = props.item
+  if (!item) return ''
+  return (
+    item.primary_image?.url ||
+    item.images?.find((img) => img.is_primary)?.url ||
+    item.images?.[0]?.url ||
+    ''
+  )
 })
 </script>
 
@@ -105,7 +105,7 @@ const productImage = computed(() => {
 					<span>🚚</span> Encomendas antes das 17:00, enviadas hoje!
 				</p>
 
-				<div class="flex flex-row items-end gap-4">
+				<div v-if="props.item.stock > 0" class="flex flex-row items-end gap-4">
 					<div class="flex flex-col gap-1.5">
 						<label
 							for="quantity"
@@ -129,11 +129,14 @@ const productImage = computed(() => {
 					</div>
 
 					<ButtonSolid
-						@click="cartStore.addToCart(props.item, selectedQuantity)"
 						color="light"
 						add="font-bold w-full"
 						content="adicionar ao carrinho"
+						@click="cartStore.addToCart(props.item, selectedQuantity)"
 					/>
+				</div>
+				<div v-else class="text-white/60 font-semibold uppercase tracking-wider mt-2">
+					Este produto encontra-se temporariamente indisponível para compra.
 				</div>
 			</div>
 

@@ -9,7 +9,7 @@ import { ref, onMounted, watch } from 'vue'
 import { Chart, registerables } from 'chart.js'
 import type { DashboardStats } from '../../../../stores/dashboard-store'
 
-const { byMonth } = defineProps<{
+const props = defineProps<{
   byMonth: DashboardStats['revenue']['by_month']
 }>()
 
@@ -37,11 +37,11 @@ const renderChart = () => {
       chartInstance = new Chart(ctx, {
         type: 'bar',
         data: {
-          labels: byMonth.map((d) => d.label),
+          labels: props.byMonth.map((d) => d.label),
           datasets: [
             {
               label: 'Faturação (€)',
-              data: byMonth.map((d) => d.total),
+              data: props.byMonth.map((d) => d.total),
               backgroundColor: '#154EC1',
               borderRadius: 6,
               barThickness: 24,
@@ -91,7 +91,7 @@ onMounted(() => {
 })
 
 watch(
-  () => byMonth,
+  () => props.byMonth,
   () => {
     renderChart()
   },

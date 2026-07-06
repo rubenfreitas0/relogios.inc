@@ -7,58 +7,58 @@ const contactMessage = ref('')
 const isSubmitted = ref(false)
 
 const faqs = [
-	{
-		q: 'Como inicio o processo de devolução?',
-		a: 'Pode iniciar o processo enviando um email para devolucoes@relogios.inc ou preenchendo o formulário abaixo. Indique o número da sua encomenda (ex: ORD-XXXX) e o motivo da devolução. Responderemos com as instruções e a etiqueta de envio gratuito no prazo de 24h úteis.',
-	},
-	{
-		q: 'Qual é o prazo para solicitar um reembolso?',
-		a: 'Em conformidade com a legislação portuguesa e europeia (Direito de Livre Resolução), tem o direito de devolver qualquer compra num prazo de 14 dias de calendário a contar da data de receção, sem necessidade de justificação. O reembolso será efetuado pelo mesmo método de pagamento no prazo de 14 dias após validarmos o estado do produto.',
-	},
-	{
-		q: 'Qual é a política de garantia dos relógios?',
-		a: 'Todos os nossos relógios têm uma garantia legal de 3 anos contra defeitos de fabrico. A garantia cobre o mecanismo do relógio. Danos causados por uso inadequado, acidentes ou desgaste natural do bracelete/vidro não estão cobertos.',
-	},
-	{
-		q: 'Posso efetuar uma troca em vez de reembolso?',
-		a: 'Sim, pode trocar o seu artigo por qualquer outro modelo disponível. O processo de devolução do artigo original é idêntico e, assim que o recebermos, processamos o envio do novo relógio.',
-	},
+  {
+    q: 'Como inicio o processo de devolução?',
+    a: 'Pode iniciar o processo enviando um email para devolucoes@relogios.inc ou preenchendo o formulário abaixo. Indique o número da sua encomenda (ex: ORD-XXXX) e o motivo da devolução. Responderemos com as instruções e a etiqueta de envio gratuito no prazo de 24h úteis.',
+  },
+  {
+    q: 'Qual é o prazo para solicitar um reembolso?',
+    a: 'Em conformidade com a legislação portuguesa e europeia (Direito de Livre Resolução), tem o direito de devolver qualquer compra num prazo de 14 dias de calendário a contar da data de receção, sem necessidade de justificação. O reembolso será efetuado pelo mesmo método de pagamento no prazo de 14 dias após validarmos o estado do produto.',
+  },
+  {
+    q: 'Qual é a política de garantia dos relógios?',
+    a: 'Todos os nossos relógios têm uma garantia legal de 3 anos contra defeitos de fabrico. A garantia cobre o mecanismo do relógio. Danos causados por uso inadequado, acidentes ou desgaste natural do bracelete/vidro não estão cobertos.',
+  },
+  {
+    q: 'Posso efetuar uma troca em vez de reembolso?',
+    a: 'Sim, pode trocar o seu artigo por qualquer outro modelo disponível. O processo de devolução do artigo original é idêntico e, assim que o recebermos, processamos o envio do novo relógio.',
+  },
 ]
 
 function toggleFaq(index: number) {
-	openFaq.value = openFaq.value === index ? null : index
+  openFaq.value = openFaq.value === index ? null : index
 }
 
 async function handleContactSubmit() {
-	if (!contactMessage.value.trim()) return
+  if (!contactMessage.value.trim()) return
 
-	const token = localStorage.getItem('auth_token')
-	if (!token) return
+  const token = localStorage.getItem('auth_token')
+  if (!token) return
 
-	try {
-		const res = await fetch('/api/support', {
-			method: 'POST',
-			headers: {
-				'Content-Type': 'application/json',
-				Accept: 'application/json',
-				Authorization: `Bearer ${token}`,
-			},
-			body: JSON.stringify({
-				subject: contactSubject.value,
-				message: contactMessage.value,
-			}),
-		})
+  try {
+    const res = await fetch('/api/support', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        Accept: 'application/json',
+        Authorization: `Bearer ${token}`,
+      },
+      body: JSON.stringify({
+        subject: contactSubject.value,
+        message: contactMessage.value,
+      }),
+    })
 
-		if (res.ok) {
-			isSubmitted.value = true
-			contactMessage.value = ''
-			setTimeout(() => {
-				isSubmitted.value = false
-			}, 5000)
-		}
-	} catch (e) {
-		console.error('Erro ao enviar mensagem de apoio:', e)
-	}
+    if (res.ok) {
+      isSubmitted.value = true
+      contactMessage.value = ''
+      setTimeout(() => {
+        isSubmitted.value = false
+      }, 5000)
+    }
+  } catch (e) {
+    console.error('Erro ao enviar mensagem de apoio:', e)
+  }
 }
 </script>
 
@@ -146,8 +146,8 @@ async function handleContactSubmit() {
 					class="py-4 first:pt-0 last:pb-0"
 				>
 					<button
-						@click="toggleFaq(index)"
 						class="flex w-full items-center justify-between text-left font-semibold text-white/80 transition hover:text-white"
+						@click="toggleFaq(index)"
 					>
 						<span class="text-sm">{{ faq.q }}</span>
 						<svg
@@ -187,7 +187,7 @@ async function handleContactSubmit() {
 				mensagem direta.
 			</p>
 
-			<form @submit.prevent="handleContactSubmit" class="space-y-4">
+			<form class="space-y-4" @submit.prevent="handleContactSubmit">
 				<div class="grid gap-4 sm:grid-cols-2">
 					<div>
 						<label

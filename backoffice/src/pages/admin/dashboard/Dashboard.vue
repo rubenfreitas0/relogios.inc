@@ -2,7 +2,7 @@
 import { onMounted } from 'vue'
 import { useDashboardStore } from '../../../stores/dashboard-store'
 import RevenueUpdates from './cards/RevenueReport.vue'
-import LatestOrdersTable from './cards/LatestOrdersTable.vue'
+import RevenueByLocationMap from './cards/RevenueByLocationMap.vue'
 import DataSection from './DataSection.vue'
 import YearlyBreakup from './cards/YearlyBreakup.vue'
 import MonthlyEarnings from './cards/MonthlyEarnings.vue'
@@ -34,9 +34,9 @@ onMounted(() => {
     <!-- Métricas -->
     <DataSection :stats="store.stats" />
 
-    <!-- Últimas Encomendas -->
+    <!-- Mapa de Receita por Região -->
     <div class="flex flex-col gap-4">
-      <LatestOrdersTable :orders="store.stats.latest_orders" class="w-full" />
+      <RevenueByLocationMap class="w-full" />
     </div>
   </section>
 

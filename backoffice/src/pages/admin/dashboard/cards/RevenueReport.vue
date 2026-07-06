@@ -2,7 +2,9 @@
   <VaCard class="flex flex-col">
     <VaCardTitle class="flex items-start justify-between">
       <h1 class="card-title text-secondary font-bold uppercase">Relatório de Faturação</h1>
-      <div class="flex gap-2">
+      <div class="flex gap-2 items-center">
+        <!-- Filtro de período -->
+        <VaSelect v-model="selectedPeriod" preset="small" :options="periodOptions" value-by="value" class="w-40" />
         <VaSelect v-slot="{ value }" v-model="selectedMonth" preset="small" :options="monthLabels" class="w-36">
           <span class="text-xs">{{ value }}</span>
         </VaSelect>
@@ -13,7 +15,7 @@
       <section class="flex flex-col items-start w-full sm:w-1/3 md:w-2/5 lg:w-1/4 gap-2 md:gap-8 pl-4">
         <div>
           <p class="text-xl font-semibold">{{ formatMoney(totalRevenue) }}</p>
-          <p class="whitespace-nowrap mt-2">Faturação (Últimos 6 meses)</p>
+          <p class="whitespace-nowrap mt-2">Faturação (Últimos {{ selectedPeriod }} meses)</p>
         </div>
         <div class="flex flex-col sm:flex-col gap-2 md:gap-8 w-full">
           <div>
@@ -34,7 +36,7 @@
       </section>
       <RevenueReportChart
         class="w-full md:w-3/5 lg:w-3/4 h-full min-h-72 sm:min-h-32 pt-4"
-        :by-month="revenue.by_month"
+        :by-month="filteredByMonth"
       />
     </VaCardContent>
   </VaCard>
@@ -42,7 +44,7 @@
 
 <script lang="ts" setup>
 import { ref, computed, watch } from 'vue'
-import { VaCard } from 'vuestic-ui'
+import { VaCard, VaSelect, VaButton } from 'vuestic-ui'
 import RevenueReportChart from './RevenueReportChart.vue'
 import { downloadAsCSV } from '../../../../services/toCSV'
 import type { DashboardStats } from '../../../../stores/dashboard-store'
@@ -58,8 +60,19 @@ const formatMoney = (amount: number) => {
   }).format(amount)
 }
 
+const periodOptions = [
+  { label: 'Últimos 3 meses', value: 3 },
+  { label: 'Últimos 6 meses', value: 6 },
+  { label: 'Últimos 12 meses', value: 12 },
+]
+const selectedPeriod = ref(6)
+
+const filteredByMonth = computed(() => {
+  return revenue.by_month.slice(-selectedPeriod.value)
+})
+
 const monthLabels = computed(() => {
-  return revenue.by_month.map((item) => item.label)
+  return filteredByMonth.value.map((item) => item.label)
 })
 
 const selectedMonth = ref('')
@@ -67,7 +80,7 @@ const selectedMonth = ref('')
 watch(
   monthLabels,
   (newLabels) => {
-    if (newLabels.length > 0 && !selectedMonth.value) {
+    if (newLabels.length > 0 && (!selectedMonth.value || !newLabels.includes(selectedMonth.value))) {
       selectedMonth.value = newLabels[newLabels.length - 1]
     }
   },
@@ -75,15 +88,15 @@ watch(
 )
 
 const selectedMonthData = computed(() => {
-  return revenue.by_month.find((item) => item.label === selectedMonth.value)
+  return filteredByMonth.value.find((item) => item.label === selectedMonth.value)
 })
 
 const totalRevenue = computed(() => {
-  return revenue.by_month.reduce((acc, item) => acc + item.total, 0)
+  return filteredByMonth.value.reduce((acc, item) => acc + item.total, 0)
 })
 
 const exportAsCSV = () => {
-  const dataToExport = revenue.by_month.map((item) => ({
+  const dataToExport = filteredByMonth.value.map((item) => ({
     Mês: item.label,
     Faturação: item.total,
     Encomendas: item.orders,

@@ -27,123 +27,123 @@ let cooldownTimer: number | null = null
 const isRateLimited = computed(() => cooldownSeconds.value > 0)
 
 function checkRateLimit(): boolean {
-	const now = Date.now()
-	attempts.value = attempts.value.filter((t) => now - t < 30000)
+  const now = Date.now()
+  attempts.value = attempts.value.filter((t) => now - t < 30000)
 
-	if (attempts.value.length >= 5) {
-		const earliest = attempts.value[0]
-		cooldownSeconds.value = Math.ceil((30000 - (now - earliest)) / 1000)
-		auth.error = `Demasiadas tentativas de registo. Aguarde ${cooldownSeconds.value}s.`
+  if (attempts.value.length >= 5) {
+    const earliest = attempts.value[0]
+    cooldownSeconds.value = Math.ceil((30000 - (now - earliest)) / 1000)
+    auth.error = `Demasiadas tentativas de registo. Aguarde ${cooldownSeconds.value}s.`
 
-		if (cooldownTimer) clearInterval(cooldownTimer)
-		cooldownTimer = window.setInterval(() => {
-			if (cooldownSeconds.value > 1) {
-				cooldownSeconds.value--
-				auth.error = `Demasiadas tentativas de registo. Aguarde ${cooldownSeconds.value}s.`
-			} else {
-				cooldownSeconds.value = 0
-				auth.error = null
-				if (cooldownTimer) {
-					clearInterval(cooldownTimer)
-					cooldownTimer = null
-				}
-			}
-		}, 1000)
-		return true
-	}
+    if (cooldownTimer) clearInterval(cooldownTimer)
+    cooldownTimer = window.setInterval(() => {
+      if (cooldownSeconds.value > 1) {
+        cooldownSeconds.value--
+        auth.error = `Demasiadas tentativas de registo. Aguarde ${cooldownSeconds.value}s.`
+      } else {
+        cooldownSeconds.value = 0
+        auth.error = null
+        if (cooldownTimer) {
+          clearInterval(cooldownTimer)
+          cooldownTimer = null
+        }
+      }
+    }, 1000)
+    return true
+  }
 
-	attempts.value.push(now)
-	return false
+  attempts.value.push(now)
+  return false
 }
 
 function injectTestData() {
-	firstname.value = 'Cliente'
-	lastname.value = 'Teste'
-	email.value = `cliente.${Math.floor(Math.random() * 10000)}@relogios.inc`
-	phone.value = '912345678'
-	password.value = 'password123'
-	passwordConfirmation.value = 'password123'
+  firstname.value = 'Cliente'
+  lastname.value = 'Teste'
+  email.value = `cliente.${Math.floor(Math.random() * 10000)}@relogios.inc`
+  phone.value = '912345678'
+  password.value = 'password123'
+  passwordConfirmation.value = 'password123'
 }
 
 function handleKeyDown(e: KeyboardEvent) {
-	if (e.ctrlKey && e.shiftKey && e.key.toLowerCase() === 'y') {
-		e.preventDefault()
-		injectTestData()
-	}
+  if (e.ctrlKey && e.shiftKey && e.key.toLowerCase() === 'y') {
+    e.preventDefault()
+    injectTestData()
+  }
 }
 
 onMounted(() => {
-	window.addEventListener('keydown', handleKeyDown)
+  window.addEventListener('keydown', handleKeyDown)
 })
 
 onUnmounted(() => {
-	window.removeEventListener('keydown', handleKeyDown)
-	if (cooldownTimer) clearInterval(cooldownTimer)
+  window.removeEventListener('keydown', handleKeyDown)
+  if (cooldownTimer) clearInterval(cooldownTimer)
 })
 
 const passwordsMatch = computed(() => {
-	if (!passwordConfirmation.value) return true
-	return password.value === passwordConfirmation.value
+  if (!passwordConfirmation.value) return true
+  return password.value === passwordConfirmation.value
 })
 
 const passwordStrength = computed(() => {
-	const p = password.value
-	if (!p) return 0
-	let score = 0
-	if (p.length >= 8) score++
-	if (/[A-Z]/.test(p)) score++
-	if (/[0-9]/.test(p)) score++
-	if (/[^A-Za-z0-9]/.test(p)) score++
-	return score
+  const p = password.value
+  if (!p) return 0
+  let score = 0
+  if (p.length >= 8) score++
+  if (/[A-Z]/.test(p)) score++
+  if (/[0-9]/.test(p)) score++
+  if (/[^A-Za-z0-9]/.test(p)) score++
+  return score
 })
 
 const strengthLabel = computed(
-	() => ['', 'Fraca', 'Razoável', 'Boa', 'Forte'][passwordStrength.value] ?? '',
+  () => ['', 'Fraca', 'Razoável', 'Boa', 'Forte'][passwordStrength.value] ?? '',
 )
 const strengthColor = computed(
-	() =>
-		['', 'bg-red-500', 'bg-yellow-500', 'bg-blue-400', 'bg-green-500'][
-			passwordStrength.value
-		] ?? '',
+  () =>
+    ['', 'bg-red-500', 'bg-yellow-500', 'bg-blue-400', 'bg-green-500'][
+      passwordStrength.value
+    ] ?? '',
 )
 
 async function handleRegister() {
-	if (isRateLimited.value) return
+  if (isRateLimited.value) return
 
-	// Fallback to DOM values if browser autofill didn't trigger Vue's input events
-	const fnEl = document.getElementById(
-		'reg-firstname',
-	) as HTMLInputElement | null
-	const lnEl = document.getElementById(
-		'reg-lastname',
-	) as HTMLInputElement | null
-	const emEl = document.getElementById('reg-email') as HTMLInputElement | null
-	const phEl = document.getElementById('reg-phone') as HTMLInputElement | null
-	const pwEl = document.getElementById(
-		'reg-password',
-	) as HTMLInputElement | null
-	const coEl = document.getElementById('reg-confirm') as HTMLInputElement | null
+  // Fallback to DOM values if browser autofill didn't trigger Vue's input events
+  const fnEl = document.getElementById(
+    'reg-firstname',
+  ) as HTMLInputElement | null
+  const lnEl = document.getElementById(
+    'reg-lastname',
+  ) as HTMLInputElement | null
+  const emEl = document.getElementById('reg-email') as HTMLInputElement | null
+  const phEl = document.getElementById('reg-phone') as HTMLInputElement | null
+  const pwEl = document.getElementById(
+    'reg-password',
+  ) as HTMLInputElement | null
+  const coEl = document.getElementById('reg-confirm') as HTMLInputElement | null
 
-	if (fnEl && fnEl.value && !firstname.value) firstname.value = fnEl.value
-	if (lnEl && lnEl.value && !lastname.value) lastname.value = lnEl.value
-	if (emEl && emEl.value && !email.value) email.value = emEl.value
-	if (phEl && phEl.value && !phone.value) phone.value = phEl.value
-	if (pwEl && pwEl.value && !password.value) password.value = pwEl.value
-	if (coEl && coEl.value && !passwordConfirmation.value)
-		passwordConfirmation.value = coEl.value
+  if (fnEl && fnEl.value && !firstname.value) firstname.value = fnEl.value
+  if (lnEl && lnEl.value && !lastname.value) lastname.value = lnEl.value
+  if (emEl && emEl.value && !email.value) email.value = emEl.value
+  if (phEl && phEl.value && !phone.value) phone.value = phEl.value
+  if (pwEl && pwEl.value && !password.value) password.value = pwEl.value
+  if (coEl && coEl.value && !passwordConfirmation.value)
+    passwordConfirmation.value = coEl.value
 
-	if (checkRateLimit()) return
+  if (checkRateLimit()) return
 
-	if (!passwordsMatch.value) return
-	const ok = await auth.register({
-		firstname: firstname.value,
-		lastname: lastname.value,
-		email: email.value,
-		password: password.value,
-		password_confirmation: passwordConfirmation.value,
-		phone: phone.value || undefined,
-	})
-	if (ok) router.push('/')
+  if (!passwordsMatch.value) return
+  const ok = await auth.register({
+    firstname: firstname.value,
+    lastname: lastname.value,
+    email: email.value,
+    password: password.value,
+    password_confirmation: passwordConfirmation.value,
+    phone: phone.value || undefined,
+  })
+  if (ok) router.push('/')
 }
 </script>
 
@@ -189,12 +189,12 @@ async function handleRegister() {
 
 						<!-- Conteúdo -->
 						<div class="relative">
-							<router-link
+							<RouterLink
 								to="/"
 								class="inline-block text-2xl font-extrabold tracking-tight text-white transition duration-300 hover:text-k-main"
 							>
 								RELOGIOS<span class="text-k-main">.inc</span>
-							</router-link>
+							</RouterLink>
 						</div>
 
 						<div class="relative mt-12">
@@ -248,12 +248,12 @@ async function handleRegister() {
 						<div class="relative mt-10 border-t border-white/10 pt-6">
 							<p class="text-xs text-white/30">
 								Já tens conta?
-								<router-link
+								<RouterLink
 									to="/login"
 									class="ml-1 font-semibold text-k-main transition duration-200 hover:text-yellow-400"
 								>
 									Entra aqui →
-								</router-link>
+								</RouterLink>
 							</p>
 						</div>
 					</div>
@@ -315,7 +315,7 @@ async function handleRegister() {
 							</div>
 						</Transition>
 
-						<form @submit.prevent="handleRegister" class="space-y-4">
+						<form class="space-y-4" @submit.prevent="handleRegister">
 							<!-- Row 1: Nome + Apelido -->
 							<div class="grid grid-cols-2 gap-3">
 								<div>
@@ -326,9 +326,9 @@ async function handleRegister() {
 									>
 									<input
 										id="reg-firstname"
+										v-model="firstname"
 										name="firstname"
 										autocomplete="given-name"
-										v-model="firstname"
 										type="text"
 										required
 										placeholder="João"
@@ -343,9 +343,9 @@ async function handleRegister() {
 									>
 									<input
 										id="reg-lastname"
+										v-model="lastname"
 										name="lastname"
 										autocomplete="family-name"
-										v-model="lastname"
 										type="text"
 										required
 										placeholder="Silva"
@@ -364,9 +364,9 @@ async function handleRegister() {
 									>
 									<input
 										id="reg-email"
+										v-model="email"
 										name="email"
 										autocomplete="email"
-										v-model="email"
 										type="email"
 										required
 										placeholder="o.teu@email.com"
@@ -385,9 +385,9 @@ async function handleRegister() {
 									</label>
 									<input
 										id="reg-phone"
+										v-model="phone"
 										name="phone"
 										autocomplete="tel"
-										v-model="phone"
 										type="tel"
 										placeholder="+351 9XX XXX XXX"
 										class="input-field"
@@ -406,9 +406,9 @@ async function handleRegister() {
 									<div class="relative">
 										<input
 											id="reg-password"
+											v-model="password"
 											name="password"
 											autocomplete="new-password"
-											v-model="password"
 											:type="showPassword ? 'text' : 'password'"
 											required
 											minlength="8"
@@ -417,8 +417,8 @@ async function handleRegister() {
 										/>
 										<button
 											type="button"
-											@click="showPassword = !showPassword"
 											class="absolute right-3 top-1/2 -translate-y-1/2 text-white/30 transition duration-200 hover:text-white/60"
+											@click="showPassword = !showPassword"
 										>
 											<svg
 												v-if="!showPassword"
@@ -482,9 +482,9 @@ async function handleRegister() {
 									<div class="relative">
 										<input
 											id="reg-confirm"
+											v-model="passwordConfirmation"
 											name="password_confirmation"
 											autocomplete="new-password"
-											v-model="passwordConfirmation"
 											:type="showConfirmPassword ? 'text' : 'password'"
 											required
 											placeholder="Repete a password"
@@ -497,8 +497,8 @@ async function handleRegister() {
 										/>
 										<button
 											type="button"
-											@click="showConfirmPassword = !showConfirmPassword"
 											class="absolute right-3 top-1/2 -translate-y-1/2 text-white/30 transition duration-200 hover:text-white/60"
+											@click="showConfirmPassword = !showConfirmPassword"
 										>
 											<svg
 												v-if="!showConfirmPassword"
@@ -590,8 +590,8 @@ async function handleRegister() {
 						>
 							<button
 								type="button"
-								@click="injectTestData"
 								class="flex items-center gap-1.5 rounded-lg bg-white/5 px-3 py-1.5 text-xs text-k-main/60 transition duration-200 hover:bg-white/10 hover:text-k-main"
+								@click="injectTestData"
 							>
 								<svg
 									class="h-3.5 w-3.5"

@@ -6,21 +6,21 @@ import watchWomenImage from '/products/premium/watch3.png'
 import watchUnisexImage from '/products/premium/watch2.png'
 
 const categories = [
-	{
-		src: watchMenImage,
-		category: 'homens',
-		imgClass: ['scale-75', 'object-contain', '-mb-4'],
-	},
-	{
-		src: watchWomenImage,
-		category: 'mulheres',
-		imgClass: ['scale-[58%]', 'object-contain', '-translate-y-8'],
-	},
-	{
-		src: watchUnisexImage,
-		category: 'unisexo',
-		imgClass: ['scale-[58%]', 'object-contain', '-translate-y-8'],
-	},
+  {
+    src: watchMenImage,
+    category: 'homens',
+    imgClass: ['scale-75', 'object-contain', '-mb-4'],
+  },
+  {
+    src: watchWomenImage,
+    category: 'mulheres',
+    imgClass: ['scale-[58%]', 'object-contain', '-translate-y-8'],
+  },
+  {
+    src: watchUnisexImage,
+    category: 'unisexo',
+    imgClass: ['scale-[58%]', 'object-contain', '-translate-y-8'],
+  },
 ]
 </script>
 
@@ -34,7 +34,7 @@ const categories = [
 				:key="index"
 				:src="item.src"
 				:category="item.category"
-				:imgClass="item.imgClass"
+				:img-class="item.imgClass"
 			/>
 		</div>
 	</div>

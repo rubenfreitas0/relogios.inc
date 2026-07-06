@@ -20,62 +20,62 @@ let cooldownTimer: number | null = null
 const isRateLimited = computed(() => cooldownSeconds.value > 0)
 
 function checkRateLimit(): boolean {
-	const now = Date.now()
-	attempts.value = attempts.value.filter((t) => now - t < 30000)
+  const now = Date.now()
+  attempts.value = attempts.value.filter((t) => now - t < 30000)
 
-	if (attempts.value.length >= 5) {
-		const earliest = attempts.value[0]
-		cooldownSeconds.value = Math.ceil((30000 - (now - earliest)) / 1000)
-		auth.error = `Demasiadas tentativas de login. Aguarde ${cooldownSeconds.value}s.`
+  if (attempts.value.length >= 5) {
+    const earliest = attempts.value[0]
+    cooldownSeconds.value = Math.ceil((30000 - (now - earliest)) / 1000)
+    auth.error = `Demasiadas tentativas de login. Aguarde ${cooldownSeconds.value}s.`
 
-		if (cooldownTimer) clearInterval(cooldownTimer)
-		cooldownTimer = window.setInterval(() => {
-			if (cooldownSeconds.value > 1) {
-				cooldownSeconds.value--
-				auth.error = `Demasiadas tentativas de login. Aguarde ${cooldownSeconds.value}s.`
-			} else {
-				cooldownSeconds.value = 0
-				auth.error = null
-				if (cooldownTimer) {
-					clearInterval(cooldownTimer)
-					cooldownTimer = null
-				}
-			}
-		}, 1000)
-		return true
-	}
+    if (cooldownTimer) clearInterval(cooldownTimer)
+    cooldownTimer = window.setInterval(() => {
+      if (cooldownSeconds.value > 1) {
+        cooldownSeconds.value--
+        auth.error = `Demasiadas tentativas de login. Aguarde ${cooldownSeconds.value}s.`
+      } else {
+        cooldownSeconds.value = 0
+        auth.error = null
+        if (cooldownTimer) {
+          clearInterval(cooldownTimer)
+          cooldownTimer = null
+        }
+      }
+    }, 1000)
+    return true
+  }
 
-	attempts.value.push(now)
-	return false
+  attempts.value.push(now)
+  return false
 }
 
 onUnmounted(() => {
-	if (cooldownTimer) clearInterval(cooldownTimer)
+  if (cooldownTimer) clearInterval(cooldownTimer)
 })
 
 async function handleLogin() {
-	if (isRateLimited.value) return
+  if (isRateLimited.value) return
 
-	// Fallback to DOM values if browser autofill didn't trigger Vue's input events
-	const emailEl = document.getElementById(
-		'login-email',
-	) as HTMLInputElement | null
-	const passwordEl = document.getElementById(
-		'login-password',
-	) as HTMLInputElement | null
-	if (emailEl && emailEl.value && !email.value) {
-		email.value = emailEl.value
-	}
-	if (passwordEl && passwordEl.value && !password.value) {
-		password.value = passwordEl.value
-	}
+  // Fallback to DOM values if browser autofill didn't trigger Vue's input events
+  const emailEl = document.getElementById(
+    'login-email',
+  ) as HTMLInputElement | null
+  const passwordEl = document.getElementById(
+    'login-password',
+  ) as HTMLInputElement | null
+  if (emailEl && emailEl.value && !email.value) {
+    email.value = emailEl.value
+  }
+  if (passwordEl && passwordEl.value && !password.value) {
+    password.value = passwordEl.value
+  }
 
-	if (checkRateLimit()) return
+  if (checkRateLimit()) return
 
-	const ok = await auth.login(email.value, password.value)
-	if (ok) {
-		router.push('/')
-	}
+  const ok = await auth.login(email.value, password.value)
+  if (ok) {
+    router.push('/')
+  }
 }
 </script>
 
@@ -133,7 +133,7 @@ async function handleLogin() {
 					</Transition>
 
 					<!-- Formulário -->
-					<form @submit.prevent="handleLogin" class="space-y-5">
+					<form class="space-y-5" @submit.prevent="handleLogin">
 						<!-- Email -->
 						<div>
 							<label
@@ -144,9 +144,9 @@ async function handleLogin() {
 							</label>
 							<input
 								id="login-email"
+								v-model="email"
 								name="email"
 								autocomplete="username"
-								v-model="email"
 								type="email"
 								required
 								placeholder="o.teu@email.com"
@@ -163,19 +163,19 @@ async function handleLogin() {
 								>
 									Password
 								</label>
-								<router-link
+								<RouterLink
 									to="/forgot-password"
 									class="text-xs text-k-main/80 transition duration-200 hover:text-k-main"
 								>
 									Esqueceste-te?
-								</router-link>
+								</RouterLink>
 							</div>
 							<div class="relative">
 								<input
 									id="login-password"
+									v-model="password"
 									name="password"
 									autocomplete="current-password"
-									v-model="password"
 									:type="showPassword ? 'text' : 'password'"
 									required
 									placeholder="••••••••"
@@ -183,8 +183,8 @@ async function handleLogin() {
 								/>
 								<button
 									type="button"
-									@click="showPassword = !showPassword"
 									class="absolute right-4 top-1/2 -translate-y-1/2 text-white/30 transition duration-200 hover:text-white/70"
+									@click="showPassword = !showPassword"
 								>
 									<svg
 										v-if="!showPassword"
@@ -263,12 +263,12 @@ async function handleLogin() {
 					<!-- Link registo -->
 					<p class="mt-6 text-center text-sm text-white/40">
 						Ainda não tens conta?
-						<router-link
+						<RouterLink
 							to="/register"
 							class="font-semibold text-k-main transition duration-200 hover:text-yellow-400"
 						>
 							Cria uma aqui
-						</router-link>
+						</RouterLink>
 					</p>
 				</div>
 			</div>

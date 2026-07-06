@@ -3,58 +3,58 @@ import type { Product } from '../data/product-types.ts'
 import { useCatalogStore } from '../pinia/catalogStore.ts'
 import { onMounted, ref, watch, computed } from 'vue'
 import {
-	resolveProductImageUrl,
-	getProductImageStyle,
+  resolveProductImageUrl,
+  getProductImageStyle,
 } from '../utils/utilities'
 
 const props = defineProps<{
-	productSlug: string
+  productSlug: string
 }>()
 
 const items = ref<Product[]>([])
 const catalogStore = useCatalogStore()
 
 const loadRelated = async () => {
-	items.value = await catalogStore.fetchRelatedProducts(props.productSlug)
+  items.value = await catalogStore.fetchRelatedProducts(props.productSlug)
 }
 
 // Filtra apenas produtos em stock
 const inStockItems = computed(() =>
-	items.value.filter((item) => item.stock > 0),
+  items.value.filter((item) => item.stock > 0),
 )
 
 onMounted(() => {
-	loadRelated()
+  loadRelated()
 })
 
 watch(
-	() => props.productSlug,
-	() => {
-		loadRelated()
-	},
+  () => props.productSlug,
+  () => {
+    loadRelated()
+  },
 )
 
 const getProductCategoryRoute = (gender?: string) => {
-	if (gender === 'masculino') return 'homens'
-	if (gender === 'feminino') return 'mulheres'
-	return 'unisexo'
+  if (gender === 'masculino') return 'homens'
+  if (gender === 'feminino') return 'mulheres'
+  return 'unisexo'
 }
 
 const getProductImage = (item: Product) => {
-	if (item.primary_image?.url) {
-		return item.primary_image.url
-	}
-	if (item.images && item.images.length > 0) {
-		const primary = item.images.find((img) => img.is_primary)
-		return primary?.url || item.images[0].url
-	}
-	return undefined
+  if (item.primary_image?.url) {
+    return item.primary_image.url
+  }
+  if (item.images && item.images.length > 0) {
+    const primary = item.images.find((img) => img.is_primary)
+    return primary?.url || item.images[0].url
+  }
+  return undefined
 }
 
 const formatPrice = (price?: number | string) => {
-	const num = Number(price)
-	if (isNaN(num)) return '€0,00'
-	return `${num.toFixed(2).replace('.', ',')} €`
+  const num = Number(price)
+  if (isNaN(num)) return '€0,00'
+  return `${num.toFixed(2).replace('.', ',')} €`
 }
 </script>
 
@@ -81,7 +81,7 @@ const formatPrice = (price?: number | string) => {
 
 		<!-- Scrollable Row -->
 		<div class="scrollbar-thin flex gap-4 overflow-x-auto pb-4">
-			<router-link
+			<RouterLink
 				v-for="item in inStockItems"
 				:key="item.id"
 				:to="`/${getProductCategoryRoute(item.gender)}/${item.slug}`"
@@ -141,8 +141,8 @@ const formatPrice = (price?: number | string) => {
 							{{ formatPrice(item.price) }}
 						</span>
 						<span
-							class="text-sm font-bold tracking-tight text-[#FFC700]"
 							v-if="item.discount_price"
+							class="text-sm font-bold tracking-tight text-[#FFC700]"
 						>
 							{{ formatPrice(item.discount_price) }}
 						</span>
@@ -161,7 +161,7 @@ const formatPrice = (price?: number | string) => {
 						</span>
 					</div>
 				</div>
-			</router-link>
+			</RouterLink>
 		</div>
 	</section>
 </template>

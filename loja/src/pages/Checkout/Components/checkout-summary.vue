@@ -19,9 +19,9 @@ const formStore = useFormStore()
 		>
 			<SummaryItem
 				v-for="(value, key) in cartStore.cart"
+				:key="key"
 				:cart-item="value.product"
 				:item-count="value.amount"
-				:key="key"
 			/>
 		</div>
 		<div class="flex flex-row justify-between">
@@ -65,8 +65,8 @@ const formStore = useFormStore()
 			color="light"
 			class="mt-8 self-center font-bold"
 			:disabled="formStore.isSubmitting || formStore.shippingLoading"
-			@click="formStore.submit()"
 			data-test="checkout-button"
+			@click="formStore.submit()"
 		/>
 	</div>
 </template>

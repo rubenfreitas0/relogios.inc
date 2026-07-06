@@ -7,11 +7,11 @@ import { useAuthStore } from '../pinia/authStore.ts'
 import { useRouter, useRoute } from 'vue-router'
 
 interface Props {
-	color?: 'black' | 'transparent' | 'k-black'
+  color?: 'black' | 'transparent' | 'k-black'
 }
 
 const props = withDefaults(defineProps<Props>(), {
-	color: 'transparent',
+  color: 'transparent',
 })
 
 const cartStore = useCartStore()
@@ -20,13 +20,13 @@ const router = useRouter()
 const route = useRoute()
 
 const isAuthPage = computed(() =>
-	['/login', '/register', '/forgot-password', '/reset-password'].some(
-		(p) => route.path === p || route.path.startsWith(p + '/'),
-	),
+  ['/login', '/register', '/forgot-password', '/reset-password'].some(
+    (p) => route.path === p || route.path.startsWith(p + '/'),
+  ),
 )
 
 let style = computed(() => {
-	return 'bg-' + props.color
+  return 'bg-' + props.color
 })
 
 const hamburgerState = ref('hide')
@@ -35,192 +35,192 @@ const activeMega = ref<string | null>(null)
 let megaLeaveTimeout: ReturnType<typeof setTimeout> | null = null
 
 function showHamburger(): void {
-	hamburgerState.value = 'show'
+  hamburgerState.value = 'show'
 }
 
 function hideHamburger(): void {
-	hamburgerState.value = 'hide'
+  hamburgerState.value = 'hide'
 }
 
 async function handleLogout(): Promise<void> {
-	userMenuOpen.value = false
-	await authStore.logout()
-	router.push('/')
+  userMenuOpen.value = false
+  await authStore.logout()
+  router.push('/')
 }
 
 function openMega(key: string) {
-	if (megaLeaveTimeout) clearTimeout(megaLeaveTimeout)
-	activeMega.value = key
+  if (megaLeaveTimeout) clearTimeout(megaLeaveTimeout)
+  activeMega.value = key
 }
 
 function closeMegaDelayed() {
-	megaLeaveTimeout = setTimeout(() => {
-		activeMega.value = null
-	}, 120)
+  megaLeaveTimeout = setTimeout(() => {
+    activeMega.value = null
+  }, 120)
 }
 
 function keepMega() {
-	if (megaLeaveTimeout) clearTimeout(megaLeaveTimeout)
+  if (megaLeaveTimeout) clearTimeout(megaLeaveTimeout)
 }
 
 // ── Mega menu data ────────────────────────────────────────────────
 interface MegaPrice {
-	label: string
-	min: number
-	max: number
+  label: string
+  min: number
+  max: number
 }
 
 const megaMenus: Record<
-	string,
-	{
-		brands: string[]
-		types: string[]
-		kind: string[]
-		prices: MegaPrice[]
-		colors: { name: string; hex: string }[]
-	}
+  string,
+  {
+    brands: string[]
+    types: string[]
+    kind: string[]
+    prices: MegaPrice[]
+    colors: { name: string; hex: string }[]
+  }
 > = {
-	homens: {
-		brands: [
-			'Casio',
-			'Seiko',
-			'Citizen',
-			'Orient',
-			'Tissot',
-			'Festina',
-			'G-Shock',
-			'Hugo Boss',
-		],
-		types: [
-			'Clássico',
-			'Desportivo',
-			'Casual',
-			'Mergulho',
-			'Aviador',
-			'Cronógrafo',
-			'Militar',
-		],
-		kind: ['Analógico', 'Digital', 'Analógico-Digital', 'Smartwatch'],
-		prices: [
-			{ label: 'Até €100', min: 0, max: 100 },
-			{ label: '€100 – €250', min: 100, max: 250 },
-			{ label: '€250 – €500', min: 250, max: 500 },
-			{ label: 'Acima de €500', min: 500, max: 999999 },
-		],
-		colors: [
-			{ name: 'Preto', hex: '#1a1a1a' },
-			{ name: 'Prata', hex: '#c0c0c0' },
-			{ name: 'Dourado', hex: '#c8a44a' },
-			{ name: 'Azul', hex: '#1e3a5f' },
-			{ name: 'Verde', hex: '#2d5a3d' },
-			{ name: 'Branco', hex: '#f0f0f0' },
-		],
-	},
-	mulheres: {
-		brands: [
-			'Casio',
-			'Citizen',
-			'Michael Kors',
-			'Anne Klein',
-			'Festina',
-			'Tissot',
-			'Cluse',
-			'Fossil',
-		],
-		types: [
-			'Clássico',
-			'Elegante',
-			'Casual',
-			'Desportivo',
-			'Minimalista',
-			'Cronógrafo',
-		],
-		kind: ['Analógico', 'Digital', 'Smartwatch'],
-		prices: [
-			{ label: 'Até €80', min: 0, max: 80 },
-			{ label: '€80 – €200', min: 80, max: 200 },
-			{ label: '€200 – €450', min: 200, max: 450 },
-			{ label: 'Acima de €450', min: 450, max: 999999 },
-		],
-		colors: [
-			{ name: 'Dourado', hex: '#c8a44a' },
-			{ name: 'Rosa Gold', hex: '#b76e79' },
-			{ name: 'Prata', hex: '#c0c0c0' },
-			{ name: 'Branco', hex: '#f0f0f0' },
-			{ name: 'Preto', hex: '#1a1a1a' },
-			{ name: 'Rose', hex: '#e8a0a0' },
-		],
-	},
-	unisexo: {
-		brands: [
-			'Casio',
-			'Swatch',
-			'Timex',
-			'Orient',
-			'Seiko',
-			'Garmin',
-			'Apple',
-			'Samsung',
-		],
-		types: [
-			'Casual',
-			'Desportivo',
-			'Smartwatch',
-			'Minimalista',
-			'Vintage',
-			'Outdoor',
-		],
-		kind: ['Analógico', 'Digital', 'Smartwatch', 'Híbrido'],
-		prices: [
-			{ label: 'Até €80', min: 0, max: 80 },
-			{ label: '€80 – €200', min: 80, max: 200 },
-			{ label: '€200 – €500', min: 200, max: 500 },
-			{ label: 'Acima de €500', min: 500, max: 999999 },
-		],
-		colors: [
-			{ name: 'Preto', hex: '#1a1a1a' },
-			{ name: 'Branco', hex: '#f0f0f0' },
-			{ name: 'Prata', hex: '#c0c0c0' },
-			{ name: 'Laranja', hex: '#d4621a' },
-			{ name: 'Verde', hex: '#2d5a3d' },
-			{ name: 'Azul', hex: '#1e3a5f' },
-		],
-	},
+  homens: {
+    brands: [
+      'Casio',
+      'Seiko',
+      'Citizen',
+      'Orient',
+      'Tissot',
+      'Festina',
+      'G-Shock',
+      'Hugo Boss',
+    ],
+    types: [
+      'Clássico',
+      'Desportivo',
+      'Casual',
+      'Mergulho',
+      'Aviador',
+      'Cronógrafo',
+      'Militar',
+    ],
+    kind: ['Analógico', 'Digital', 'Analógico-Digital', 'Smartwatch'],
+    prices: [
+      { label: 'Até €100', min: 0, max: 100 },
+      { label: '€100 – €250', min: 100, max: 250 },
+      { label: '€250 – €500', min: 250, max: 500 },
+      { label: 'Acima de €500', min: 500, max: 999999 },
+    ],
+    colors: [
+      { name: 'Preto', hex: '#1a1a1a' },
+      { name: 'Prata', hex: '#c0c0c0' },
+      { name: 'Dourado', hex: '#c8a44a' },
+      { name: 'Azul', hex: '#1e3a5f' },
+      { name: 'Verde', hex: '#2d5a3d' },
+      { name: 'Branco', hex: '#f0f0f0' },
+    ],
+  },
+  mulheres: {
+    brands: [
+      'Casio',
+      'Citizen',
+      'Michael Kors',
+      'Anne Klein',
+      'Festina',
+      'Tissot',
+      'Cluse',
+      'Fossil',
+    ],
+    types: [
+      'Clássico',
+      'Elegante',
+      'Casual',
+      'Desportivo',
+      'Minimalista',
+      'Cronógrafo',
+    ],
+    kind: ['Analógico', 'Digital', 'Smartwatch'],
+    prices: [
+      { label: 'Até €80', min: 0, max: 80 },
+      { label: '€80 – €200', min: 80, max: 200 },
+      { label: '€200 – €450', min: 200, max: 450 },
+      { label: 'Acima de €450', min: 450, max: 999999 },
+    ],
+    colors: [
+      { name: 'Dourado', hex: '#c8a44a' },
+      { name: 'Rosa Gold', hex: '#b76e79' },
+      { name: 'Prata', hex: '#c0c0c0' },
+      { name: 'Branco', hex: '#f0f0f0' },
+      { name: 'Preto', hex: '#1a1a1a' },
+      { name: 'Rose', hex: '#e8a0a0' },
+    ],
+  },
+  unisexo: {
+    brands: [
+      'Casio',
+      'Swatch',
+      'Timex',
+      'Orient',
+      'Seiko',
+      'Garmin',
+      'Apple',
+      'Samsung',
+    ],
+    types: [
+      'Casual',
+      'Desportivo',
+      'Smartwatch',
+      'Minimalista',
+      'Vintage',
+      'Outdoor',
+    ],
+    kind: ['Analógico', 'Digital', 'Smartwatch', 'Híbrido'],
+    prices: [
+      { label: 'Até €80', min: 0, max: 80 },
+      { label: '€80 – €200', min: 80, max: 200 },
+      { label: '€200 – €500', min: 200, max: 500 },
+      { label: 'Acima de €500', min: 500, max: 999999 },
+    ],
+    colors: [
+      { name: 'Preto', hex: '#1a1a1a' },
+      { name: 'Branco', hex: '#f0f0f0' },
+      { name: 'Prata', hex: '#c0c0c0' },
+      { name: 'Laranja', hex: '#d4621a' },
+      { name: 'Verde', hex: '#2d5a3d' },
+      { name: 'Azul', hex: '#1e3a5f' },
+    ],
+  },
 }
 
 onMounted(async () => {
-	if (authStore.token && !authStore.user) {
-		await authStore.fetchUser()
-	}
+  if (authStore.token && !authStore.user) {
+    await authStore.fetchUser()
+  }
 })
 
 const categorySlugMap: Record<string, string> = {
-	Clássico: 'classicos',
-	Desportivo: 'desporto',
-	Casual: 'casual',
-	Mergulho: 'mergulho',
-	Aviador: 'aviador',
-	Cronógrafo: 'cronografos',
-	Militar: 'militar',
-	Analógico: 'analogico',
-	Digital: 'digital',
-	'Analógico-Digital': 'analogico-digital',
-	Smartwatch: 'smartwatch',
-	Minimalista: 'classicos', // fallback ou mapeamento aproximado
-	Vintage: 'classicos',
-	Outdoor: 'desporto',
-	Híbrido: 'automaticos',
-	Elegante: 'classicos',
+  Clássico: 'classicos',
+  Desportivo: 'desporto',
+  Casual: 'casual',
+  Mergulho: 'mergulho',
+  Aviador: 'aviador',
+  Cronógrafo: 'cronografos',
+  Militar: 'militar',
+  Analógico: 'analogico',
+  Digital: 'digital',
+  'Analógico-Digital': 'analogico-digital',
+  Smartwatch: 'smartwatch',
+  Minimalista: 'classicos', // fallback ou mapeamento aproximado
+  Vintage: 'classicos',
+  Outdoor: 'desporto',
+  Híbrido: 'automaticos',
+  Elegante: 'classicos',
 }
 
 function getCategorySlug(name: string): string {
-	return (
-		categorySlugMap[name] ||
-		name
-			.toLowerCase()
-			.normalize('NFD')
-			.replace(/[\u0300-\u036f]/g, '')
-	)
+  return (
+    categorySlugMap[name] ||
+    name
+      .toLowerCase()
+      .normalize('NFD')
+      .replace(/[\u0300-\u036f]/g, '')
+  )
 }
 </script>
 
@@ -238,8 +238,8 @@ function getCategorySlug(name: string): string {
 			<button
 				id="hamburger"
 				class="select-none lg:hidden"
-				@click="showHamburger()"
 				data-test="hamburger"
+				@click="showHamburger()"
 			>
 				<svg
 					xmlns="http://www.w3.org/2000/svg"
@@ -257,21 +257,21 @@ function getCategorySlug(name: string): string {
 				</svg>
 			</button>
 
-			<router-link
+			<RouterLink
 				to="/"
 				class="text-3xl font-extrabold tracking-tight antialiased transition duration-300 hover:scale-110 hover:text-k-main"
 				data-test="nav-logo"
 			>
 				RELOGIOS.inc
-			</router-link>
+			</RouterLink>
 
 			<!-- Centro: links de navegação (apenas desktop) -->
 			<nav class="hidden tracking-widest lg:flex lg:items-center lg:gap-8">
-				<router-link
+				<RouterLink
 					to="/"
 					class="text-sm uppercase text-white transition duration-300 hover:text-k-main active:translate-y-0.5"
 					data-test="nav-home"
-					>Home</router-link
+					>Home</RouterLink
 				>
 
 				<!-- Mega: Homens -->
@@ -280,12 +280,12 @@ function getCategorySlug(name: string): string {
 					@mouseenter="openMega('homens')"
 					@mouseleave="closeMegaDelayed()"
 				>
-					<router-link
+					<RouterLink
 						to="/homens"
 						class="flex items-center gap-1 text-sm uppercase text-white transition duration-300 hover:text-k-main"
 						:class="activeMega === 'homens' ? 'text-k-main' : ''"
-						@click="activeMega = null"
 						data-test="nav-homens"
+						@click="activeMega = null"
 					>
 						Homens
 						<svg
@@ -302,7 +302,7 @@ function getCategorySlug(name: string): string {
 								d="M19 9l-7 7-7-7"
 							/>
 						</svg>
-					</router-link>
+					</RouterLink>
 				</div>
 
 				<!-- Mega: Mulheres -->
@@ -311,12 +311,12 @@ function getCategorySlug(name: string): string {
 					@mouseenter="openMega('mulheres')"
 					@mouseleave="closeMegaDelayed()"
 				>
-					<router-link
+					<RouterLink
 						to="/mulheres"
 						class="flex items-center gap-1 text-sm uppercase text-white transition duration-300 hover:text-k-main"
 						:class="activeMega === 'mulheres' ? 'text-k-main' : ''"
-						@click="activeMega = null"
 						data-test="nav-mulheres"
+						@click="activeMega = null"
 					>
 						Mulheres
 						<svg
@@ -333,7 +333,7 @@ function getCategorySlug(name: string): string {
 								d="M19 9l-7 7-7-7"
 							/>
 						</svg>
-					</router-link>
+					</RouterLink>
 				</div>
 
 				<!-- Mega: Unisexo -->
@@ -342,12 +342,12 @@ function getCategorySlug(name: string): string {
 					@mouseenter="openMega('unisexo')"
 					@mouseleave="closeMegaDelayed()"
 				>
-					<router-link
+					<RouterLink
 						to="/unisexo"
 						class="flex items-center gap-1 text-sm uppercase text-white transition duration-300 hover:text-k-main"
 						:class="activeMega === 'unisexo' ? 'text-k-main' : ''"
-						@click="activeMega = null"
 						data-test="nav-unisexo"
+						@click="activeMega = null"
 					>
 						Unisexo
 						<svg
@@ -364,14 +364,14 @@ function getCategorySlug(name: string): string {
 								d="M19 9l-7 7-7-7"
 							/>
 						</svg>
-					</router-link>
+					</RouterLink>
 				</div>
 
-				<router-link
+				<RouterLink
 					to="/sobre-nos"
 					class="text-sm uppercase text-white transition duration-300 hover:text-k-main active:translate-y-0.5"
 					data-test="nav-sobre-nos"
-					>Sobre Nós</router-link
+					>Sobre Nós</RouterLink
 				>
 			</nav>
 
@@ -384,8 +384,8 @@ function getCategorySlug(name: string): string {
 					data-test="user-menu"
 				>
 					<button
-						@click="userMenuOpen = !userMenuOpen"
 						class="group flex items-center gap-2 transition duration-200"
+						@click="userMenuOpen = !userMenuOpen"
 					>
 						<div
 							class="flex h-8 w-8 select-none items-center justify-center rounded-full bg-k-main text-xs font-black tracking-tight text-k-black"
@@ -428,11 +428,11 @@ function getCategorySlug(name: string): string {
 								</p>
 							</div>
 							<div class="p-1.5">
-								<router-link
+								<RouterLink
 									to="/conta"
-									@click="userMenuOpen = false"
 									class="flex w-full items-center gap-2.5 rounded-lg px-3 py-2 text-sm text-white/60 transition duration-200 hover:bg-[#FFC700]/5 hover:text-[#FFC700]"
 									data-test="nav-account"
+									@click="userMenuOpen = false"
 								>
 									<svg
 										class="h-4 w-4"
@@ -448,12 +448,12 @@ function getCategorySlug(name: string): string {
 										/>
 									</svg>
 									A Minha Conta
-								</router-link>
-								<router-link
+								</RouterLink>
+								<RouterLink
 									to="/conta/encomendas"
-									@click="userMenuOpen = false"
 									class="flex w-full items-center gap-2.5 rounded-lg px-3 py-2 text-sm text-white/60 transition duration-200 hover:bg-[#FFC700]/5 hover:text-[#FFC700]"
 									data-test="nav-orders"
+									@click="userMenuOpen = false"
 								>
 									<svg
 										class="h-4 w-4"
@@ -469,11 +469,11 @@ function getCategorySlug(name: string): string {
 										/>
 									</svg>
 									As Minhas Encomendas
-								</router-link>
+								</RouterLink>
 								<button
-									@click="handleLogout"
 									class="flex w-full items-center gap-2.5 rounded-lg px-3 py-2 text-sm text-white/60 transition duration-200 hover:bg-red-500/10 hover:text-red-400"
 									data-test="nav-logout"
+									@click="handleLogout"
 								>
 									<svg
 										class="h-4 w-4"
@@ -507,14 +507,14 @@ function getCategorySlug(name: string): string {
 					class="hidden items-center gap-2 lg:flex"
 					data-test="auth-buttons"
 				>
-					<router-link
+					<RouterLink
 						to="/login"
 						class="px-3 py-1.5 text-xs uppercase tracking-wider text-white/70 transition duration-200 hover:text-white"
 						data-test="nav-login"
 					>
 						Entrar
-					</router-link>
-					<router-link
+					</RouterLink>
+					<RouterLink
 						to="/register"
 						class="flex items-center gap-1.5 rounded-full bg-k-main px-4 py-2 text-xs font-bold uppercase tracking-wider text-k-black shadow-md shadow-k-main/20 transition duration-200 hover:bg-yellow-400 active:scale-95"
 						data-test="nav-register"
@@ -533,15 +533,15 @@ function getCategorySlug(name: string): string {
 							/>
 						</svg>
 						Criar Conta
-					</router-link>
+					</RouterLink>
 				</div>
 
 				<!-- Carrinho -->
 				<div
 					v-if="!isAuthPage"
 					class="relative h-5 cursor-pointer"
-					@click="cartStore.cartOn()"
 					data-test="cart-button"
+					@click="cartStore.cartOn()"
 				>
 					<img
 						class="h-full origin-center hover:opacity-50 active:translate-y-0.5"
@@ -580,20 +580,20 @@ function getCategorySlug(name: string): string {
 						</p>
 						<ul class="space-y-2">
 							<li v-for="brand in megaMenus[activeMega!].brands" :key="brand">
-								<router-link
+								<RouterLink
 									:to="`/${activeMega}?brand=${brand.toLowerCase()}`"
 									class="block text-sm text-white/60 transition-all duration-150 hover:translate-x-1 hover:text-white"
 									@click="activeMega = null"
 								>
 									{{ brand }}
-								</router-link>
+								</RouterLink>
 							</li>
 						</ul>
-						<router-link
+						<RouterLink
 							:to="`/${activeMega}`"
 							class="mt-4 block text-[0.65rem] font-bold uppercase tracking-wider text-[#FFC700] transition-colors hover:text-yellow-300"
 							@click="activeMega = null"
-							>Ver todas as marcas →</router-link
+							>Ver todas as marcas →</RouterLink
 						>
 					</div>
 
@@ -606,13 +606,13 @@ function getCategorySlug(name: string): string {
 						</p>
 						<ul class="space-y-2">
 							<li v-for="t in megaMenus[activeMega!].types" :key="t">
-								<router-link
+								<RouterLink
 									:to="`/${activeMega}?category=${getCategorySlug(t)}`"
 									class="block text-sm text-white/60 transition-all duration-150 hover:translate-x-1 hover:text-white"
 									@click="activeMega = null"
 								>
 									{{ t }}
-								</router-link>
+								</RouterLink>
 							</li>
 						</ul>
 					</div>
@@ -626,13 +626,13 @@ function getCategorySlug(name: string): string {
 						</p>
 						<ul class="space-y-2">
 							<li v-for="k in megaMenus[activeMega!].kind" :key="k">
-								<router-link
+								<RouterLink
 									:to="`/${activeMega}?category=${getCategorySlug(k)}`"
 									class="block text-sm text-white/60 transition-all duration-150 hover:translate-x-1 hover:text-white"
 									@click="activeMega = null"
 								>
 									{{ k }}
-								</router-link>
+								</RouterLink>
 							</li>
 						</ul>
 					</div>
@@ -646,13 +646,13 @@ function getCategorySlug(name: string): string {
 						</p>
 						<ul class="space-y-2">
 							<li v-for="p in megaMenus[activeMega!].prices" :key="p.label">
-								<router-link
+								<RouterLink
 									:to="`/${activeMega}?min_price=${p.min}&max_price=${p.max}`"
 									class="block text-sm text-white/60 transition-all duration-150 hover:translate-x-1 hover:text-white"
 									@click="activeMega = null"
 								>
 									{{ p.label }}
-								</router-link>
+								</RouterLink>
 							</li>
 						</ul>
 					</div>
@@ -690,56 +690,56 @@ function getCategorySlug(name: string): string {
 		<Cart v-if="cartStore.showCart" />
 
 		<!-- Menu Mobile (hamburger) -->
-		<transition>
+		<Transition>
 			<nav
-				class="absolute z-50 flex w-screen flex-col items-center gap-4 bg-black p-9 text-sm font-semibold tracking-widest"
 				v-if="hamburgerState === 'show'"
+				class="absolute z-50 flex w-screen flex-col items-center gap-4 bg-black p-9 text-sm font-semibold tracking-widest"
 				:class="$route.path === '/' ? 'bg-k-black' : 'bg-black'"
 				data-test="nav-mobile"
 			>
 				<button
 					class="uppercase text-white transition duration-300 hover:text-k-main active:translate-y-0.5"
-					@click="hideHamburger()"
 					data-test="close-hamburger"
+					@click="hideHamburger()"
 				>
 					Fechar ✕
 				</button>
-				<router-link
+				<RouterLink
 					to="/"
 					class="uppercase text-white transition duration-300 hover:text-k-main active:translate-y-0.5"
 					:class="$route.path === '/' && 'hidden'"
-					@click="hideHamburger()"
 					data-test="mobile-nav-home"
-					>Home</router-link
+					@click="hideHamburger()"
+					>Home</RouterLink
 				>
-				<router-link
+				<RouterLink
 					to="/homens"
 					class="uppercase text-white transition duration-300 hover:text-k-main active:translate-y-0.5"
-					@click="hideHamburger()"
 					data-test="mobile-nav-homens"
-					>Homens</router-link
+					@click="hideHamburger()"
+					>Homens</RouterLink
 				>
-				<router-link
+				<RouterLink
 					to="/mulheres"
 					class="uppercase text-white transition duration-300 hover:text-k-main active:translate-y-0.5"
-					@click="hideHamburger()"
 					data-test="mobile-nav-mulheres"
-					>Mulheres</router-link
+					@click="hideHamburger()"
+					>Mulheres</RouterLink
 				>
-				<router-link
+				<RouterLink
 					to="/unisexo"
 					class="uppercase text-white transition duration-300 hover:text-k-main active:translate-y-0.5"
-					@click="hideHamburger()"
 					data-test="mobile-nav-unisexo"
-					>Unisexo</router-link
+					@click="hideHamburger()"
+					>Unisexo</RouterLink
 				>
-				<router-link
+				<RouterLink
 					to="/sobre-nos"
 					class="uppercase text-white transition duration-300 hover:text-k-main active:translate-y-0.5"
 					:class="$route.path === '/sobre-nos' && 'hidden'"
-					@click="hideHamburger()"
 					data-test="mobile-nav-sobre-nos"
-					>Sobre Nós</router-link
+					@click="hideHamburger()"
+					>Sobre Nós</RouterLink
 				>
 
 				<!-- Divisor -->
@@ -758,46 +758,46 @@ function getCategorySlug(name: string): string {
 							{{ authStore.user.firstname }} {{ authStore.user.lastname }}
 						</p>
 					</div>
-					<router-link
+					<RouterLink
 						to="/conta"
 						class="uppercase text-[#FFC700]/80 transition duration-300 hover:text-[#FFC700]"
-						@click="hideHamburger()"
 						data-test="mobile-nav-account"
-						>A Minha Conta</router-link
+						@click="hideHamburger()"
+						>A Minha Conta</RouterLink
 					>
-					<router-link
+					<RouterLink
 						to="/conta/encomendas"
 						class="uppercase text-[#FFC700]/80 transition duration-300 hover:text-[#FFC700]"
-						@click="hideHamburger()"
 						data-test="mobile-nav-orders"
-						>As Minhas Encomendas</router-link
+						@click="hideHamburger()"
+						>As Minhas Encomendas</RouterLink
 					>
 					<button
-						@click="handleLogout(); hideHamburger();"
 						class="uppercase text-red-400/80 transition duration-300 hover:text-red-400"
 						data-test="mobile-nav-logout"
+						@click="handleLogout(); hideHamburger();"
 					>
 						Terminar Sessão
 					</button>
 				</template>
 				<template v-else>
-					<router-link
+					<RouterLink
 						to="/login"
 						class="uppercase text-white/70 transition duration-300 hover:text-white"
-						@click="hideHamburger()"
 						data-test="mobile-nav-login"
-						>Entrar</router-link
+						@click="hideHamburger()"
+						>Entrar</RouterLink
 					>
-					<router-link
+					<RouterLink
 						to="/register"
 						class="flex items-center gap-2 rounded-full bg-k-main px-6 py-2.5 font-bold uppercase text-k-black transition duration-200 hover:bg-yellow-400"
-						@click="hideHamburger()"
 						data-test="mobile-nav-register"
-						>Criar Conta</router-link
+						@click="hideHamburger()"
+						>Criar Conta</RouterLink
 					>
 				</template>
 			</nav>
-		</transition>
+		</Transition>
 	</header>
 </template>
 

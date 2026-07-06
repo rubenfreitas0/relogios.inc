@@ -2,11 +2,10 @@ export const sleep = (ms = 0) => {
   return new Promise((resolve) => setTimeout(resolve, ms))
 }
 
-/** Validation */
 export const validators = {
   email: (v: string) => {
     const pattern = /^[^\s@]+@[^\s@]+\.[^\s@]+$/
-    return pattern.test(v) || 'Please enter a valid email address'
+    return pattern.test(v) || 'Por favor, introduza um endereço de email válido'
   },
-  required: (v: any) => !!v || 'This field is required',
+  required: (v: any) => !!v || 'Este campo é obrigatório',
 }

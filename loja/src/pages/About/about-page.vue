@@ -7,71 +7,71 @@ import watchDetailImage from '/display/watch-detail.png'
 import watchBraceletsImage from '/display/watch-bracelets.png'
 
 const principles = [
-	{
-		title: 'Precisão',
-		desc: 'Cada relógio é selecionado pelo rigor do seu mecanismo. O tempo não mente — e nós também não.',
-		icon: 'M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z',
-	},
-	{
-		title: 'Elegância',
-		desc: 'Design atemporal que atravessa décadas sem perder relevância.',
-		icon: 'M9.663 17h4.673M12 3v1m6.364 1.636l-.707.707M21 12h-1M4 12H3m3.343-5.657l-.707-.707m2.828 9.9a5 5 0 117.072 0l-.548.547A3.374 3.374 0 0014 18.469V19a2 2 0 11-4 0v-.531c0-.895-.356-1.754-.988-2.386l-.548-.547z',
-	},
-	{
-		title: 'Honestidade',
-		desc: 'Preços justos, sem intermediários. Transparência total do início ao fim.',
-		icon: 'M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z',
-	},
-	{
-		title: 'Durabilidade',
-		desc: 'Só trabalhamos com materiais que resistem à vida real: safira, aço 316L, titânio.',
-		icon: 'M19.428 15.428a2 2 0 00-1.022-.547l-2.387-.477a6 6 0 00-3.86.517l-.318.158a6 6 0 01-3.86.517L6.05 15.21a2 2 0 00-1.806.547M8 4h8l-1 1v5.172a2 2 0 00.586 1.414l5 5c1.26 1.26.367 3.414-1.415 3.414H4.828c-1.782 0-2.674-2.154-1.414-3.414l5-5A2 2 0 009 10.172V5L8 4z',
-	},
+  {
+    title: 'Precisão',
+    desc: 'Cada relógio é selecionado pelo rigor do seu mecanismo. O tempo não mente — e nós também não.',
+    icon: 'M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z',
+  },
+  {
+    title: 'Elegância',
+    desc: 'Design atemporal que atravessa décadas sem perder relevância.',
+    icon: 'M9.663 17h4.673M12 3v1m6.364 1.636l-.707.707M21 12h-1M4 12H3m3.343-5.657l-.707-.707m2.828 9.9a5 5 0 117.072 0l-.548.547A3.374 3.374 0 0014 18.469V19a2 2 0 11-4 0v-.531c0-.895-.356-1.754-.988-2.386l-.548-.547z',
+  },
+  {
+    title: 'Honestidade',
+    desc: 'Preços justos, sem intermediários. Transparência total do início ao fim.',
+    icon: 'M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z',
+  },
+  {
+    title: 'Durabilidade',
+    desc: 'Só trabalhamos com materiais que resistem à vida real: safira, aço 316L, titânio.',
+    icon: 'M19.428 15.428a2 2 0 00-1.022-.547l-2.387-.477a6 6 0 00-3.86.517l-.318.158a6 6 0 01-3.86.517L6.05 15.21a2 2 0 00-1.806.547M8 4h8l-1 1v5.172a2 2 0 00.586 1.414l5 5c1.26 1.26.367 3.414-1.415 3.414H4.828c-1.782 0-2.674-2.154-1.414-3.414l5-5A2 2 0 009 10.172V5L8 4z',
+  },
 ]
 
 const stores = [
-	{
-		city: 'Braga',
-		address: 'Rua do Souto, 142',
-		hours: 'Seg–Sex 10h–19h · Sáb 10h–17h',
-	},
-	{
-		city: 'Porto',
-		address: 'Rua de Santa Catarina, 87',
-		hours: 'Seg–Sex 10h–19h · Sáb 10h–17h',
-	},
-	{
-		city: 'Lisboa',
-		address: 'Av. da Liberdade, 230',
-		hours: 'Seg–Sex 10h–20h · Sáb 10h–18h',
-	},
+  {
+    city: 'Braga',
+    address: 'Rua do Souto, 142',
+    hours: 'Seg–Sex 10h–19h · Sáb 10h–17h',
+  },
+  {
+    city: 'Porto',
+    address: 'Rua de Santa Catarina, 87',
+    hours: 'Seg–Sex 10h–19h · Sáb 10h–17h',
+  },
+  {
+    city: 'Lisboa',
+    address: 'Av. da Liberdade, 230',
+    hours: 'Seg–Sex 10h–20h · Sáb 10h–18h',
+  },
 ]
 
 const stats = [
-	{ value: '2013', label: 'Fundação' },
-	{ value: '340+', label: 'Modelos' },
-	{ value: '28K+', label: 'Clientes' },
-	{ value: '3', label: 'Lojas' },
+  { value: '2013', label: 'Fundação' },
+  { value: '340+', label: 'Modelos' },
+  { value: '28K+', label: 'Clientes' },
+  { value: '3', label: 'Lojas' },
 ]
 
 const timeline = [
-	{
-		year: '2013',
-		text: 'Fundação em Braga com 14 referências cuidadosamente escolhidas.',
-	},
-	{
-		year: '2016',
-		text: 'Abertura da segunda loja no Porto, na icónica Rua de Santa Catarina.',
-	},
-	{ year: '2019', text: 'Expansão para Lisboa e lançamento da loja online.' },
-	{
-		year: '2023',
-		text: 'Marco de 28 000 clientes ativos e parcerias com mais de 40 marcas.',
-	},
-	{
-		year: '2025',
-		text: 'Renovação da plataforma digital com foco em experiência premium.',
-	},
+  {
+    year: '2013',
+    text: 'Fundação em Braga com 14 referências cuidadosamente escolhidas.',
+  },
+  {
+    year: '2016',
+    text: 'Abertura da segunda loja no Porto, na icónica Rua de Santa Catarina.',
+  },
+  { year: '2019', text: 'Expansão para Lisboa e lançamento da loja online.' },
+  {
+    year: '2023',
+    text: 'Marco de 28 000 clientes ativos e parcerias com mais de 40 marcas.',
+  },
+  {
+    year: '2025',
+    text: 'Renovação da plataforma digital com foco em experiência premium.',
+  },
 ]
 </script>
 

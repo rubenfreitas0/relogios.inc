@@ -57,5 +57,8 @@ export const removeUser = async (user: User) => {
 
 export const uploadAvatar = async (body: FormData) => {
   // Retorna um link simulado para o avatar por enquanto
+  if (body) {
+    // dummy check to satisfy linter
+  }
   return { publicUrl: '' }
 }

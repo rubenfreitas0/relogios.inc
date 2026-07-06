@@ -1,13 +1,6 @@
 describe('Gestão de Encomendas', () => {
   beforeEach(() => {
-    // Efetuar login antes de cada teste
-    cy.visit('/auth/login')
-    cy.get('input[type="email"]').type('admin@relogios.inc')
-    cy.get('input[type="password"]').type('password')
-    cy.get('button').contains('Entrar').click()
-    cy.url().should('include', '/dashboard')
-
-    // Ir para a página de encomendas
+    cy.login()
     cy.visit('/encomendas')
     cy.url().should('include', '/encomendas')
     cy.get('h1.page-title').should('contain', 'Encomendas')

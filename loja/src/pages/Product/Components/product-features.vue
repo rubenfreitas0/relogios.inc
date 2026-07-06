@@ -1,12 +1,12 @@
 <script setup lang="ts">
 interface BoxItem {
-	count?: number
-	content: string
+  count?: number
+  content: string
 }
 
 const props = defineProps<{
-	features: string
-	inthebox: (string | BoxItem)[]
+  features: string
+  inthebox: (string | BoxItem)[]
 }>()
 </script>
 <template>
@@ -26,9 +26,9 @@ const props = defineProps<{
 		<div class="mt-16 flex h-full w-full flex-col lg:ml-24 lg:mt-0">
 			<h2 class="mb-8 text-2xl font-bold uppercase tracking-wide">Na Caixa</h2>
 			<div
-				class="mb-3 flex flex-row items-baseline gap-4 border-b border-black/5 pb-2"
 				v-for="(item, index) of props.inthebox"
 				:key="index"
+				class="mb-3 flex flex-row items-baseline gap-4 border-b border-black/5 pb-2"
 			>
 				<template v-if="typeof item === 'object' && item !== null">
 					<p class="font-bold tracking-wide text-k-main">{{ item.count }}x</p>

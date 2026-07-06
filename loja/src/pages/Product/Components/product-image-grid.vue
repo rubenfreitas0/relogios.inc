@@ -1,9 +1,9 @@
 <script setup lang="ts">
 // delete later
 const props = defineProps<{
-	topSrc: string
-	botSrc: string
-	rightSrc: string
+  topSrc: string
+  botSrc: string
+  rightSrc: string
 }>()
 </script>
 

@@ -54,9 +54,7 @@
         <VaButton :style="buttonStyles" preset="secondary" color="secondary" @click="emits('cancel')">
           Cancelar
         </VaButton>
-        <VaButton :style="buttonStyles" class="mb-4 md:mb-0" type="submit" @click="submit">
-          Atualizar
-        </VaButton>
+        <VaButton :style="buttonStyles" class="mb-4 md:mb-0" type="submit" @click="submit"> Atualizar </VaButton>
       </div>
     </VaForm>
   </VaModal>

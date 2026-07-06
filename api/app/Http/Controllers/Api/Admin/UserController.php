@@ -79,6 +79,7 @@ class UserController extends Controller
             'email'    => 'required|email|max:255|unique:users,email',
             'role'     => 'required|string|in:admin,user,owner',
             'active'   => 'required|boolean',
+            'password' => 'nullable|string|min:8',
         ]);
 
         $parts = explode(' ', $validated['fullname'], 2);
@@ -89,7 +90,7 @@ class UserController extends Controller
             'firstname'         => $firstname,
             'lastname'          => $lastname,
             'email'             => $validated['email'],
-            'password'          => bcrypt('password'), // Palavra-passe padrão para novos utilizadores
+            'password'          => bcrypt($request->input('password', 'password')),
             'role'              => $validated['role'] === 'admin' ? 'admin' : 'customer',
             'is_active'         => $validated['active'],
             'email_verified_at' => now(), // Auto-verificar email

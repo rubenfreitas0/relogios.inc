@@ -34,7 +34,7 @@ watchEffect(() => {
 })
 
 const onUserSaved = async (user: User) => {
-  if (user.avatar.startsWith('blob:')) {
+  if (user.avatar && user.avatar.startsWith('blob:')) {
     const blob = await fetch(user.avatar).then((r) => r.blob())
     const { publicUrl } = await usersApi.uploadAvatar(blob)
     user.avatar = publicUrl
@@ -44,7 +44,7 @@ const onUserSaved = async (user: User) => {
     await usersApi.update(user)
     if (!error.value) {
       notify({
-        message: `${user.fullname} has been updated`,
+        message: `O utilizador ${user.fullname} foi atualizado`,
         color: 'success',
       })
     }
@@ -53,7 +53,7 @@ const onUserSaved = async (user: User) => {
 
     if (!error.value) {
       notify({
-        message: `${user.fullname} has been created`,
+        message: `O utilizador ${user.fullname} foi criado`,
         color: 'success',
       })
     }
@@ -63,7 +63,7 @@ const onUserSaved = async (user: User) => {
 const onUserDelete = async (user: User) => {
   await usersApi.remove(user)
   notify({
-    message: `${user.fullname} has been deleted`,
+    message: `O utilizador ${user.fullname} foi eliminado`,
     color: 'success',
   })
 }
@@ -76,7 +76,7 @@ const beforeEditFormModalClose = async (hide: () => unknown) => {
   if (editFormRef.value.isFormHasUnsavedChanges) {
     const agreed = await confirm({
       maxWidth: '380px',
-      message: 'Form has unsaved changes. Are you sure you want to close it?',
+      message: 'O formulário tem alterações não guardadas. Tem a certeza que pretende fechar?',
       size: 'small',
     })
     if (agreed) {
@@ -89,7 +89,7 @@ const beforeEditFormModalClose = async (hide: () => unknown) => {
 </script>
 
 <template>
-  <h1 class="page-title">Users</h1>
+  <h1 class="page-title">Utilizadores</h1>
 
   <VaCard>
     <VaCardContent>
@@ -100,17 +100,17 @@ const beforeEditFormModalClose = async (hide: () => unknown) => {
             color="background-element"
             border-color="background-element"
             :options="[
-              { label: 'Active', value: true },
-              { label: 'Inactive', value: false },
+              { label: 'Ativos', value: true },
+              { label: 'Inativos', value: false },
             ]"
           />
-          <VaInput v-model="filters.search" placeholder="Search">
+          <VaInput v-model="filters.search" placeholder="Pesquisar">
             <template #prependInner>
               <VaIcon name="search" color="secondary" size="small" />
             </template>
           </VaInput>
         </div>
-        <VaButton @click="showAddUserModal">Add User</VaButton>
+        <VaButton @click="showAddUserModal">Adicionar Utilizador</VaButton>
       </div>
 
       <UsersTable
@@ -134,11 +134,11 @@ const beforeEditFormModalClose = async (hide: () => unknown) => {
     hide-default-actions
     :before-cancel="beforeEditFormModalClose"
   >
-    <h1 class="va-h5">{{ userToEdit ? 'Edit user' : 'Add user' }}</h1>
+    <h1 class="va-h5">{{ userToEdit ? 'Editar utilizador' : 'Adicionar utilizador' }}</h1>
     <EditUserForm
       ref="editFormRef"
       :user="userToEdit"
-      :save-button-label="userToEdit ? 'Save' : 'Add'"
+      :save-button-label="userToEdit ? 'Guardar' : 'Adicionar'"
       @close="cancel"
       @save="
         (user) => {

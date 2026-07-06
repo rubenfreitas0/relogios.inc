@@ -13,81 +13,81 @@ const deletingId = ref<number | null>(null)
 const isSaving = ref(false)
 
 const form = reactive({
-	firstname: '',
-	lastname: '',
-	phone: '',
-	address_line1: '',
-	address_line2: '',
-	city: '',
-	postal_code: '',
-	country: 'PT',
+  firstname: '',
+  lastname: '',
+  phone: '',
+  address_line1: '',
+  address_line2: '',
+  city: '',
+  postal_code: '',
+  country: 'PT',
 })
 
 onMounted(() => {
-	store.fetchAddresses()
+  store.fetchAddresses()
 })
 
 function openCreateModal() {
-	isEditing.value = false
-	editingId.value = null
-	resetForm()
-	showModal.value = true
+  isEditing.value = false
+  editingId.value = null
+  resetForm()
+  showModal.value = true
 }
 
 function openEditModal(address: Address) {
-	isEditing.value = true
-	editingId.value = address.id
-	form.firstname = address.firstname
-	form.lastname = address.lastname
-	form.phone = address.phone || ''
-	form.address_line1 = address.address_line1
-	form.address_line2 = address.address_line2 || ''
-	form.city = address.city
-	form.postal_code = address.postal_code
-	form.country = address.country
-	showModal.value = true
+  isEditing.value = true
+  editingId.value = address.id
+  form.firstname = address.firstname
+  form.lastname = address.lastname
+  form.phone = address.phone || ''
+  form.address_line1 = address.address_line1
+  form.address_line2 = address.address_line2 || ''
+  form.city = address.city
+  form.postal_code = address.postal_code
+  form.country = address.country
+  showModal.value = true
 }
 
 function resetForm() {
-	form.firstname = ''
-	form.lastname = ''
-	form.phone = ''
-	form.address_line1 = ''
-	form.address_line2 = ''
-	form.city = ''
-	form.postal_code = ''
-	form.country = 'PT'
+  form.firstname = ''
+  form.lastname = ''
+  form.phone = ''
+  form.address_line1 = ''
+  form.address_line2 = ''
+  form.city = ''
+  form.postal_code = ''
+  form.country = 'PT'
 }
 
 async function saveAddress() {
-	isSaving.value = true
-	let success: boolean
-	if (isEditing.value && editingId.value) {
-		success = await store.updateAddress(editingId.value, { ...form })
-	} else {
-		success = await store.createAddress({ ...form })
-	}
-	isSaving.value = false
-	if (success) {
-		showModal.value = false
-	}
+  isSaving.value = true
+  let success: boolean
+  if (isEditing.value && editingId.value) {
+    success = await store.updateAddress(editingId.value, { ...form })
+  } else {
+    success = await store.createAddress({ ...form })
+  }
+  isSaving.value = false
+  if (success) {
+    showModal.value = false
+  }
 }
 
 function confirmDelete(id: number) {
-	deletingId.value = id
-	showDeleteConfirm.value = true
+  deletingId.value = id
+  showDeleteConfirm.value = true
 }
 
 async function executeDelete() {
-	if (deletingId.value) {
-		await store.deleteAddress(deletingId.value)
-	}
-	showDeleteConfirm.value = false
-	deletingId.value = null
+  if (deletingId.value) {
+    await store.deleteAddress(deletingId.value)
+  }
+  showDeleteConfirm.value = false
+  deletingId.value = null
 }
 
 async function makeDefault(id: number) {
-	await store.setDefaultAddress(id)
+  await store.setDefaultAddress(id)
 }
 </script>
 
@@ -102,8 +102,8 @@ async function makeDefault(id: number) {
 				guardada{{ store.addresses.length !== 1 ? 's' : '' }}
 			</p>
 			<button
-				@click="openCreateModal"
 				class="flex items-center gap-2 rounded-lg bg-[#FFC700] px-4 py-2 text-xs font-bold uppercase tracking-wider text-black transition-colors hover:bg-yellow-400"
+				@click="openCreateModal"
 			>
 				<svg
 					class="h-4 w-4"
@@ -203,20 +203,20 @@ async function makeDefault(id: number) {
 				<div class="mt-4 flex items-center gap-3 border-t border-white/5 pt-3">
 					<button
 						v-if="!addr.is_default"
-						@click="makeDefault(addr.id)"
 						class="text-[0.65rem] font-bold uppercase tracking-wider text-[#FFC700]/60 transition-colors hover:text-[#FFC700]"
+						@click="makeDefault(addr.id)"
 					>
 						Definir principal
 					</button>
 					<button
-						@click="openEditModal(addr)"
 						class="text-[0.65rem] font-bold uppercase tracking-wider text-white/30 transition-colors hover:text-white"
+						@click="openEditModal(addr)"
 					>
 						Editar
 					</button>
 					<button
-						@click="confirmDelete(addr.id)"
 						class="text-[0.65rem] font-bold uppercase tracking-wider text-red-400/50 transition-colors hover:text-red-400"
+						@click="confirmDelete(addr.id)"
 					>
 						Eliminar
 					</button>
@@ -247,7 +247,7 @@ async function makeDefault(id: number) {
 							{{ store.error }}
 						</div>
 
-						<form @submit.prevent="saveAddress" class="space-y-4">
+						<form class="space-y-4" @submit.prevent="saveAddress">
 							<div class="grid gap-4 md:grid-cols-2">
 								<div>
 									<label
@@ -352,8 +352,8 @@ async function makeDefault(id: number) {
 							<div class="flex justify-end gap-3 pt-2">
 								<button
 									type="button"
-									@click="showModal = false"
 									class="rounded-lg border border-white/10 px-5 py-2 text-xs font-bold uppercase tracking-wider text-white/40 transition-colors hover:text-white"
+									@click="showModal = false"
 								>
 									Cancelar
 								</button>
@@ -405,14 +405,14 @@ async function makeDefault(id: number) {
 						<p class="mt-2 text-sm text-white/40">Esta ação é irreversível.</p>
 						<div class="mt-6 flex justify-center gap-3">
 							<button
-								@click="showDeleteConfirm = false"
 								class="rounded-lg border border-white/10 px-5 py-2 text-xs font-bold uppercase tracking-wider text-white/40 transition-colors hover:text-white"
+								@click="showDeleteConfirm = false"
 							>
 								Cancelar
 							</button>
 							<button
-								@click="executeDelete"
 								class="rounded-lg bg-red-500 px-5 py-2 text-xs font-bold uppercase tracking-wider text-white transition-colors hover:bg-red-600"
+								@click="executeDelete"
 							>
 								Eliminar
 							</button>

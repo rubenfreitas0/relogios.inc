@@ -3,20 +3,20 @@ import { useFormStore } from '../../../pinia/formStore'
 const formStore = useFormStore()
 
 const props = defineProps<{
-	type: 'email' | 'number' | 'password' | 'search' | 'tel' | 'text' | 'url'
-	validator: 'empty' | 'true' | 'false'
+  type: 'email' | 'number' | 'password' | 'search' | 'tel' | 'text' | 'url'
+  validator: 'empty' | 'true' | 'false'
 
-	// as in html id tag - must correspond to data name in formStore storage
-	id: string
+  // as in html id tag - must correspond to data name in formStore storage
+  id: string
 
-	label: string
-	containerClass?: string
-	placeholder?: string
-	minLength?: string
-	maxLength?: string
-	autocomplete?: 'off'
-	required?: boolean
-	errorMessage: string
+  label: string
+  containerClass?: string
+  placeholder?: string
+  minLength?: string
+  maxLength?: string
+  autocomplete?: 'off'
+  required?: boolean
+  errorMessage: string
 }>()
 </script>
 <template>
@@ -31,6 +31,7 @@ const props = defineProps<{
 		</label>
 		<div class="relative h-full w-full">
 			<input
+				:id="props.id"
 				v-model="(formStore as any)[props.id]"
 				:autocomplete="props.autocomplete"
 				:class="[
@@ -39,7 +40,6 @@ const props = defineProps<{
 				]"
 				class="w-full rounded border border-black border-opacity-60 bg-white p-3 font-Manrope font-semibold text-black outline-none focus:border-k-main"
 				:type="props.type"
-				:id="props.id"
 				:maxlength="props.maxLength"
 				:placeholder="props.placeholder"
 				:required="props.required"

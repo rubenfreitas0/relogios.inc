@@ -8,6 +8,12 @@ import RouteViewComponent from '../layouts/RouterBypass.vue'
 
 const routes: Array<RouteRecordRaw> = [
   {
+    path: '/reset-password',
+    redirect: (to) => {
+      return { name: 'recover-password', query: to.query }
+    },
+  },
+  {
     path: '/:pathMatch(.*)*',
     redirect: { name: 'dashboard' },
   },
@@ -158,13 +164,25 @@ const router = createRouter({
 router.beforeEach((to, from, next) => {
   const authStore = useAuthStore()
 
-  if (!authStore.isAuthenticated) {
-    authStore.init()
-  }
+  authStore.init()
 
   if (to.matched.some((record) => record.meta.requiresAuth)) {
     if (!authStore.isAuthenticated) {
       next({ name: 'login', query: { redirect: to.fullPath } })
+      return
+    }
+
+    // Apenas utilizadores com papel 'admin' têm permissão de acesso ao backoffice
+    if (authStore.user?.role !== 'admin') {
+      authStore.logout()
+      next({ name: 'login' })
+      return
+    }
+
+    // Apenas o administrador principal (admin@relogios.inc) tem acesso a Utilizadores, Relatórios e Vitrine
+    const restrictedRoutes = ['users', 'reports', 'vitrine']
+    if (restrictedRoutes.includes(to.name as string) && authStore.user?.email !== 'admin@relogios.inc') {
+      next({ name: 'dashboard' })
       return
     }
   }

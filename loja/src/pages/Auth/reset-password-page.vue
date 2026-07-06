@@ -25,123 +25,123 @@ let cooldownTimer: number | null = null
 const isRateLimited = computed(() => cooldownSeconds.value > 0)
 
 function checkRateLimit(): boolean {
-	const now = Date.now()
-	attempts.value = attempts.value.filter((t) => now - t < 30000)
+  const now = Date.now()
+  attempts.value = attempts.value.filter((t) => now - t < 30000)
 
-	if (attempts.value.length >= 5) {
-		const earliest = attempts.value[0]
-		cooldownSeconds.value = Math.ceil((30000 - (now - earliest)) / 1000)
-		auth.error = `Demasiadas tentativas. Aguarde ${cooldownSeconds.value}s.`
+  if (attempts.value.length >= 5) {
+    const earliest = attempts.value[0]
+    cooldownSeconds.value = Math.ceil((30000 - (now - earliest)) / 1000)
+    auth.error = `Demasiadas tentativas. Aguarde ${cooldownSeconds.value}s.`
 
-		if (cooldownTimer) clearInterval(cooldownTimer)
-		cooldownTimer = window.setInterval(() => {
-			if (cooldownSeconds.value > 1) {
-				cooldownSeconds.value--
-				auth.error = `Demasiadas tentativas. Aguarde ${cooldownSeconds.value}s.`
-			} else {
-				cooldownSeconds.value = 0
-				auth.error = null
-				if (cooldownTimer) {
-					clearInterval(cooldownTimer)
-					cooldownTimer = null
-				}
-			}
-		}, 1000)
-		return true
-	}
+    if (cooldownTimer) clearInterval(cooldownTimer)
+    cooldownTimer = window.setInterval(() => {
+      if (cooldownSeconds.value > 1) {
+        cooldownSeconds.value--
+        auth.error = `Demasiadas tentativas. Aguarde ${cooldownSeconds.value}s.`
+      } else {
+        cooldownSeconds.value = 0
+        auth.error = null
+        if (cooldownTimer) {
+          clearInterval(cooldownTimer)
+          cooldownTimer = null
+        }
+      }
+    }, 1000)
+    return true
+  }
 
-	attempts.value.push(now)
-	return false
+  attempts.value.push(now)
+  return false
 }
 
 function injectTestData() {
-	password.value = 'password123'
-	passwordConfirmation.value = 'password123'
+  password.value = 'password123'
+  passwordConfirmation.value = 'password123'
 }
 
 function handleKeyDown(e: KeyboardEvent) {
-	if (e.ctrlKey && e.shiftKey && e.key.toLowerCase() === 'y') {
-		e.preventDefault()
-		injectTestData()
-	}
+  if (e.ctrlKey && e.shiftKey && e.key.toLowerCase() === 'y') {
+    e.preventDefault()
+    injectTestData()
+  }
 }
 
 onMounted(() => {
-	window.addEventListener('keydown', handleKeyDown)
-	// O email e token chegam via query string: /reset-password?token=xxx&email=yyy
-	token.value = (route.query.token as string) ?? ''
-	email.value = (route.query.email as string) ?? ''
+  window.addEventListener('keydown', handleKeyDown)
+  // O email e token chegam via query string: /reset-password?token=xxx&email=yyy
+  token.value = (route.query.token as string) ?? ''
+  email.value = (route.query.email as string) ?? ''
 })
 
 onUnmounted(() => {
-	window.removeEventListener('keydown', handleKeyDown)
-	if (cooldownTimer) clearInterval(cooldownTimer)
+  window.removeEventListener('keydown', handleKeyDown)
+  if (cooldownTimer) clearInterval(cooldownTimer)
 })
 
 const passwordsMatch = computed(() => {
-	if (!passwordConfirmation.value) return true
-	return password.value === passwordConfirmation.value
+  if (!passwordConfirmation.value) return true
+  return password.value === passwordConfirmation.value
 })
 
 const passwordStrength = computed(() => {
-	const p = password.value
-	if (!p) return 0
-	let score = 0
-	if (p.length >= 8) score++
-	if (/[A-Z]/.test(p)) score++
-	if (/[0-9]/.test(p)) score++
-	if (/[^A-Za-z0-9]/.test(p)) score++
-	return score
+  const p = password.value
+  if (!p) return 0
+  let score = 0
+  if (p.length >= 8) score++
+  if (/[A-Z]/.test(p)) score++
+  if (/[0-9]/.test(p)) score++
+  if (/[^A-Za-z0-9]/.test(p)) score++
+  return score
 })
 
 const strengthLabel = computed(() => {
-	const labels = ['', 'Fraca', 'Razoável', 'Boa', 'Forte']
-	return labels[passwordStrength.value] ?? ''
+  const labels = ['', 'Fraca', 'Razoável', 'Boa', 'Forte']
+  return labels[passwordStrength.value] ?? ''
 })
 
 const strengthColor = computed(() => {
-	const colors = [
-		'',
-		'bg-red-500',
-		'bg-yellow-500',
-		'bg-blue-400',
-		'bg-green-500',
-	]
-	return colors[passwordStrength.value] ?? ''
+  const colors = [
+    '',
+    'bg-red-500',
+    'bg-yellow-500',
+    'bg-blue-400',
+    'bg-green-500',
+  ]
+  return colors[passwordStrength.value] ?? ''
 })
 
 async function handleReset() {
-	if (isRateLimited.value) return
+  if (isRateLimited.value) return
 
-	const emEl = document.getElementById('reset-email') as HTMLInputElement | null
-	const pwEl = document.getElementById(
-		'reset-password',
-	) as HTMLInputElement | null
-	const coEl = document.getElementById(
-		'reset-confirm',
-	) as HTMLInputElement | null
+  const emEl = document.getElementById('reset-email') as HTMLInputElement | null
+  const pwEl = document.getElementById(
+    'reset-password',
+  ) as HTMLInputElement | null
+  const coEl = document.getElementById(
+    'reset-confirm',
+  ) as HTMLInputElement | null
 
-	if (emEl && emEl.value && !email.value) email.value = emEl.value
-	if (pwEl && pwEl.value && !password.value) password.value = pwEl.value
-	if (coEl && coEl.value && !passwordConfirmation.value)
-		passwordConfirmation.value = coEl.value
+  if (emEl && emEl.value && !email.value) email.value = emEl.value
+  if (pwEl && pwEl.value && !password.value) password.value = pwEl.value
+  if (coEl && coEl.value && !passwordConfirmation.value)
+    passwordConfirmation.value = coEl.value
 
-	if (checkRateLimit()) return
+  if (checkRateLimit()) return
 
-	if (!passwordsMatch.value) return
+  if (!passwordsMatch.value) return
 
-	const ok = await auth.resetPassword({
-		email: email.value,
-		token: token.value,
-		password: password.value,
-		password_confirmation: passwordConfirmation.value,
-	})
+  const ok = await auth.resetPassword({
+    email: email.value,
+    token: token.value,
+    password: password.value,
+    password_confirmation: passwordConfirmation.value,
+  })
 
-	if (ok) {
-		resetDone.value = true
-		// Redireciona para login após 3 segundos
-		setTimeout(() => router.push('/login'), 3000)
-	}
+  if (ok) {
+    resetDone.value = true
+    // Redireciona para login após 3 segundos
+    setTimeout(() => router.push('/login'), 3000)
+  }
 }
 </script>
 
@@ -162,12 +162,12 @@ async function handleReset() {
 		<div class="relative w-full max-w-md">
 			<!-- Logo -->
 			<div class="mb-10 text-center">
-				<router-link
+				<RouterLink
 					to="/"
 					class="text-3xl font-extrabold tracking-tight text-white transition duration-300 hover:text-k-main"
 				>
 					RELOGIOS<span class="text-k-main">.inc</span>
-				</router-link>
+				</RouterLink>
 			</div>
 
 			<!-- Card -->
@@ -203,12 +203,12 @@ async function handleReset() {
 						<p class="mb-8 text-xs text-white/30">
 							A redirecionar para o login em instantes...
 						</p>
-						<router-link
+						<RouterLink
 							to="/login"
 							class="inline-flex items-center gap-2 rounded-xl bg-k-main px-6 py-2.5 text-sm font-bold text-k-black transition duration-200 hover:bg-yellow-400"
 						>
 							Ir para o Login
-						</router-link>
+						</RouterLink>
 					</div>
 
 					<!-- Estado: formulário -->
@@ -236,12 +236,12 @@ async function handleReset() {
 							<p class="mb-8 text-sm text-white/50">
 								Este link de recuperação é inválido ou expirou.
 							</p>
-							<router-link
+							<RouterLink
 								to="/forgot-password"
 								class="inline-flex items-center gap-2 rounded-xl bg-k-main px-6 py-2.5 text-sm font-bold text-k-black transition duration-200 hover:bg-yellow-400"
 							>
 								Pedir novo link
-							</router-link>
+							</RouterLink>
 						</div>
 
 						<!-- Formulário normal -->
@@ -295,7 +295,7 @@ async function handleReset() {
 								</div>
 							</Transition>
 
-							<form @submit.prevent="handleReset" class="space-y-5">
+							<form class="space-y-5" @submit.prevent="handleReset">
 								<!-- Email (readonly, pré-preenchido) -->
 								<div>
 									<label
@@ -306,9 +306,9 @@ async function handleReset() {
 									</label>
 									<input
 										id="reset-email"
+										v-model="email"
 										name="email"
 										autocomplete="email"
-										v-model="email"
 										type="email"
 										required
 										placeholder="o.teu@email.com"
@@ -327,9 +327,9 @@ async function handleReset() {
 									<div class="relative">
 										<input
 											id="reset-password"
+											v-model="password"
 											name="password"
 											autocomplete="new-password"
-											v-model="password"
 											:type="showPassword ? 'text' : 'password'"
 											required
 											minlength="8"
@@ -338,8 +338,8 @@ async function handleReset() {
 										/>
 										<button
 											type="button"
-											@click="showPassword = !showPassword"
 											class="absolute right-4 top-1/2 -translate-y-1/2 text-white/30 transition duration-200 hover:text-white/70"
+											@click="showPassword = !showPassword"
 										>
 											<svg
 												v-if="!showPassword"
@@ -406,9 +406,9 @@ async function handleReset() {
 									<div class="relative">
 										<input
 											id="reset-confirm"
+											v-model="passwordConfirmation"
 											name="password_confirmation"
 											autocomplete="new-password"
-											v-model="passwordConfirmation"
 											:type="showConfirmPassword ? 'text' : 'password'"
 											required
 											placeholder="Repete a nova password"
@@ -421,8 +421,8 @@ async function handleReset() {
 										/>
 										<button
 											type="button"
-											@click="showConfirmPassword = !showConfirmPassword"
 											class="absolute right-4 top-1/2 -translate-y-1/2 text-white/30 transition duration-200 hover:text-white/70"
+											@click="showConfirmPassword = !showConfirmPassword"
 										>
 											<svg
 												v-if="!showConfirmPassword"
@@ -512,8 +512,8 @@ async function handleReset() {
 							>
 								<button
 									type="button"
-									@click="injectTestData"
 									class="flex items-center gap-1.5 rounded-lg bg-white/5 px-3 py-1.5 text-xs text-k-main/60 transition duration-200 hover:bg-white/10 hover:text-k-main"
+									@click="injectTestData"
 								>
 									<svg
 										class="h-3.5 w-3.5"
@@ -536,7 +536,7 @@ async function handleReset() {
 							</div>
 
 							<div class="mt-6 text-center">
-								<router-link
+								<RouterLink
 									to="/login"
 									class="inline-flex items-center gap-2 text-sm text-white/40 transition duration-200 hover:text-white/70"
 								>
@@ -554,7 +554,7 @@ async function handleReset() {
 										/>
 									</svg>
 									Voltar ao Login
-								</router-link>
+								</RouterLink>
 							</div>
 						</div>
 					</div>

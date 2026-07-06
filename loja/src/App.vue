@@ -6,7 +6,7 @@ const cartStore = useCartStore()
 
 <template>
 	<div class="relative select-none font-Manrope">
-		<router-view></router-view>
+		<RouterView></RouterView>
 
 		<!-- Global Toast Notification -->
 		<Transition name="toast">
@@ -39,8 +39,8 @@ const cartStore = useCartStore()
 					</p>
 				</div>
 				<button
-					@click="cartStore.showToast = false"
 					class="absolute right-2 top-2 text-gray-400 hover:text-black"
+					@click="cartStore.showToast = false"
 				>
 					<svg
 						class="h-4 w-4"

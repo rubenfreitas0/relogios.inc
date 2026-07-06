@@ -14,9 +14,9 @@ const cartStore = useCartStore()
 		>
 			<!-- Clickable background area to close the cart -->
 			<div
-				@click="cartStore.cartOff()"
 				class="absolute inset-0 cursor-pointer"
 				data-test="cart-background"
+				@click="cartStore.cartOff()"
 			></div>
 
 			<!-- Drawer panel -->
@@ -32,9 +32,9 @@ const cartStore = useCartStore()
 						CART ({{ cartStore.cartLength }})
 					</p>
 					<button
-						@click="cartStore.cartOff()"
 						class="cursor-pointer font-semibold text-black opacity-60 transition hover:opacity-100"
 						data-test="cart-close-button"
+						@click="cartStore.cartOff()"
 					>
 						✕ Close
 					</button>
@@ -42,9 +42,9 @@ const cartStore = useCartStore()
 
 				<div class="mb-4 mt-2 px-6 lg:px-10">
 					<p
-						@click="cartStore.clearCart()"
 						class="inline-block cursor-pointer text-sm text-k-dark-grey underline opacity-70 transition hover:opacity-100 active:translate-y-0.5"
 						data-test="cart-delete-all"
+						@click="cartStore.clearCart()"
 					>
 						Delete All
 					</p>
@@ -65,9 +65,9 @@ const cartStore = useCartStore()
 					<div v-else class="flex flex-col gap-5">
 						<CartItem
 							v-for="(value, key) in cartStore.cart"
+							:key="key"
 							:cart-item="value.product as any"
 							:item-count="value.amount"
-							:key="key"
 						/>
 					</div>
 				</div>
@@ -92,8 +92,8 @@ const cartStore = useCartStore()
 						add="font-bold w-full py-4"
 						color="light"
 						content="Checkout"
-						@click="cartStore.cartOff"
 						data-test="cart-checkout-button"
+						@click="cartStore.cartOff"
 					/>
 				</div>
 			</div>

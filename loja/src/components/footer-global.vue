@@ -24,40 +24,40 @@ import instagramIcon from '/icons/instagram.svg'
 				id="titleNav"
 				class="mb-10 flex flex-col items-center justify-between md:flex-row"
 			>
-				<router-link
+				<RouterLink
 					to="/"
 					class="mb-8 cursor-pointer text-4xl font-bold text-white subpixel-antialiased transition duration-300 hover:scale-110 hover:text-k-main md:mb-0 md:text-3xl"
 				>
 					RELOGIOS.inc
-				</router-link>
+				</RouterLink>
 				<nav
 					class="flex flex-col items-center justify-between gap-6 md:flex-row md:items-start md:gap-10"
 				>
-					<router-link
+					<RouterLink
 						class="font-semibold uppercase tracking-wider text-white transition duration-300 hover:text-k-main"
 						to="/"
 						>Home
-					</router-link>
-					<router-link
+					</RouterLink>
+					<RouterLink
 						class="font-semibold uppercase tracking-wider text-white transition duration-300 hover:text-k-main"
 						to="/homens"
 						>HOMENS
-					</router-link>
-					<router-link
+					</RouterLink>
+					<RouterLink
 						class="font-semibold uppercase tracking-wider text-white transition duration-300 hover:text-k-main"
 						to="/mulheres"
 						>MULHERES
-					</router-link>
-					<router-link
+					</RouterLink>
+					<RouterLink
 						class="font-semibold uppercase tracking-wider text-white transition duration-300 hover:text-k-main"
 						to="/unisexo"
 						>UNISEXO
-					</router-link>
-					<router-link
+					</RouterLink>
+					<RouterLink
 						class="font-semibold uppercase tracking-wider text-white transition duration-300 hover:text-k-main"
 						to="/sobre-nos"
 						>SOBRE NÓS
-					</router-link>
+					</RouterLink>
 				</nav>
 			</div>
 			<div

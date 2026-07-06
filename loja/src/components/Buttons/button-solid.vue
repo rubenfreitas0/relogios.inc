@@ -2,22 +2,22 @@
 import type { RouteLocationRaw } from 'vue-router'
 
 interface Props {
-	content?: string
-	color?: 'light' | 'dark'
-	add?: string
-	to?: RouteLocationRaw
-	size?: 'small' | 'big'
+  content?: string
+  color?: 'light' | 'dark'
+  add?: string
+  to?: RouteLocationRaw
+  size?: 'small' | 'big'
 }
 
 const props = withDefaults(defineProps<Props>(), {
-	content: 'to product',
-	to: '',
-	size: 'big',
+  content: 'to product',
+  to: '',
+  size: 'big',
 })
 </script>
 
 <template>
-	<component :is="to ? 'router-link' : 'div'" class="w-fit" :to="props.to">
+	<Component :is="to ? 'router-link' : 'div'" class="w-fit" :to="props.to">
 		<button
 			class="rounded-sm border-2 uppercase tracking-wide text-k-black shadow-md transition duration-100 hover:translate-y-0.5 active:translate-y-1"
 			:class="[
@@ -37,5 +37,5 @@ const props = withDefaults(defineProps<Props>(), {
 		>
 			{{ props.content }}
 		</button>
-	</component>
+	</Component>
 </template>

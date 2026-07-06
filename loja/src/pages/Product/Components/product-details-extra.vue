@@ -2,57 +2,57 @@
 import { computed, ref } from 'vue'
 import type { Product } from '../../../data/product-types.ts'
 import {
-	resolveProductImageUrl,
-	getProductImageStyle,
+  resolveProductImageUrl,
+  getProductImageStyle,
 } from '../../../utils/utilities'
 
 const props = defineProps<{
-	item: Product
+  item: Product
 }>()
 
 const activeIndex = ref(0)
 
 const allImages = computed(() => {
-	const imgs: string[] = []
-	if (props.item.images && props.item.images.length > 0) {
-		// Ordena por ordem de ordenação para respeitar a galeria
-		const sorted = [...props.item.images].sort(
-			(a, b) => a.sort_order - b.sort_order,
-		)
-		sorted.forEach((img) => {
-			// Usamos props.item.id para carregar o mesmo modelo de relógio
-			// Usamos img.sort_order para carregar ângulos diferentes (frente, lado, detalhe)
-			const resolved = resolveProductImageUrl(
-				img.url,
-				props.item.id,
-				img.sort_order,
-			)
-			if (!imgs.includes(resolved)) {
-				imgs.push(resolved)
-			}
-		})
-	} else if (props.item.primary_image?.url) {
-		imgs.push(
-			resolveProductImageUrl(props.item.primary_image.url, props.item.id, 1),
-		)
-	}
-	if (imgs.length === 0) {
-		imgs.push('/images/placeholder.png')
-	}
-	return imgs
+  const imgs: string[] = []
+  if (props.item.images && props.item.images.length > 0) {
+    // Ordena por ordem de ordenação para respeitar a galeria
+    const sorted = [...props.item.images].sort(
+      (a, b) => a.sort_order - b.sort_order,
+    )
+    sorted.forEach((img) => {
+      // Usamos props.item.id para carregar o mesmo modelo de relógio
+      // Usamos img.sort_order para carregar ângulos diferentes (frente, lado, detalhe)
+      const resolved = resolveProductImageUrl(
+        img.url,
+        props.item.id,
+        img.sort_order,
+      )
+      if (!imgs.includes(resolved)) {
+        imgs.push(resolved)
+      }
+    })
+  } else if (props.item.primary_image?.url) {
+    imgs.push(
+      resolveProductImageUrl(props.item.primary_image.url, props.item.id, 1),
+    )
+  }
+  if (imgs.length === 0) {
+    imgs.push('/images/placeholder.png')
+  }
+  return imgs
 })
 
 function nextImage() {
-	activeIndex.value = (activeIndex.value + 1) % allImages.value.length
+  activeIndex.value = (activeIndex.value + 1) % allImages.value.length
 }
 
 function prevImage() {
-	activeIndex.value =
-		(activeIndex.value - 1 + allImages.value.length) % allImages.value.length
+  activeIndex.value =
+    (activeIndex.value - 1 + allImages.value.length) % allImages.value.length
 }
 
 function selectImage(index: number) {
-	activeIndex.value = index
+  activeIndex.value = index
 }
 </script>
 
@@ -74,8 +74,8 @@ function selectImage(index: number) {
 			>
 				<button
 					v-if="allImages.length > 1"
-					@click="prevImage"
 					class="absolute left-4 z-30 flex h-10 w-10 items-center justify-center rounded-full border border-white/10 bg-black/40 text-lg font-bold text-white transition duration-200 hover:bg-k-main hover:text-k-black"
+					@click="prevImage"
 				>
 					&larr;
 				</button>
@@ -89,8 +89,8 @@ function selectImage(index: number) {
 
 				<button
 					v-if="allImages.length > 1"
-					@click="nextImage"
 					class="absolute right-4 z-30 flex h-10 w-10 items-center justify-center rounded-full border border-white/10 bg-black/40 text-lg font-bold text-white transition duration-200 hover:bg-k-main hover:text-k-black"
+					@click="nextImage"
 				>
 					&rarr;
 				</button>
@@ -112,13 +112,13 @@ function selectImage(index: number) {
 				<button
 					v-for="(img, idx) in allImages"
 					:key="idx"
-					@click="selectImage(idx)"
 					class="flex h-16 w-16 items-center justify-center overflow-hidden rounded-md border-2 bg-black p-1 transition duration-200"
 					:class="
 						activeIndex === idx
 							? 'scale-105 border-k-main'
 							: 'border-white/10 hover:border-white/30'
 					"
+					@click="selectImage(idx)"
 				>
 					<img
 						:src="img"

@@ -1,15 +1,15 @@
 <script setup lang="ts">
 interface CartItemProduct {
-	id: number
-	name?: string
-	primary_image?: { url: string }
-	price: number | string
-	discount_price?: number | string | null
+  id: number
+  name?: string
+  primary_image?: { url: string }
+  price: number | string
+  discount_price?: number | string | null
 }
 
 const props = defineProps<{
-	cartItem: CartItemProduct
-	itemCount: number
+  cartItem: CartItemProduct
+  itemCount: number
 }>()
 
 import { resolveProductImageUrl } from '../../../utils/utilities'

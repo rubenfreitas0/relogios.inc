@@ -4,40 +4,40 @@ import ButtonSolid from '../../../components/Buttons/button-solid.vue'
 import defaultWatchImage from '/products/keyboards/relogio2.png'
 
 const heroData = ref({
-	hero_subtitle: 'nova coleção',
-	hero_title: 'CASIO MTP-1274 \n DARK EDITION \n COLEÇÃO PREMIUM',
-	hero_description: 'Na RELOGIOS.inc selecionamos apenas o que resiste ao tempo.\nO Casio MTP-1274 combina aço inoxidável, precisão e um\ndesign atemporal que se adapta a qualquer ocasião.',
-	hero_image: defaultWatchImage,
-	hero_link: '/homens',
-	hero_button_text: 'ver relógio',
+  hero_subtitle: 'nova coleção',
+  hero_title: 'CASIO MTP-1274 \n DARK EDITION \n COLEÇÃO PREMIUM',
+  hero_description: 'Na RELOGIOS.inc selecionamos apenas o que resiste ao tempo.\nO Casio MTP-1274 combina aço inoxidável, precisão e um\ndesign atemporal que se adapta a qualquer ocasião.',
+  hero_image: defaultWatchImage,
+  hero_link: '/homens',
+  hero_button_text: 'ver relógio',
 })
 
 onMounted(async () => {
-	try {
-		const res = await fetch('/api/site-settings/hero')
-		if (res.ok) {
-			const data = await res.json()
-			if (data.hero_subtitle) heroData.value.hero_subtitle = data.hero_subtitle
-			if (data.hero_title) heroData.value.hero_title = data.hero_title
-			if (data.hero_description) heroData.value.hero_description = data.hero_description
-			if (data.hero_image) {
-				// Se a imagem for caminho do Laravel (ex: site/imagem.png), formatar a url
-				if (!data.hero_image.startsWith('http') && !data.hero_image.startsWith('/')) {
-					heroData.value.hero_image = `/api/storage/${data.hero_image}`
-				} else {
-					heroData.value.hero_image = data.hero_image
-				}
-			}
-			if (data.hero_link) heroData.value.hero_link = data.hero_link
-			if (data.hero_button_text) heroData.value.hero_button_text = data.hero_button_text
-		}
-	} catch (e) {
-		console.error('Erro ao buscar definições do Hero:', e)
-	}
+  try {
+    const res = await fetch('/api/site-settings/hero')
+    if (res.ok) {
+      const data = await res.json()
+      if (data.hero_subtitle) heroData.value.hero_subtitle = data.hero_subtitle
+      if (data.hero_title) heroData.value.hero_title = data.hero_title
+      if (data.hero_description) heroData.value.hero_description = data.hero_description
+      if (data.hero_image) {
+        // Se a imagem for caminho do Laravel (ex: site/imagem.png), formatar a url
+        if (!data.hero_image.startsWith('http') && !data.hero_image.startsWith('/')) {
+          heroData.value.hero_image = `/api/storage/${data.hero_image}`
+        } else {
+          heroData.value.hero_image = data.hero_image
+        }
+      }
+      if (data.hero_link) heroData.value.hero_link = data.hero_link
+      if (data.hero_button_text) heroData.value.hero_button_text = data.hero_button_text
+    }
+  } catch (e) {
+    console.error('Erro ao buscar definições do Hero:', e)
+  }
 })
 
 const formatText = (text: string) => {
-	return text.replace(/\n/g, '<br />')
+  return text.replace(/\n/g, '<br />')
 }
 </script>
 
@@ -75,7 +75,7 @@ const formatText = (text: string) => {
 				<img
 					class="relative top-12 scale-[175%] md:top-20 md:scale-[175%] lg:top-12 lg:scale-150"
 					:src="heroData.hero_image"
-					:alt="heroData.hero_title"
+					alt="Casio MTP-1274 Dark Edition"
 				/>
 			</div>
 		</div>

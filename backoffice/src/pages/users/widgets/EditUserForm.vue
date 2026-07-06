@@ -2,7 +2,6 @@
 import { PropType, computed, ref, watch } from 'vue'
 import { useForm } from 'vuestic-ui'
 import { User, UserRole } from '../types'
-import UserAvatar from './UserAvatar.vue'
 import { validators } from '../../../services/utils'
 
 const props = defineProps({
@@ -79,45 +78,26 @@ const onSave = () => {
   }
 }
 
-const roleSelectOptions: { text: Capitalize<Lowercase<UserRole>>; value: UserRole }[] = [
-  { text: 'Admin', value: 'admin' },
-  { text: 'User', value: 'user' },
-  { text: 'Owner', value: 'owner' },
+const roleSelectOptions = [
+  { text: 'Administrador', value: 'admin' as UserRole },
+  { text: 'Cliente', value: 'user' as UserRole },
 ]
 </script>
 
 <template>
   <VaForm v-slot="{ isValid }" ref="add-user-form" class="flex-col justify-start items-start gap-4 inline-flex w-full">
-    <VaFileUpload
-      v-model="avatar"
-      type="single"
-      hide-file-list
-      class="self-stretch justify-start items-center gap-4 inline-flex"
-    >
-      <UserAvatar :user="newUser" size="large" />
-      <VaButton preset="primary" size="small">Add image</VaButton>
-      <VaButton
-        v-if="avatar"
-        preset="primary"
-        color="danger"
-        size="small"
-        icon="delete"
-        class="z-10"
-        @click.stop="avatar = undefined"
-      />
-    </VaFileUpload>
     <div class="self-stretch flex-col justify-start items-start gap-4 flex">
       <div class="flex gap-4 flex-col sm:flex-row w-full">
         <VaInput
           v-model="newUser.fullname"
-          label="Full name"
+          label="Nome completo"
           class="w-full sm:w-1/2"
           :rules="[validators.required]"
           name="fullName"
         />
         <VaInput
           v-model="newUser.username"
-          label="Username"
+          label="Nome de utilizador"
           class="w-full sm:w-1/2"
           :rules="[validators.required]"
           name="username"
@@ -127,9 +107,21 @@ const roleSelectOptions: { text: Capitalize<Lowercase<UserRole>>; value: UserRol
         <VaInput
           v-model="newUser.email"
           label="Email"
-          class="w-full sm:w-1/2"
+          class="w-full sm:w-[48%]"
           :rules="[validators.required, validators.email]"
           name="email"
+        />
+        <VaInput
+          v-if="!user"
+          v-model="newUser.password"
+          type="password"
+          label="Palavra-passe"
+          class="w-full sm:w-[48%]"
+          :rules="[
+            validators.required,
+            (v) => (v && v.length >= 8) || 'A palavra-passe deve ter pelo menos 8 caracteres',
+          ]"
+          name="password"
         />
       </div>
 
@@ -137,7 +129,7 @@ const roleSelectOptions: { text: Capitalize<Lowercase<UserRole>>; value: UserRol
         <div class="w-1/2">
           <VaSelect
             v-model="newUser.role"
-            label="Role"
+            label="Função"
             class="w-full"
             :options="roleSelectOptions"
             :rules="[validators.required]"
@@ -147,13 +139,13 @@ const roleSelectOptions: { text: Capitalize<Lowercase<UserRole>>; value: UserRol
         </div>
 
         <div class="flex items-center w-1/2 mt-4">
-          <VaCheckbox v-model="newUser.active" label="Active" class="w-full" name="active" />
+          <VaCheckbox v-model="newUser.active" label="Ativo" class="w-full" name="active" />
         </div>
       </div>
 
-      <VaTextarea v-model="newUser.notes" label="Notes" class="w-full" name="notes" />
+      <VaTextarea v-model="newUser.notes" label="Notas" class="w-full" name="notes" />
       <div class="flex gap-2 flex-col-reverse items-stretch justify-end w-full sm:flex-row sm:items-center">
-        <VaButton preset="secondary" color="secondary" @click="$emit('close')">Cancel</VaButton>
+        <VaButton preset="secondary" color="secondary" @click="$emit('close')">Cancelar</VaButton>
         <VaButton :disabled="!isValid" @click="onSave">{{ saveButtonLabel }}</VaButton>
       </div>
     </div>

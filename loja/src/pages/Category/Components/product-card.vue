@@ -2,8 +2,8 @@
 import type { Product } from '../../../data/product-types.ts'
 import { useCartStore } from '../../../pinia/cartStore.ts'
 import {
-	resolveProductImageUrl,
-	getProductImageStyle,
+  resolveProductImageUrl,
+  getProductImageStyle,
 } from '../../../utils/utilities'
 
 import ButtonSolid from '../../../components/Buttons/button-solid.vue'
@@ -11,26 +11,26 @@ import ButtonSolid from '../../../components/Buttons/button-solid.vue'
 const cartStore = useCartStore()
 
 const props = defineProps<{
-	category: string
-	item: Product
-	index?: number
+  category: string
+  item: Product
+  index?: number
 }>()
 
 const formatPrice = (price?: number | string) => {
-	if (price !== undefined) {
-		const num = Number(price)
-		if (!isNaN(num)) {
-			return `€${num.toFixed(2).replace('.', ',')}`
-		}
-	}
-	return '€199,00'
+  if (price !== undefined) {
+    const num = Number(price)
+    if (!isNaN(num)) {
+      return `€${num.toFixed(2).replace('.', ',')}`
+    }
+  }
+  return '€199,00'
 }
 </script>
 
 <template>
 	<div class="group relative flex flex-col transition-all duration-300">
 		<!-- Image Container -->
-		<router-link
+		<RouterLink
 			:to="`/${props.category}/${props.item.slug}`"
 			class="relative block aspect-[4/5] w-full overflow-hidden rounded-xl bg-k-dark-grey transition-all duration-500 group-hover:shadow-lg group-hover:shadow-[#FFC700]/10"
 		>
@@ -49,7 +49,7 @@ const formatPrice = (price?: number | string) => {
 				:alt="props.item.name"
 				:style="getProductImageStyle(props.item.id)"
 			/>
-		</router-link>
+		</RouterLink>
 
 		<!-- Content Container -->
 		<div class="flex flex-1 flex-col pt-5">
@@ -62,7 +62,7 @@ const formatPrice = (price?: number | string) => {
 				</span>
 			</div>
 
-			<router-link
+			<RouterLink
 				:to="`/${props.category}/${props.item.slug}`"
 				class="mb-2 block"
 			>
@@ -74,7 +74,7 @@ const formatPrice = (price?: number | string) => {
 				>
 					{{ props.item.name }}
 				</h3>
-			</router-link>
+			</RouterLink>
 
 			<!-- Truncated description -->
 			<p
@@ -110,7 +110,6 @@ const formatPrice = (price?: number | string) => {
 
 				<!-- Add to Cart (Desktop & Mobile) -->
 				<button
-					@click.prevent="cartStore.addToCart(props.item)"
 					class="flex h-11 w-11 items-center justify-center rounded-full bg-white/5 text-white transition-all duration-300 hover:scale-110 hover:bg-[#FFC700] hover:text-black active:scale-95"
 					title="Adicionar ao carrinho"
 					:data-test="
@@ -118,6 +117,7 @@ const formatPrice = (price?: number | string) => {
 							? `quick-add-${props.category}-${props.index}`
 							: undefined
 					"
+					@click.prevent="cartStore.addToCart(props.item)"
 				>
 					<svg
 						xmlns="http://www.w3.org/2000/svg"

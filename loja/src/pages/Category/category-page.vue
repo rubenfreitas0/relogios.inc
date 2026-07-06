@@ -13,102 +13,102 @@ const route = useRoute()
 const router = useRouter()
 
 interface PriceRange {
-	label: string
-	min: number
-	max: number
+  label: string
+  min: number
+  max: number
 }
 
 interface CategoryFilterMeta {
-	label: string
-	subtitle: string
-	brands: string[]
-	priceRanges: PriceRange[]
-	categories: { slug: string; name: string }[]
-	colors: { name: string; hex: string }[]
+  label: string
+  subtitle: string
+  brands: string[]
+  priceRanges: PriceRange[]
+  categories: { slug: string; name: string }[]
+  colors: { name: string; hex: string }[]
 }
 
 // ── Static filter data (future: fetch from API) ──────────────────
 const filterData: Record<string, CategoryFilterMeta> = {
-	homens: {
-		label: 'Homens',
-		subtitle: 'Elegância e precisão para ele.',
-		brands: ['Rolex', 'Casio', 'Seiko', 'Omega', 'Tag Heuer'],
-		priceRanges: [
-			{ label: 'Até €100', min: 0, max: 100 },
-			{ label: '€100 – €250', min: 100, max: 250 },
-			{ label: '€250 – €500', min: 250, max: 500 },
-			{ label: 'Acima de €500', min: 500, max: 999999 },
-		],
-		categories: [
-			{ slug: 'classicos', name: 'Clássico' },
-			{ slug: 'desporto', name: 'Desportivo' },
-			{ slug: 'mergulho', name: 'Mergulho' },
-			{ slug: 'cronografos', name: 'Cronógrafo' },
-			{ slug: 'automaticos', name: 'Automático' },
-			{ slug: 'digital', name: 'Digital' },
-			{ slug: 'smartwatch', name: 'Smartwatch' },
-		],
-		colors: [
-			{ name: 'Preto', hex: '#1a1a1a' },
-			{ name: 'Prata', hex: '#c0c0c0' },
-			{ name: 'Dourado', hex: '#c8a44a' },
-			{ name: 'Azul', hex: '#1e3a5f' },
-			{ name: 'Verde', hex: '#2d5a3d' },
-			{ name: 'Branco', hex: '#f0f0f0' },
-		],
-	},
-	mulheres: {
-		label: 'Mulheres',
-		subtitle: 'Sofisticação em cada detalhe.',
-		brands: ['Rolex', 'Casio', 'Seiko', 'Omega', 'Tag Heuer'],
-		priceRanges: [
-			{ label: 'Até €80', min: 0, max: 80 },
-			{ label: '€80 – €200', min: 80, max: 200 },
-			{ label: '€200 – €450', min: 200, max: 450 },
-			{ label: 'Acima de €450', min: 450, max: 999999 },
-		],
-		categories: [
-			{ slug: 'classicos', name: 'Clássico' },
-			{ slug: 'desporto', name: 'Desportivo' },
-			{ slug: 'automaticos', name: 'Automático' },
-			{ slug: 'analogico', name: 'Analógico' },
-			{ slug: 'smartwatch', name: 'Smartwatch' },
-		],
-		colors: [
-			{ name: 'Dourado', hex: '#c8a44a' },
-			{ name: 'Rosa Gold', hex: '#b76e79' },
-			{ name: 'Prata', hex: '#c0c0c0' },
-			{ name: 'Branco', hex: '#f0f0f0' },
-			{ name: 'Preto', hex: '#1a1a1a' },
-			{ name: 'Rose', hex: '#e8a0a0' },
-		],
-	},
-	unisexo: {
-		label: 'Unisexo',
-		subtitle: 'Para quem não segue regras.',
-		brands: ['Rolex', 'Casio', 'Seiko', 'Omega', 'Tag Heuer'],
-		priceRanges: [
-			{ label: 'Até €80', min: 0, max: 80 },
-			{ label: '€80 – €200', min: 80, max: 200 },
-			{ label: '€200 – €500', min: 200, max: 500 },
-			{ label: 'Acima de €500', min: 500, max: 999999 },
-		],
-		categories: [
-			{ slug: 'classicos', name: 'Clássico' },
-			{ slug: 'desporto', name: 'Desportivo' },
-			{ slug: 'automaticos', name: 'Automático' },
-			{ slug: 'digital', name: 'Digital' },
-			{ slug: 'smartwatch', name: 'Smartwatch' },
-		],
-		colors: [
-			{ name: 'Preto', hex: '#1a1a1a' },
-			{ name: 'Branco', hex: '#f0f0f0' },
-			{ name: 'Prata', hex: '#c0c0c0' },
-			{ name: 'Laranja', hex: '#d4621a' },
-			{ name: 'Verde', hex: '#2d5a3d' },
-			{ name: 'Azul', hex: '#1e3a5f' },
-		],
-	},
+  homens: {
+    label: 'Homens',
+    subtitle: 'Elegância e precisão para ele.',
+    brands: ['Rolex', 'Casio', 'Seiko', 'Omega', 'Tag Heuer'],
+    priceRanges: [
+      { label: 'Até €100', min: 0, max: 100 },
+      { label: '€100 – €250', min: 100, max: 250 },
+      { label: '€250 – €500', min: 250, max: 500 },
+      { label: 'Acima de €500', min: 500, max: 999999 },
+    ],
+    categories: [
+      { slug: 'classicos', name: 'Clássico' },
+      { slug: 'desporto', name: 'Desportivo' },
+      { slug: 'mergulho', name: 'Mergulho' },
+      { slug: 'cronografos', name: 'Cronógrafo' },
+      { slug: 'automaticos', name: 'Automático' },
+      { slug: 'digital', name: 'Digital' },
+      { slug: 'smartwatch', name: 'Smartwatch' },
+    ],
+    colors: [
+      { name: 'Preto', hex: '#1a1a1a' },
+      { name: 'Prata', hex: '#c0c0c0' },
+      { name: 'Dourado', hex: '#c8a44a' },
+      { name: 'Azul', hex: '#1e3a5f' },
+      { name: 'Verde', hex: '#2d5a3d' },
+      { name: 'Branco', hex: '#f0f0f0' },
+    ],
+  },
+  mulheres: {
+    label: 'Mulheres',
+    subtitle: 'Sofisticação em cada detalhe.',
+    brands: ['Rolex', 'Casio', 'Seiko', 'Omega', 'Tag Heuer'],
+    priceRanges: [
+      { label: 'Até €80', min: 0, max: 80 },
+      { label: '€80 – €200', min: 80, max: 200 },
+      { label: '€200 – €450', min: 200, max: 450 },
+      { label: 'Acima de €450', min: 450, max: 999999 },
+    ],
+    categories: [
+      { slug: 'classicos', name: 'Clássico' },
+      { slug: 'desporto', name: 'Desportivo' },
+      { slug: 'automaticos', name: 'Automático' },
+      { slug: 'analogico', name: 'Analógico' },
+      { slug: 'smartwatch', name: 'Smartwatch' },
+    ],
+    colors: [
+      { name: 'Dourado', hex: '#c8a44a' },
+      { name: 'Rosa Gold', hex: '#b76e79' },
+      { name: 'Prata', hex: '#c0c0c0' },
+      { name: 'Branco', hex: '#f0f0f0' },
+      { name: 'Preto', hex: '#1a1a1a' },
+      { name: 'Rose', hex: '#e8a0a0' },
+    ],
+  },
+  unisexo: {
+    label: 'Unisexo',
+    subtitle: 'Para quem não segue regras.',
+    brands: ['Rolex', 'Casio', 'Seiko', 'Omega', 'Tag Heuer'],
+    priceRanges: [
+      { label: 'Até €80', min: 0, max: 80 },
+      { label: '€80 – €200', min: 80, max: 200 },
+      { label: '€200 – €500', min: 200, max: 500 },
+      { label: 'Acima de €500', min: 500, max: 999999 },
+    ],
+    categories: [
+      { slug: 'classicos', name: 'Clássico' },
+      { slug: 'desporto', name: 'Desportivo' },
+      { slug: 'automaticos', name: 'Automático' },
+      { slug: 'digital', name: 'Digital' },
+      { slug: 'smartwatch', name: 'Smartwatch' },
+    ],
+    colors: [
+      { name: 'Preto', hex: '#1a1a1a' },
+      { name: 'Branco', hex: '#f0f0f0' },
+      { name: 'Prata', hex: '#c0c0c0' },
+      { name: 'Laranja', hex: '#d4621a' },
+      { name: 'Verde', hex: '#2d5a3d' },
+      { name: 'Azul', hex: '#1e3a5f' },
+    ],
+  },
 }
 
 const meta = computed(() => filterData[props.category] ?? filterData.homens)
@@ -116,26 +116,26 @@ const meta = computed(() => filterData[props.category] ?? filterData.homens)
 // ── Active filters ────────────────────────────────────────────────
 const selectedBrands = ref<string[]>([])
 const selectedPriceRange = ref<{
-	label: string
-	min: number
-	max: number
+  label: string
+  min: number
+  max: number
 } | null>(null)
 const selectedCategory = ref<string | null>(null)
 const selectedColor = ref<string | null>(null)
 
 const categoryNames: Record<string, string> = {
-	classicos: 'Clássico',
-	desporto: 'Desportivo',
-	casual: 'Casual',
-	mergulho: 'Mergulho',
-	aviador: 'Aviador',
-	cronografos: 'Cronógrafo',
-	militar: 'Militar',
-	automaticos: 'Automático',
-	analogico: 'Analógico',
-	digital: 'Digital',
-	'analogico-digital': 'Analógico-Digital',
-	smartwatch: 'Smartwatch',
+  classicos: 'Clássico',
+  desporto: 'Desportivo',
+  casual: 'Casual',
+  mergulho: 'Mergulho',
+  aviador: 'Aviador',
+  cronografos: 'Cronógrafo',
+  militar: 'Militar',
+  automaticos: 'Automático',
+  analogico: 'Analógico',
+  digital: 'Digital',
+  'analogico-digital': 'Analógico-Digital',
+  smartwatch: 'Smartwatch',
 }
 
 // Flag to prevent circular updates between URL ↔ filters
@@ -143,78 +143,78 @@ let syncing = false
 
 // ── Read query params and apply to filters ─────────────────────────
 function syncFiltersFromQuery() {
-	syncing = true
-	const q = route.query
+  syncing = true
+  const q = route.query
 
-	// Brand: query has slug (lowercase), sidebar has display name
-	if (q.brand && typeof q.brand === 'string') {
-		const brandSlug = q.brand.toLowerCase()
-		const matched = meta.value.brands.find((b) => b.toLowerCase() === brandSlug)
-		selectedBrands.value = matched ? [matched] : []
-	} else {
-		selectedBrands.value = []
-	}
+  // Brand: query has slug (lowercase), sidebar has display name
+  if (q.brand && typeof q.brand === 'string') {
+    const brandSlug = q.brand.toLowerCase()
+    const matched = meta.value.brands.find((b) => b.toLowerCase() === brandSlug)
+    selectedBrands.value = matched ? [matched] : []
+  } else {
+    selectedBrands.value = []
+  }
 
-	// Price range: from min_price / max_price query params
-	if (q.min_price || q.max_price) {
-		const minP = q.min_price ? Number(q.min_price) : 0
-		const maxP = q.max_price ? Number(q.max_price) : 999999
-		const matched = meta.value.priceRanges.find(
-			(r) => r.min === minP && r.max === maxP,
-		)
-		selectedPriceRange.value = matched ?? {
-			label: `€${minP} – €${maxP}`,
-			min: minP,
-			max: maxP,
-		}
-	} else {
-		selectedPriceRange.value = null
-	}
+  // Price range: from min_price / max_price query params
+  if (q.min_price || q.max_price) {
+    const minP = q.min_price ? Number(q.min_price) : 0
+    const maxP = q.max_price ? Number(q.max_price) : 999999
+    const matched = meta.value.priceRanges.find(
+      (r) => r.min === minP && r.max === maxP,
+    )
+    selectedPriceRange.value = matched ?? {
+      label: `€${minP} – €${maxP}`,
+      min: minP,
+      max: maxP,
+    }
+  } else {
+    selectedPriceRange.value = null
+  }
 
-	// Category filter
-	if (q.category && typeof q.category === 'string') {
-		selectedCategory.value = q.category
-	} else {
-		selectedCategory.value = null
-	}
+  // Category filter
+  if (q.category && typeof q.category === 'string') {
+    selectedCategory.value = q.category
+  } else {
+    selectedCategory.value = null
+  }
 
-	// Color filter
-	if (q.color && typeof q.color === 'string') {
-		selectedColor.value = q.color
-	} else {
-		selectedColor.value = null
-	}
+  // Color filter
+  if (q.color && typeof q.color === 'string') {
+    selectedColor.value = q.color
+  } else {
+    selectedColor.value = null
+  }
 
-	nextTick(() => {
-		syncing = false
-	})
+  nextTick(() => {
+    syncing = false
+  })
 }
 
 // ── Update URL query params when filters change ─────────────────────
 function syncQueryFromFilters() {
-	if (syncing) return
+  if (syncing) return
 
-	const query: Record<string, string> = {}
+  const query: Record<string, string> = {}
 
-	if (selectedBrands.value.length > 0) {
-		query.brand = selectedBrands.value[0].toLowerCase()
-	}
+  if (selectedBrands.value.length > 0) {
+    query.brand = selectedBrands.value[0].toLowerCase()
+  }
 
-	if (selectedPriceRange.value) {
-		query.min_price = String(selectedPriceRange.value.min)
-		query.max_price = String(selectedPriceRange.value.max)
-	}
+  if (selectedPriceRange.value) {
+    query.min_price = String(selectedPriceRange.value.min)
+    query.max_price = String(selectedPriceRange.value.max)
+  }
 
-	if (selectedCategory.value) {
-		query.category = selectedCategory.value
-	}
+  if (selectedCategory.value) {
+    query.category = selectedCategory.value
+  }
 
-	if (selectedColor.value) {
-		query.color = selectedColor.value
-	}
+  if (selectedColor.value) {
+    query.color = selectedColor.value
+  }
 
-	// Replace URL without triggering navigation (silent update)
-	router.replace({ path: `/${props.category}`, query }).catch(() => {})
+  // Replace URL without triggering navigation (silent update)
+  router.replace({ path: `/${props.category}`, query }).catch(() => {})
 }
 
 // ── Pagination & Data ──────────────────────────────────────────────
@@ -224,115 +224,115 @@ const totalProducts = ref(0)
 const totalPages = ref(1)
 
 const loadProducts = async () => {
-	const params: Record<string, string | number> = {
-		gender: props.category,
-		page: currentPage.value,
-		per_page: 20,
-	}
+  const params: Record<string, string | number> = {
+    gender: props.category,
+    page: currentPage.value,
+    per_page: 20,
+  }
 
-	if (selectedBrands.value.length > 0) {
-		params.brand = selectedBrands.value[0].toLowerCase()
-	}
+  if (selectedBrands.value.length > 0) {
+    params.brand = selectedBrands.value[0].toLowerCase()
+  }
 
-	if (selectedPriceRange.value) {
-		params.min_price = selectedPriceRange.value.min
-		params.max_price = selectedPriceRange.value.max
-	}
+  if (selectedPriceRange.value) {
+    params.min_price = selectedPriceRange.value.min
+    params.max_price = selectedPriceRange.value.max
+  }
 
-	if (selectedCategory.value) {
-		params.category = selectedCategory.value
-	}
+  if (selectedCategory.value) {
+    params.category = selectedCategory.value
+  }
 
-	if (selectedColor.value) {
-		params.color = selectedColor.value
-	}
+  if (selectedColor.value) {
+    params.color = selectedColor.value
+  }
 
-	const res = await catalogStore.fetchProducts(params)
-	if (res) {
-		products.value = res.data
-		totalProducts.value = res.meta.total
-		totalPages.value = res.meta.last_page
-	} else {
-		products.value = []
-		totalProducts.value = 0
-		totalPages.value = 1
-	}
+  const res = await catalogStore.fetchProducts(params)
+  if (res) {
+    products.value = res.data
+    totalProducts.value = res.meta.total
+    totalPages.value = res.meta.last_page
+  } else {
+    products.value = []
+    totalProducts.value = 0
+    totalPages.value = 1
+  }
 }
 
 // ── Init: read URL query params on mount ──────────────────────────
 onMounted(() => {
-	syncFiltersFromQuery()
-	nextTick(() => loadProducts())
+  syncFiltersFromQuery()
+  nextTick(() => loadProducts())
 })
 
 // ── React to URL query changes (e.g. mega menu clicks) ────────────
 watch(
-	() => route.query,
-	() => {
-		if (!syncing) {
-			syncFiltersFromQuery()
-			currentPage.value = 1
-			nextTick(() => loadProducts())
-		}
-	},
-	{ deep: true },
+  () => route.query,
+  () => {
+    if (!syncing) {
+      syncFiltersFromQuery()
+      currentPage.value = 1
+      nextTick(() => loadProducts())
+    }
+  },
+  { deep: true },
 )
 
 // ── React to category changes (different gender page) ─────────────
 watch(
-	() => props.category,
-	() => {
-		syncFiltersFromQuery()
-		currentPage.value = 1
-		products.value = []
-		nextTick(() => loadProducts())
-	},
+  () => props.category,
+  () => {
+    syncFiltersFromQuery()
+    currentPage.value = 1
+    products.value = []
+    nextTick(() => loadProducts())
+  },
 )
 
 // ── React to sidebar filter changes → update URL + reload ─────────
 watch(
-	[selectedBrands, selectedPriceRange, selectedCategory, selectedColor],
-	() => {
-		if (!syncing) {
-			syncQueryFromFilters()
-			currentPage.value = 1
-			products.value = []
-			loadProducts()
-		}
-	},
-	{ deep: true },
+  [selectedBrands, selectedPriceRange, selectedCategory, selectedColor],
+  () => {
+    if (!syncing) {
+      syncQueryFromFilters()
+      currentPage.value = 1
+      products.value = []
+      loadProducts()
+    }
+  },
+  { deep: true },
 )
 
 watch(currentPage, () => {
-	loadProducts()
+  loadProducts()
 })
 
 function toggleBrand(b: string) {
-	const i = selectedBrands.value.indexOf(b)
-	const newBrands = [...selectedBrands.value]
-	if (i === -1) {
-		newBrands.push(b)
-	} else {
-		newBrands.splice(i, 1)
-	}
-	selectedBrands.value = newBrands
+  const i = selectedBrands.value.indexOf(b)
+  const newBrands = [...selectedBrands.value]
+  if (i === -1) {
+    newBrands.push(b)
+  } else {
+    newBrands.splice(i, 1)
+  }
+  selectedBrands.value = newBrands
 }
 function setPriceRange(r: { label: string; min: number; max: number } | null) {
-	selectedPriceRange.value = r
+  selectedPriceRange.value = r
 }
 function clearAllFilters() {
-	selectedBrands.value = []
-	selectedPriceRange.value = null
-	selectedCategory.value = null
-	selectedColor.value = null
+  selectedBrands.value = []
+  selectedPriceRange.value = null
+  selectedCategory.value = null
+  selectedColor.value = null
 }
 
 const hasActiveFilters = computed(
-	() =>
-		selectedBrands.value.length > 0 ||
-		selectedPriceRange.value !== null ||
-		selectedCategory.value !== null ||
-		selectedColor.value !== null,
+  () =>
+    selectedBrands.value.length > 0 ||
+    selectedPriceRange.value !== null ||
+    selectedCategory.value !== null ||
+    selectedColor.value !== null,
 )
 </script>
 
@@ -386,8 +386,8 @@ const hasActiveFilters = computed(
 					</p>
 					<button
 						v-if="hasActiveFilters"
-						@click="clearAllFilters"
 						class="text-[0.6rem] font-bold uppercase tracking-wider text-[#FFC700] transition-colors hover:text-yellow-300"
+						@click="clearAllFilters"
 					>
 						Limpar
 					</button>
@@ -406,8 +406,8 @@ const hasActiveFilters = computed(
 								<input
 									type="checkbox"
 									:checked="selectedBrands.includes(brand)"
-									@change="toggleBrand(brand)"
 									class="hidden"
+									@change="toggleBrand(brand)"
 								/>
 								<span
 									class="flex h-4 w-4 flex-shrink-0 items-center justify-center rounded border transition-all duration-300"
@@ -457,12 +457,12 @@ const hasActiveFilters = computed(
 					<ul class="space-y-2">
 						<li v-for="range in meta.priceRanges" :key="range.label">
 							<button
+								class="group flex w-full items-center gap-2.5 text-left"
 								@click="
 									setPriceRange(
 										selectedPriceRange?.label === range.label ? null : range,
 									)
 								"
-								class="group flex w-full items-center gap-2.5 text-left"
 							>
 								<span
 									class="h-4 w-4 flex-shrink-0 rounded-full border transition-all duration-300"
@@ -500,11 +500,11 @@ const hasActiveFilters = computed(
 					<ul class="space-y-2">
 						<li v-for="cat in meta.categories" :key="cat.slug">
 							<button
+								class="group flex w-full items-center gap-2.5 text-left"
 								@click="
 									selectedCategory =
 										selectedCategory === cat.slug ? null : cat.slug
 								"
-								class="group flex w-full items-center gap-2.5 text-left"
 							>
 								<span
 									class="flex h-4 w-4 flex-shrink-0 items-center justify-center rounded border transition-all duration-300"
@@ -559,9 +559,6 @@ const hasActiveFilters = computed(
 							v-for="color in meta.colors"
 							:key="color.name"
 							:title="color.name"
-							@click="
-								selectedColor = selectedColor === color.name ? null : color.name
-							"
 							class="relative flex h-7 w-7 items-center justify-center rounded-full border transition-all duration-200"
 							:class="
 								selectedColor === color.name
@@ -569,6 +566,9 @@ const hasActiveFilters = computed(
 									: 'border-white/10 hover:border-white/30'
 							"
 							:style="{ backgroundColor: color.hex }"
+							@click="
+								selectedColor = selectedColor === color.name ? null : color.name
+							"
 						>
 							<span
 								v-if="selectedColor === color.name"
@@ -597,8 +597,8 @@ const hasActiveFilters = computed(
 							>
 								{{ brand }}
 								<button
-									@click="toggleBrand(brand)"
 									class="transition-colors hover:text-white"
+									@click="toggleBrand(brand)"
 								>
 									×
 								</button>
@@ -609,8 +609,8 @@ const hasActiveFilters = computed(
 							>
 								{{ selectedPriceRange.label }}
 								<button
-									@click="setPriceRange(null)"
 									class="transition-colors hover:text-[#FFC700]"
+									@click="setPriceRange(null)"
 								>
 									×
 								</button>
@@ -622,8 +622,8 @@ const hasActiveFilters = computed(
 								Categoria:
 								{{ categoryNames[selectedCategory] || selectedCategory }}
 								<button
-									@click="selectedCategory = null"
 									class="transition-colors hover:text-[#FFC700]"
+									@click="selectedCategory = null"
 								>
 									×
 								</button>
@@ -634,8 +634,8 @@ const hasActiveFilters = computed(
 							>
 								Cor: {{ selectedColor }}
 								<button
-									@click="selectedColor = null"
 									class="transition-colors hover:text-[#FFC700]"
+									@click="selectedColor = null"
 								>
 									×
 								</button>
@@ -655,11 +655,11 @@ const hasActiveFilters = computed(
 				>
 					<ProductCard
 						v-for="(product, index) in products"
+						:key="product.id"
 						:item="product"
 						:category="props.category"
 						:index="index"
 						:data-test="`product-card-${props.category}-${product.id}`"
-						:key="product.id"
 					/>
 				</div>
 
@@ -690,8 +690,8 @@ const hasActiveFilters = computed(
 						Experimenta ajustar os filtros
 					</p>
 					<button
-						@click="clearAllFilters"
 						class="mt-5 text-xs font-bold uppercase tracking-wider text-[#FFC700] transition-colors hover:text-yellow-300"
+						@click="clearAllFilters"
 					>
 						Limpar Filtros
 					</button>
@@ -702,9 +702,9 @@ const hasActiveFilters = computed(
 					class="mt-12 flex items-center justify-center gap-2"
 				>
 					<button
-						@click="currentPage--"
 						:disabled="currentPage === 1"
 						class="border-white/15 disabled:hover:border-white/15 flex h-9 w-9 items-center justify-center rounded-lg border text-white/40 transition-all duration-300 hover:border-[#FFC700] hover:text-[#FFC700] disabled:cursor-not-allowed disabled:opacity-25 disabled:hover:text-white/40"
+						@click="currentPage--"
 					>
 						<svg
 							class="h-4 w-4"
@@ -724,21 +724,21 @@ const hasActiveFilters = computed(
 					<button
 						v-for="page in totalPages"
 						:key="page"
-						@click="currentPage = page"
 						class="h-9 w-9 rounded-lg text-sm font-bold transition-all duration-300"
 						:class="
 							currentPage === page
 								? 'bg-[#FFC700] text-black'
 								: 'border-white/15 border text-white/40 hover:border-[#FFC700] hover:text-[#FFC700]'
 						"
+						@click="currentPage = page"
 					>
 						{{ page }}
 					</button>
 
 					<button
-						@click="currentPage++"
 						:disabled="currentPage === totalPages"
 						class="border-white/15 disabled:hover:border-white/15 flex h-9 w-9 items-center justify-center rounded-lg border text-white/40 transition-all duration-300 hover:border-[#FFC700] hover:text-[#FFC700] disabled:cursor-not-allowed disabled:opacity-25 disabled:hover:text-white/40"
+						@click="currentPage++"
 					>
 						<svg
 							class="h-4 w-4"

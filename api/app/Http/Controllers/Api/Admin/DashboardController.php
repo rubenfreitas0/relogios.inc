@@ -48,7 +48,7 @@ class DashboardController extends Controller
             ->pluck('count', 'status');
 
         // — Revenue
-        $sixMonthsAgo = $now->copy()->subMonths(5)->startOfMonth();
+        $twelveMonthsAgo = $now->copy()->subMonths(11)->startOfMonth();
 
         $driver = DB::connection()->getDriverName();
         $monthExpression = match ($driver) {
@@ -61,14 +61,14 @@ class DashboardController extends Controller
             ->selectRaw("$monthExpression as month")
             ->selectRaw('SUM(CASE WHEN payment_status = ? THEN total ELSE 0 END) as revenue', ['paid'])
             ->selectRaw('COUNT(*) as orders')
-            ->where('created_at', '>=', $sixMonthsAgo)
+            ->where('created_at', '>=', $twelveMonthsAgo)
             ->groupByRaw($monthExpression)
             ->orderBy('month')
             ->get()
             ->keyBy('month');
 
         $revenueByMonth = [];
-        for ($i = 5; $i >= 0; $i--) {
+        for ($i = 11; $i >= 0; $i--) {
             $monthStart = $now->copy()->subMonths($i)->startOfMonth();
             $key = $monthStart->format('Y-m');
             $row = $revenueRaw->get($key);

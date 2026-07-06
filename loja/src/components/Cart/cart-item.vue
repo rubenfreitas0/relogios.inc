@@ -7,8 +7,8 @@ import { resolveProductImageUrl } from '../../utils/utilities'
 const cartStore = useCartStore()
 
 const props = defineProps<{
-	cartItem: Product
-	itemCount: number
+  cartItem: Product
+  itemCount: number
 }>()
 </script>
 
@@ -52,8 +52,8 @@ const props = defineProps<{
 		</div>
 		<ButtonCount
 			:item-count="props.itemCount"
-			@increase-cart="cartStore.addToCart(cartItem)"
-			@decrease-cart="cartStore.removeFromCart(cartItem)"
+			@increaseCart="cartStore.addToCart(cartItem)"
+			@decreaseCart="cartStore.removeFromCart(cartItem)"
 		/>
 	</div>
 </template>

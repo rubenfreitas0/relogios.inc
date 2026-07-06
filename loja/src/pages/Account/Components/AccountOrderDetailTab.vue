@@ -11,75 +11,75 @@ const router = useRouter()
 const orderNumber = computed(() => route.params.orderNumber as string)
 
 onMounted(() => {
-	if (orderNumber.value) {
-		store.fetchOrderDetail(orderNumber.value)
-	}
+  if (orderNumber.value) {
+    store.fetchOrderDetail(orderNumber.value)
+  }
 })
 
 watch(orderNumber, (newVal) => {
-	if (newVal) store.fetchOrderDetail(newVal)
+  if (newVal) store.fetchOrderDetail(newVal)
 })
 
 function goBack() {
-	router.push('/conta/encomendas')
+  router.push('/conta/encomendas')
 }
 
 function formatDate(iso: string): string {
-	return new Date(iso).toLocaleDateString('pt-PT', {
-		day: '2-digit',
-		month: 'long',
-		year: 'numeric',
-		hour: '2-digit',
-		minute: '2-digit',
-	})
+  return new Date(iso).toLocaleDateString('pt-PT', {
+    day: '2-digit',
+    month: 'long',
+    year: 'numeric',
+    hour: '2-digit',
+    minute: '2-digit',
+  })
 }
 
 function formatPrice(value: number | string): string {
-	const num = Number(value)
-	if (isNaN(num)) return '0,00'
-	return num.toFixed(2).replace('.', ',')
+  const num = Number(value)
+  if (isNaN(num)) return '0,00'
+  return num.toFixed(2).replace('.', ',')
 }
 
 const statusColor = (value: string) => {
-	switch (value) {
-		case 'pending':
-			return 'bg-amber-500/10 text-amber-400 border-amber-500/20'
-		case 'processing':
-			return 'bg-blue-500/10 text-blue-400 border-blue-500/20'
-		case 'shipped':
-			return 'bg-indigo-500/10 text-indigo-400 border-indigo-500/20'
-		case 'delivered':
-			return 'bg-green-500/10 text-green-400 border-green-500/20'
-		case 'cancelled':
-			return 'bg-red-500/10 text-red-400 border-red-500/20'
-		case 'refunded':
-			return 'bg-gray-500/10 text-gray-400 border-gray-500/20'
-		default:
-			return 'bg-white/5 text-white/50 border-white/10'
-	}
+  switch (value) {
+  case 'pending':
+    return 'bg-amber-500/10 text-amber-400 border-amber-500/20'
+  case 'processing':
+    return 'bg-blue-500/10 text-blue-400 border-blue-500/20'
+  case 'shipped':
+    return 'bg-indigo-500/10 text-indigo-400 border-indigo-500/20'
+  case 'delivered':
+    return 'bg-green-500/10 text-green-400 border-green-500/20'
+  case 'cancelled':
+    return 'bg-red-500/10 text-red-400 border-red-500/20'
+  case 'refunded':
+    return 'bg-gray-500/10 text-gray-400 border-gray-500/20'
+  default:
+    return 'bg-white/5 text-white/50 border-white/10'
+  }
 }
 
 // Timeline steps
 const timelineSteps = ['pending', 'processing', 'shipped', 'delivered']
 const timelineLabels: Record<string, string> = {
-	pending: 'Pendente',
-	processing: 'Em Processamento',
-	shipped: 'Enviado',
-	delivered: 'Entregue',
+  pending: 'Pendente',
+  processing: 'Em Processamento',
+  shipped: 'Enviado',
+  delivered: 'Entregue',
 }
 
 const currentStepIndex = computed(() => {
-	if (!store.currentOrder) return -1
-	const val = store.currentOrder.status.value
-	if (val === 'cancelled' || val === 'refunded') return -1
-	return timelineSteps.indexOf(val)
+  if (!store.currentOrder) return -1
+  const val = store.currentOrder.status.value
+  if (val === 'cancelled' || val === 'refunded') return -1
+  return timelineSteps.indexOf(val)
 })
 
 const payment = computed(() => store.currentOrder?.payments?.[0])
 
 function formatReference(ref: string | number): string {
-	const str = String(ref)
-	return `${str.substring(0, 3)} ${str.substring(3, 6)} ${str.substring(6, 9)}`
+  const str = String(ref)
+  return `${str.substring(0, 3)} ${str.substring(3, 6)} ${str.substring(6, 9)}`
 }
 </script>
 
@@ -99,8 +99,8 @@ function formatReference(ref: string | number): string {
 		>
 			<p class="text-sm text-red-400">{{ store.error }}</p>
 			<button
-				@click="goBack"
 				class="mt-4 text-xs font-bold uppercase tracking-wider text-[#FFC700] hover:text-yellow-300"
+				@click="goBack"
 			>
 				← Voltar às encomendas
 			</button>
@@ -110,8 +110,8 @@ function formatReference(ref: string | number): string {
 		<div v-else-if="store.currentOrder">
 			<!-- Back + Header -->
 			<button
-				@click="goBack"
 				class="mb-6 flex items-center gap-2 text-xs font-bold uppercase tracking-wider text-white/40 transition-colors hover:text-[#FFC700]"
+				@click="goBack"
 			>
 				<svg
 					class="h-4 w-4"

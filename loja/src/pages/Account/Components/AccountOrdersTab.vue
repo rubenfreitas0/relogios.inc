@@ -7,55 +7,55 @@ const store = useAccountStore()
 const router = useRouter()
 
 onMounted(() => {
-	store.fetchOrders(1)
+  store.fetchOrders(1)
 })
 
 function goToPage(page: number) {
-	store.fetchOrders(page)
+  store.fetchOrders(page)
 }
 
 function viewOrder(orderNumber: string) {
-	router.push(`/conta/encomendas/${orderNumber}`)
+  router.push(`/conta/encomendas/${orderNumber}`)
 }
 
 function formatDate(iso: string): string {
-	return new Date(iso).toLocaleDateString('pt-PT', {
-		day: '2-digit',
-		month: 'short',
-		year: 'numeric',
-	})
+  return new Date(iso).toLocaleDateString('pt-PT', {
+    day: '2-digit',
+    month: 'short',
+    year: 'numeric',
+  })
 }
 
 function formatPrice(value: number | string): string {
-	const num = Number(value)
-	if (isNaN(num)) return '0,00'
-	return num.toFixed(2).replace('.', ',')
+  const num = Number(value)
+  if (isNaN(num)) return '0,00'
+  return num.toFixed(2).replace('.', ',')
 }
 
 const statusColor = (value: string) => {
-	switch (value) {
-		case 'pending':
-			return 'bg-amber-500/10 text-amber-400 border-amber-500/20'
-		case 'processing':
-			return 'bg-blue-500/10 text-blue-400 border-blue-500/20'
-		case 'shipped':
-			return 'bg-indigo-500/10 text-indigo-400 border-indigo-500/20'
-		case 'delivered':
-			return 'bg-green-500/10 text-green-400 border-green-500/20'
-		case 'cancelled':
-			return 'bg-red-500/10 text-red-400 border-red-500/20'
-		case 'refunded':
-			return 'bg-gray-500/10 text-gray-400 border-gray-500/20'
-		default:
-			return 'bg-white/5 text-white/50 border-white/10'
-	}
+  switch (value) {
+  case 'pending':
+    return 'bg-amber-500/10 text-amber-400 border-amber-500/20'
+  case 'processing':
+    return 'bg-blue-500/10 text-blue-400 border-blue-500/20'
+  case 'shipped':
+    return 'bg-indigo-500/10 text-indigo-400 border-indigo-500/20'
+  case 'delivered':
+    return 'bg-green-500/10 text-green-400 border-green-500/20'
+  case 'cancelled':
+    return 'bg-red-500/10 text-red-400 border-red-500/20'
+  case 'refunded':
+    return 'bg-gray-500/10 text-gray-400 border-gray-500/20'
+  default:
+    return 'bg-white/5 text-white/50 border-white/10'
+  }
 }
 
 const pages = computed(() => {
-	const p = store.ordersPagination
-	const arr: number[] = []
-	for (let i = 1; i <= p.last_page; i++) arr.push(i)
-	return arr
+  const p = store.ordersPagination
+  const arr: number[] = []
+  for (let i = 1; i <= p.last_page; i++) arr.push(i)
+  return arr
 })
 </script>
 
@@ -103,12 +103,12 @@ const pages = computed(() => {
 			<p class="mt-1 text-xs text-white/20">
 				As tuas encomendas aparecerão aqui.
 			</p>
-			<router-link
+			<RouterLink
 				to="/homens"
 				class="mt-6 rounded-full bg-[#FFC700] px-6 py-2 text-xs font-bold uppercase tracking-wider text-black transition-colors hover:bg-yellow-400"
 			>
 				Explorar catálogo
-			</router-link>
+			</RouterLink>
 		</div>
 
 		<!-- Orders list -->
@@ -116,8 +116,8 @@ const pages = computed(() => {
 			<button
 				v-for="order in store.orders"
 				:key="order.order_number"
-				@click="viewOrder(order.order_number)"
 				class="group flex w-full flex-col gap-3 rounded-xl border border-white/10 bg-white/[0.03] p-5 text-left transition-all duration-200 hover:border-[#FFC700]/30 hover:bg-white/[0.05] md:flex-row md:items-center md:justify-between"
+				@click="viewOrder(order.order_number)"
 			>
 				<div class="flex items-center gap-4">
 					<div
@@ -179,9 +179,9 @@ const pages = computed(() => {
 				class="mt-8 flex items-center justify-center gap-2"
 			>
 				<button
-					@click="goToPage(store.ordersPagination.current_page - 1)"
 					:disabled="store.ordersPagination.current_page === 1"
 					class="border-white/15 flex h-9 w-9 items-center justify-center rounded-lg border text-white/40 transition-all hover:border-[#FFC700] hover:text-[#FFC700] disabled:cursor-not-allowed disabled:opacity-25"
+					@click="goToPage(store.ordersPagination.current_page - 1)"
 				>
 					<svg
 						class="h-4 w-4"
@@ -200,23 +200,23 @@ const pages = computed(() => {
 				<button
 					v-for="page in pages"
 					:key="page"
-					@click="goToPage(page)"
 					class="h-9 w-9 rounded-lg text-sm font-bold transition-all"
 					:class="
 						store.ordersPagination.current_page === page
 							? 'bg-[#FFC700] text-black'
 							: 'border-white/15 border text-white/40 hover:border-[#FFC700] hover:text-[#FFC700]'
 					"
+					@click="goToPage(page)"
 				>
 					{{ page }}
 				</button>
 				<button
-					@click="goToPage(store.ordersPagination.current_page + 1)"
 					:disabled="
 						store.ordersPagination.current_page ===
 						store.ordersPagination.last_page
 					"
 					class="border-white/15 flex h-9 w-9 items-center justify-center rounded-lg border text-white/40 transition-all hover:border-[#FFC700] hover:text-[#FFC700] disabled:cursor-not-allowed disabled:opacity-25"
+					@click="goToPage(store.ordersPagination.current_page + 1)"
 				>
 					<svg
 						class="h-4 w-4"

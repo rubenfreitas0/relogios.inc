@@ -1,7 +1,7 @@
 <template>
   <VaSidebar v-model="writableVisible" :width="sidebarWidth" :color="color" minimized-width="0">
     <VaAccordion v-model="value" multiple>
-      <VaCollapse v-for="(route, index) in navigationRoutes.routes" :key="index">
+      <VaCollapse v-for="(route, index) in filteredNavigationRoutes" :key="index">
         <template #header="{ value: isCollapsed }">
           <VaSidebarItem
             :to="route.children ? undefined : { name: route.name }"
@@ -55,6 +55,7 @@ import { useRoute } from 'vue-router'
 
 import { useI18n } from 'vue-i18n'
 import { useColors } from 'vuestic-ui'
+import { useAuthStore } from '../../stores/auth-store'
 
 import navigationRoutes, { type INavigationRoute } from './NavigationRoutes'
 
@@ -91,6 +92,13 @@ export default defineComponent({
     const setActiveExpand = () =>
       (value.value = navigationRoutes.routes.map((route: INavigationRoute) => routeHasActiveChild(route)))
 
+    const authStore = useAuthStore()
+    const filteredNavigationRoutes = computed(() => {
+      const isMainAdmin = authStore.user?.email === 'admin@relogios.inc'
+      const restrictedNames = ['users', 'reports', 'vitrine']
+      return navigationRoutes.routes.filter((r) => !restrictedNames.includes(r.name) || isMainAdmin)
+    })
+
     const sidebarWidth = computed(() => (props.mobile ? '100vw' : '280px'))
     const color = computed(() => getColor('background-secondary'))
     const activeColor = computed(() => colorToRgba(getColor('focus'), 0.1))
@@ -108,6 +116,7 @@ export default defineComponent({
       color,
       activeColor,
       navigationRoutes,
+      filteredNavigationRoutes,
       routeHasActiveChild,
       isActiveChildRoute,
       t,

@@ -11,80 +11,80 @@ const selectedAddressId = ref<number | null>(null)
 const isLoggedIn = ref(false)
 
 onMounted(async () => {
-	formStore.fetchShippingForCountry()
+  formStore.fetchShippingForCountry()
 
-	// Se o user está autenticado, buscar moradas guardadas
-	const token = localStorage.getItem('auth_token')
-	if (token) {
-		isLoggedIn.value = true
-		await accountStore.fetchAddresses()
+  // Se o user está autenticado, buscar moradas guardadas
+  const token = localStorage.getItem('auth_token')
+  if (token) {
+    isLoggedIn.value = true
+    await accountStore.fetchAddresses()
 
-		// Auto-selecionar a morada default se existir
-		const defaultAddr = accountStore.addresses.find((a) => a.is_default)
-		if (defaultAddr) {
-			applyAddress(defaultAddr)
-		}
-	}
+    // Auto-selecionar a morada default se existir
+    const defaultAddr = accountStore.addresses.find((a) => a.is_default)
+    if (defaultAddr) {
+      applyAddress(defaultAddr)
+    }
+  }
 })
 
 function applyAddress(addr: Address) {
-	selectedAddressId.value = addr.id
-	formStore.name = `${addr.firstname} ${addr.lastname}`
-	formStore.phone = addr.phone || ''
-	formStore.address =
-		addr.address_line1 + (addr.address_line2 ? `, ${addr.address_line2}` : '')
-	formStore.zip = addr.postal_code
-	formStore.city = addr.city
-	formStore.country = addr.country
+  selectedAddressId.value = addr.id
+  formStore.name = `${addr.firstname} ${addr.lastname}`
+  formStore.phone = addr.phone || ''
+  formStore.address =
+    addr.address_line1 + (addr.address_line2 ? `, ${addr.address_line2}` : '')
+  formStore.zip = addr.postal_code
+  formStore.city = addr.city
+  formStore.country = addr.country
 }
 
 function clearSelection() {
-	selectedAddressId.value = null
-	formStore.name = ''
-	formStore.phone = ''
-	formStore.address = ''
-	formStore.zip = ''
-	formStore.city = ''
-	formStore.country = 'PT'
+  selectedAddressId.value = null
+  formStore.name = ''
+  formStore.phone = ''
+  formStore.address = ''
+  formStore.zip = ''
+  formStore.city = ''
+  formStore.country = 'PT'
 }
 
 function onSelectAddress(event: Event) {
-	const id = Number((event.target as HTMLSelectElement).value)
-	if (id === 0) {
-		clearSelection()
-		return
-	}
-	const addr = accountStore.addresses.find((a) => a.id === id)
-	if (addr) applyAddress(addr)
+  const id = Number((event.target as HTMLSelectElement).value)
+  if (id === 0) {
+    clearSelection()
+    return
+  }
+  const addr = accountStore.addresses.find((a) => a.id === id)
+  if (addr) applyAddress(addr)
 }
 
 // Recalcular shipping quando o país ou código postal mudam
 let debounceTimer: ReturnType<typeof setTimeout> | null = null
 
 watch(
-	() => [formStore.country, formStore.zip],
-	() => {
-		formStore.shippingLoading = true
-		if (debounceTimer) clearTimeout(debounceTimer)
-		debounceTimer = setTimeout(() => {
-			const country = formStore.country.substring(0, 2).toUpperCase()
-			if (country.length === 2) {
-				formStore.fetchShippingForCountry(country, formStore.zip)
-			} else {
-				formStore.shippingLoading = false
-			}
-		}, 300)
-	},
+  () => [formStore.country, formStore.zip],
+  () => {
+    formStore.shippingLoading = true
+    if (debounceTimer) clearTimeout(debounceTimer)
+    debounceTimer = setTimeout(() => {
+      const country = formStore.country.substring(0, 2).toUpperCase()
+      if (country.length === 2) {
+        formStore.fetchShippingForCountry(country, formStore.zip)
+      } else {
+        formStore.shippingLoading = false
+      }
+    }, 300)
+  },
 )
 
 onBeforeUnmount(() => {
-	if (debounceTimer) clearTimeout(debounceTimer)
+  if (debounceTimer) clearTimeout(debounceTimer)
 })
 </script>
 <template>
 	<form
-		class="col-span-2 h-full w-full rounded bg-white px-6 py-12 lg:px-10"
 		id="checkoutForm"
+		class="col-span-2 h-full w-full rounded bg-white px-6 py-12 lg:px-10"
 	>
 		<h1 class="text-3xl font-bold uppercase text-black">Checkout</h1>
 
@@ -105,9 +105,9 @@ onBeforeUnmount(() => {
 				class="flex w-full flex-col items-center gap-4 lg:grid lg:grid-cols-2"
 			>
 				<TextInputField
+					id="name"
 					type="text"
 					:validator="formStore.isValidName"
-					id="name"
 					label="Nome"
 					placeholder="João Silva"
 					error-message="Apenas caracteres."
@@ -116,9 +116,9 @@ onBeforeUnmount(() => {
 				/>
 
 				<TextInputField
+					id="email"
 					type="email"
 					:validator="formStore.isValidEmail"
-					id="email"
 					label="Email"
 					placeholder="joao@email.com"
 					error-message="Email inválido."
@@ -127,9 +127,9 @@ onBeforeUnmount(() => {
 				/>
 
 				<TextInputField
+					id="phone"
 					type="tel"
 					:validator="formStore.isValidPhone"
-					id="phone"
 					label="Telefone"
 					placeholder="+351 912 345 678"
 					error-message="Apenas números e '+-'."
@@ -176,8 +176,8 @@ onBeforeUnmount(() => {
 				</div>
 				<select
 					:value="selectedAddressId || 0"
-					@change="onSelectAddress"
 					class="w-full cursor-pointer rounded-lg border border-black/20 bg-white px-4 py-3 font-Manrope text-sm font-semibold text-black outline-none transition-colors hover:border-k-main focus:border-k-main"
+					@change="onSelectAddress"
 				>
 					<option :value="0">✏️ Introduzir morada manualmente</option>
 					<option
@@ -196,9 +196,9 @@ onBeforeUnmount(() => {
 				class="flex w-full flex-col items-center gap-4 lg:grid lg:grid-cols-2"
 			>
 				<TextInputField
+					id="address"
 					type="text"
 					:validator="formStore.isValidAddress"
-					id="address"
 					label="Morada"
 					container-class="col-span-2"
 					placeholder="Rua das Flores, 123"
@@ -208,9 +208,9 @@ onBeforeUnmount(() => {
 				/>
 
 				<TextInputField
+					id="zip"
 					type="text"
 					:validator="formStore.isValidZip"
-					id="zip"
 					label="Código Postal"
 					placeholder="1000-001"
 					error-message="Código postal inválido."
@@ -220,9 +220,9 @@ onBeforeUnmount(() => {
 				/>
 
 				<TextInputField
+					id="city"
 					type="text"
 					:validator="formStore.isValidCity"
-					id="city"
 					label="Cidade"
 					placeholder="Lisboa"
 					error-message="Apenas caracteres."
@@ -231,9 +231,9 @@ onBeforeUnmount(() => {
 				/>
 
 				<TextInputField
+					id="country"
 					type="text"
 					:validator="formStore.isValidCountry"
-					id="country"
 					label="País (código ISO, ex: PT)"
 					placeholder="PT"
 					error-message="Código de 2 letras (ex: PT, ES, DE)."
@@ -302,8 +302,8 @@ onBeforeUnmount(() => {
 					type="button"
 					class="group flex w-full cursor-pointer flex-row items-center gap-4 rounded border border-black border-opacity-60 p-3 transition-all active:translate-y-0.5"
 					:class="{ 'bg-k-main': formStore.payment === 'credit_card' }"
-					@click="formStore.payment = 'credit_card'"
 					data-test="form-button-emoney"
+					@click="formStore.payment = 'credit_card'"
 				>
 					<div
 						class="aspect-square h-3 rounded-full border border-black border-opacity-60"
@@ -317,8 +317,8 @@ onBeforeUnmount(() => {
 					type="button"
 					class="group flex w-full cursor-pointer flex-row items-center gap-4 rounded border border-black border-opacity-60 p-3 transition-all active:translate-y-0.5"
 					:class="{ 'bg-k-main': formStore.payment === 'multibanco' }"
-					@click="formStore.payment = 'multibanco'"
 					data-test="form-button-cash"
+					@click="formStore.payment = 'multibanco'"
 				>
 					<div
 						class="aspect-square h-3 rounded-full border border-black border-opacity-60"
@@ -332,8 +332,8 @@ onBeforeUnmount(() => {
 					type="button"
 					class="group flex w-full cursor-pointer flex-row items-center gap-4 rounded border border-black border-opacity-60 p-3 transition-all active:translate-y-0.5"
 					:class="{ 'bg-k-main': formStore.payment === 'mbway' }"
-					@click="formStore.payment = 'mbway'"
 					data-test="form-button-mbway"
+					@click="formStore.payment = 'mbway'"
 				>
 					<div
 						class="aspect-square h-3 rounded-full border border-black border-opacity-60"
@@ -347,8 +347,8 @@ onBeforeUnmount(() => {
 					type="button"
 					class="group flex w-full cursor-pointer flex-row items-center gap-4 rounded border border-black border-opacity-60 p-3 transition-all active:translate-y-0.5"
 					:class="{ 'bg-k-main': formStore.payment === 'apple_pay' }"
-					@click="formStore.payment = 'apple_pay'"
 					data-test="form-button-apple-pay"
+					@click="formStore.payment = 'apple_pay'"
 				>
 					<div
 						class="aspect-square h-3 rounded-full border border-black border-opacity-60"
@@ -362,8 +362,8 @@ onBeforeUnmount(() => {
 					type="button"
 					class="group flex w-full cursor-pointer flex-row items-center gap-4 rounded border border-black border-opacity-60 p-3 transition-all active:translate-y-0.5 lg:col-span-2"
 					:class="{ 'bg-k-main': formStore.payment === 'google_pay' }"
-					@click="formStore.payment = 'google_pay'"
 					data-test="form-button-google-pay"
+					@click="formStore.payment = 'google_pay'"
 				>
 					<div
 						class="aspect-square h-3 rounded-full border border-black border-opacity-60"
@@ -375,9 +375,9 @@ onBeforeUnmount(() => {
 				<!-- Dynamic MB Way Phone field -->
 				<div v-if="formStore.payment === 'mbway'" class="col-span-2 mt-2">
 					<TextInputField
+						id="paymentPhone"
 						type="text"
 						:validator="formStore.isValidPaymentPhone"
-						id="paymentPhone"
 						label="Número de Telemóvel MB Way"
 						placeholder="912345678"
 						error-message="Por favor introduza um número de telemóvel válido."
@@ -391,10 +391,10 @@ onBeforeUnmount(() => {
 						>Comentário</label
 					>
 					<textarea
-						class="h-full rounded border border-black border-opacity-60 bg-white p-3 font-Manrope font-semibold text-black outline-none hover:border-k-main"
 						id="comment"
-						placeholder="A sua mensagem"
 						v-model="formStore.comment"
+						class="h-full rounded border border-black border-opacity-60 bg-white p-3 font-Manrope font-semibold text-black outline-none hover:border-k-main"
+						placeholder="A sua mensagem"
 						data-test="form-text-area"
 					/>
 				</div>

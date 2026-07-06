@@ -130,8 +130,12 @@
             </template>
 
             <!-- Destaque -->
-            <template #cell(is_featured)="{ value }">
-              <VaIcon :name="value ? 'star' : 'star_outline'" :color="value ? 'warning' : 'secondary'" size="small" />
+            <template #cell(is_featured)="{ rowData }">
+              <VaIcon
+                :name="rowData.is_featured ? 'star' : 'star_outline'"
+                :color="rowData.is_featured ? 'warning' : 'secondary'"
+                size="small"
+              />
             </template>
 
             <!-- Ações -->
@@ -166,11 +170,21 @@
           </VaDataTable>
 
           <!-- Paginação -->
-          <div v-if="store.pagination.last_page > 1" class="flex justify-between items-center mt-4">
-            <span class="text-sm text-[var(--va-secondary)]">
-              {{ store.pagination.total }} produto(s) encontrado(s)
-            </span>
+          <div class="flex flex-col sm:flex-row justify-between items-center gap-4 mt-4">
+            <div class="flex items-center gap-3">
+              <span class="text-sm text-[var(--va-secondary)]">
+                {{ store.pagination.total }} produto(s) encontrado(s)
+              </span>
+              <span class="text-sm text-[var(--va-secondary)] ml-2">Itens por página:</span>
+              <VaSelect
+                v-model="store.pagination.per_page"
+                class="!w-20"
+                :options="[5, 10, 20, 50]"
+                @update:modelValue="applyFilters"
+              />
+            </div>
             <VaPagination
+              v-if="store.pagination.last_page > 1"
               v-model="store.pagination.current_page"
               :pages="store.pagination.last_page"
               :visible-pages="5"

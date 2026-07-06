@@ -1,6 +1,7 @@
 import { defineStore } from 'pinia'
 import { ref, computed } from 'vue'
 import { authApi } from '../services/api'
+import api from '../services/api'
 
 export interface AuthUser {
   id: number
@@ -43,6 +44,9 @@ export const useAuthStore = defineStore('auth', () => {
       } catch {
         logout()
       }
+    } else {
+      token.value = null
+      user.value = null
     }
   }
 
@@ -90,17 +94,24 @@ export const useAuthStore = defineStore('auth', () => {
    * Logout — revogar token no servidor e limpar estado local.
    */
   async function logout() {
-    try {
-      if (token.value) {
-        await authApi.logout()
+    const savedToken = token.value
+
+    // Limpar localmente de forma síncrona para evitar loops de redirecionamento assíncronos
+    token.value = null
+    user.value = null
+    localStorage.removeItem('backoffice_auth_token')
+    localStorage.removeItem('backoffice_auth_user')
+
+    if (savedToken) {
+      try {
+        await api.post('/logout', null, {
+          headers: {
+            Authorization: `Bearer ${savedToken}`,
+          },
+        })
+      } catch {
+        // Se falhar, ignorar (token pode já ter expirado)
       }
-    } catch {
-      // Se falhar, limpar na mesma (token pode já ter expirado)
-    } finally {
-      token.value = null
-      user.value = null
-      localStorage.removeItem('backoffice_auth_token')
-      localStorage.removeItem('backoffice_auth_user')
     }
   }
 

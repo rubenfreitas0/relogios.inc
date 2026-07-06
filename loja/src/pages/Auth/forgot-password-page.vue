@@ -18,71 +18,71 @@ let cooldownTimer: number | null = null
 const isRateLimited = computed(() => cooldownSeconds.value > 0)
 
 function checkRateLimit(): boolean {
-	const now = Date.now()
-	attempts.value = attempts.value.filter((t) => now - t < 30000)
+  const now = Date.now()
+  attempts.value = attempts.value.filter((t) => now - t < 30000)
 
-	if (attempts.value.length >= 5) {
-		const earliest = attempts.value[0]
-		cooldownSeconds.value = Math.ceil((30000 - (now - earliest)) / 1000)
-		auth.error = `Demasiadas tentativas. Aguarde ${cooldownSeconds.value}s.`
+  if (attempts.value.length >= 5) {
+    const earliest = attempts.value[0]
+    cooldownSeconds.value = Math.ceil((30000 - (now - earliest)) / 1000)
+    auth.error = `Demasiadas tentativas. Aguarde ${cooldownSeconds.value}s.`
 
-		if (cooldownTimer) clearInterval(cooldownTimer)
-		cooldownTimer = window.setInterval(() => {
-			if (cooldownSeconds.value > 1) {
-				cooldownSeconds.value--
-				auth.error = `Demasiadas tentativas. Aguarde ${cooldownSeconds.value}s.`
-			} else {
-				cooldownSeconds.value = 0
-				auth.error = null
-				if (cooldownTimer) {
-					clearInterval(cooldownTimer)
-					cooldownTimer = null
-				}
-			}
-		}, 1000)
-		return true
-	}
+    if (cooldownTimer) clearInterval(cooldownTimer)
+    cooldownTimer = window.setInterval(() => {
+      if (cooldownSeconds.value > 1) {
+        cooldownSeconds.value--
+        auth.error = `Demasiadas tentativas. Aguarde ${cooldownSeconds.value}s.`
+      } else {
+        cooldownSeconds.value = 0
+        auth.error = null
+        if (cooldownTimer) {
+          clearInterval(cooldownTimer)
+          cooldownTimer = null
+        }
+      }
+    }, 1000)
+    return true
+  }
 
-	attempts.value.push(now)
-	return false
+  attempts.value.push(now)
+  return false
 }
 
 function injectTestData() {
-	email.value = 'admin@relogios.inc'
+  email.value = 'admin@relogios.inc'
 }
 
 function handleKeyDown(e: KeyboardEvent) {
-	if (e.ctrlKey && e.shiftKey && e.key.toLowerCase() === 'y') {
-		e.preventDefault()
-		injectTestData()
-	}
+  if (e.ctrlKey && e.shiftKey && e.key.toLowerCase() === 'y') {
+    e.preventDefault()
+    injectTestData()
+  }
 }
 
 onMounted(() => {
-	window.addEventListener('keydown', handleKeyDown)
+  window.addEventListener('keydown', handleKeyDown)
 })
 
 onUnmounted(() => {
-	window.removeEventListener('keydown', handleKeyDown)
-	if (cooldownTimer) clearInterval(cooldownTimer)
+  window.removeEventListener('keydown', handleKeyDown)
+  if (cooldownTimer) clearInterval(cooldownTimer)
 })
 
 async function handleForgotPassword() {
-	if (isRateLimited.value) return
+  if (isRateLimited.value) return
 
-	const emEl = document.getElementById(
-		'forgot-email',
-	) as HTMLInputElement | null
-	if (emEl && emEl.value && !email.value) {
-		email.value = emEl.value
-	}
+  const emEl = document.getElementById(
+    'forgot-email',
+  ) as HTMLInputElement | null
+  if (emEl && emEl.value && !email.value) {
+    email.value = emEl.value
+  }
 
-	if (checkRateLimit()) return
+  if (checkRateLimit()) return
 
-	const ok = await auth.forgotPassword(email.value)
-	if (ok) {
-		submitted.value = true
-	}
+  const ok = await auth.forgotPassword(email.value)
+  if (ok) {
+    submitted.value = true
+  }
 }
 </script>
 
@@ -132,7 +132,7 @@ async function handleForgotPassword() {
 							<p class="mb-8 text-sm leading-relaxed text-white/50">
 								{{ auth.successMessage }}
 							</p>
-							<router-link
+							<RouterLink
 								to="/login"
 								class="inline-flex items-center gap-2 text-sm font-semibold text-k-main transition duration-200 hover:text-yellow-400"
 							>
@@ -150,7 +150,7 @@ async function handleForgotPassword() {
 									/>
 								</svg>
 								Voltar ao Login
-							</router-link>
+							</RouterLink>
 						</div>
 
 						<!-- Estado: formulário -->
@@ -204,7 +204,7 @@ async function handleForgotPassword() {
 								</div>
 							</Transition>
 
-							<form @submit.prevent="handleForgotPassword" class="space-y-5">
+							<form class="space-y-5" @submit.prevent="handleForgotPassword">
 								<div>
 									<label
 										class="mb-2 block text-xs font-semibold uppercase tracking-wider text-white/60"
@@ -214,9 +214,9 @@ async function handleForgotPassword() {
 									</label>
 									<input
 										id="forgot-email"
+										v-model="email"
 										name="email"
 										autocomplete="email"
-										v-model="email"
 										type="email"
 										required
 										placeholder="o.teu@email.com"
@@ -266,8 +266,8 @@ async function handleForgotPassword() {
 							>
 								<button
 									type="button"
-									@click="injectTestData"
 									class="flex items-center gap-1.5 rounded-lg bg-white/5 px-3 py-1.5 text-xs text-k-main/60 transition duration-200 hover:bg-white/10 hover:text-k-main"
+									@click="injectTestData"
 								>
 									<svg
 										class="h-3.5 w-3.5"
@@ -290,7 +290,7 @@ async function handleForgotPassword() {
 							</div>
 
 							<div class="mt-6 text-center">
-								<router-link
+								<RouterLink
 									to="/login"
 									class="inline-flex items-center gap-2 text-sm text-white/40 transition duration-200 hover:text-white/70"
 								>
@@ -308,7 +308,7 @@ async function handleForgotPassword() {
 										/>
 									</svg>
 									Voltar ao Login
-								</router-link>
+								</RouterLink>
 							</div>
 						</div>
 					</Transition>
