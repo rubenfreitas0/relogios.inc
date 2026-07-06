@@ -2,6 +2,10 @@
 
 namespace App\Providers;
 
+use App\Models\Order;
+use App\Models\OrderItem;
+use App\Observers\OrderObserver;
+use App\Observers\OrderItemObserver;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\ServiceProvider;
 
@@ -25,5 +29,9 @@ class AppServiceProvider extends ServiceProvider
 
         // Previne atribuições silenciosas a campos não-fillable
         Model::preventSilentlyDiscardingAttributes(! app()->isProduction());
+
+        // Register observers
+        Order::observe(OrderObserver::class);
+        OrderItem::observe(OrderItemObserver::class);
     }
 }

@@ -8,12 +8,6 @@ import RouteViewComponent from '../layouts/RouterBypass.vue'
 
 const routes: Array<RouteRecordRaw> = [
   {
-    path: '/reset-password',
-    redirect: (to) => {
-      return { name: 'recover-password', query: to.query }
-    },
-  },
-  {
     path: '/:pathMatch(.*)*',
     redirect: { name: 'dashboard' },
   },
@@ -126,11 +120,6 @@ const routes: Array<RouteRecordRaw> = [
         name: 'login',
         path: 'login',
         component: () => import('../pages/auth/Login.vue'),
-      },
-      {
-        name: 'recover-password',
-        path: 'recover-password',
-        component: () => import('../pages/auth/RecoverPassword.vue'),
       },
       {
         path: '',

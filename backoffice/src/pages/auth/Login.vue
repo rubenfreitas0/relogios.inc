@@ -13,7 +13,7 @@
         v-model="formData.password"
         :rules="[validators.required]"
         :type="isPasswordVisible.value ? 'text' : 'password'"
-        class="mb-4"
+        class="mb-6"
         label="Senha"
         @clickAppendInner.stop="isPasswordVisible.value = !isPasswordVisible.value"
       >
@@ -26,12 +26,6 @@
         </template>
       </VaInput>
     </VaValue>
-
-    <div class="flex justify-end items-center mb-6">
-      <RouterLink :to="{ name: 'recover-password' }" class="va-link font-semibold text-sm">
-        Esqueceu-se da palavra-passe?
-      </RouterLink>
-    </div>
 
     <div class="flex justify-center mt-4">
       <VaButton class="w-full" @click="submit"> Entrar</VaButton>
