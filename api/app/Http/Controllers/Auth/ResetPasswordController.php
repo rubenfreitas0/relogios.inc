@@ -17,7 +17,7 @@ use App\Mail\ResetPasswordMail;
 class ResetPasswordController extends Controller
 {
     /**
-     * Enviar link de recuperação de password por email.
+     * Enviar código de recuperação de password por email.
      */
     public function sendResetLink(Request $request)
     {
@@ -29,7 +29,7 @@ class ResetPasswordController extends Controller
 
         if (!$user) {
             return response()->json([
-                'message' => 'Se o e-mail existir, enviámos o link de recuperação.',
+                'message' => 'Se o e-mail existir, enviámos o código de recuperação.',
             ]);
         }
 
@@ -48,7 +48,7 @@ class ResetPasswordController extends Controller
         Mail::to($request->email)->send(new ResetPasswordMail($token, $request->email));
 
         return response()->json([
-            'message' => 'Se o e-mail existir, enviámos o link de recuperação.',
+            'message' => 'Se o e-mail existir, enviámos o código de recuperação.',
         ]);
     }
 

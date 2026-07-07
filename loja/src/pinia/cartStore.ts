@@ -28,6 +28,9 @@ interface CartState {
 	toastTimeout: ReturnType<typeof setTimeout> | null
 	isBumping: boolean
 	bumpTimeout: ReturnType<typeof setTimeout> | null
+	cartError: string | null
+	showErrorToast: boolean
+	errorToastTimeout: ReturnType<typeof setTimeout> | null
 }
 
 export const useCartStore = defineStore('cart', {
@@ -41,6 +44,9 @@ export const useCartStore = defineStore('cart', {
 		toastTimeout: null,
 		isBumping: false,
 		bumpTimeout: null,
+		cartError: null,
+		showErrorToast: false,
+		errorToastTimeout: null,
 	}),
 	actions: {
 		cartOn() {
@@ -122,6 +128,9 @@ export const useCartStore = defineStore('cart', {
 		async addToCart(item: CartProduct, quantity: number = 1) {
 			const itemKey = 'api_' + item.id
 			const token = localStorage.getItem('auth_token')
+			const previousItem = this.cart[itemKey]
+				? { ...this.cart[itemKey] }
+				: undefined
 
 			if (itemKey in this.cart) {
 				this.cart[itemKey].amount = this.cart[itemKey].amount + quantity
@@ -142,6 +151,23 @@ export const useCartStore = defineStore('cart', {
 					})
 					if (res.ok) {
 						await this.fetchCart()
+					} else {
+						// Reverter a atualização otimista: o backend recusou o pedido
+						// (ex: stock insuficiente) e não podemos fingir que resultou.
+						if (previousItem) {
+							this.cart[itemKey] = previousItem
+						} else {
+							delete this.cart[itemKey]
+						}
+
+						const data = await res.json().catch(() => null)
+						this.cartError = data?.message ?? 'Não foi possível adicionar o produto ao carrinho.'
+						this.showErrorToast = true
+						if (this.errorToastTimeout) clearTimeout(this.errorToastTimeout)
+						this.errorToastTimeout = setTimeout(() => {
+							this.showErrorToast = false
+						}, 4000)
+						return
 					}
 				} catch (e) {
 					console.error('Erro ao adicionar à API:', e)

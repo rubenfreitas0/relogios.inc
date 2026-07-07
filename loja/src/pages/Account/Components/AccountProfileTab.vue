@@ -9,6 +9,10 @@ const successMsg = ref('')
 const errorMsg = ref('')
 const isSubmitting = ref(false)
 
+const resendingVerification = ref(false)
+const resendSuccess = ref(false)
+const resendError = ref('')
+
 watch(
 	() => authStore.user,
 	(newUser) => {
@@ -42,6 +46,21 @@ async function saveProfile() {
 		isEditing.value = false
 	} else {
 		errorMsg.value = authStore.error || 'Erro ao atualizar telemóvel.'
+	}
+}
+
+async function handleResendVerification() {
+	resendingVerification.value = true
+	resendSuccess.value = false
+	resendError.value = ''
+
+	const ok = await authStore.resendVerification()
+
+	resendingVerification.value = false
+	if (ok) {
+		resendSuccess.value = true
+	} else {
+		resendError.value = authStore.error || 'Erro ao enviar email.'
 	}
 }
 </script>
@@ -163,8 +182,26 @@ async function saveProfile() {
 				</div>
 			</div>
 
+			<!-- Mensagens de Verificação -->
+			<div v-if="resendSuccess" class="mb-4 text-xs font-semibold text-green-400">
+				Email de verificação enviado! Verifica a tua caixa de entrada.
+			</div>
+			<div v-if="resendError" class="mb-4 text-xs font-semibold text-red-400">
+				{{ resendError }}
+			</div>
+
 			<!-- Botões de Ação -->
-			<div class="mt-6 flex justify-end gap-3 border-t border-white/5 pt-6">
+			<div class="mt-6 flex flex-wrap justify-end gap-3 border-t border-white/5 pt-6">
+				<button
+					v-if="!isEditing && !authStore.user?.email_verified_at"
+					type="button"
+					:disabled="resendingVerification"
+					class="rounded-lg border border-amber-400/40 px-4 py-2 text-xs font-semibold text-amber-400 hover:border-amber-400 hover:bg-amber-400/10 disabled:opacity-50"
+					@click="handleResendVerification"
+				>
+					{{ resendingVerification ? 'A enviar...' : 'Verificar Conta' }}
+				</button>
+
 				<template v-if="isEditing">
 					<button
 						type="button"

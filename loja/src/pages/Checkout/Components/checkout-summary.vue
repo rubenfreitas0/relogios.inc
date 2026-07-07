@@ -84,7 +84,7 @@ async function handleResend() {
 			content="Confirmar e Pagar"
 			color="light"
 			class="mt-8 self-center font-bold"
-			:disabled="formStore.isSubmitting || formStore.shippingLoading || (authStore.user && !authStore.user?.email_verified_at)"
+			:disabled="formStore.isSubmitting || formStore.shippingLoading || !!(authStore.user && !authStore.user?.email_verified_at)"
 			data-test="checkout-button"
 			@click="formStore.submit()"
 		/>

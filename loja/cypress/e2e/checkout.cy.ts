@@ -30,12 +30,28 @@ describe('Desktop: Filled cart - customer', () => {
 		}).then((response) => {
 			const token = response.body.token
 			window.localStorage.setItem('auth_token', token)
+			const authHeader = { Authorization: `Bearer ${token}` }
 			cy.request({
 				method: 'DELETE',
 				url: '/api/cart',
-				headers: {
-					Authorization: `Bearer ${token}`
-				}
+				headers: authHeader
+			})
+			// Outras specs (ex: account.cy.ts) deixam moradas guardadas nesta
+			// conta partilhada. Uma morada default poluída seria auto-aplicada
+			// ao formulário de checkout, pelo que a limpamos aqui.
+			cy.request({
+				method: 'GET',
+				url: '/api/addresses',
+				headers: authHeader
+			}).then((addressesResponse) => {
+				const addresses = addressesResponse.body.data ?? addressesResponse.body
+				addresses.forEach((address: { id: number }) => {
+					cy.request({
+						method: 'DELETE',
+						url: `/api/addresses/${address.id}`,
+						headers: authHeader
+					})
+				})
 			})
 		})
 
@@ -229,12 +245,28 @@ describe('Mobile: Filled cart - customer', () => {
 		}).then((response) => {
 			const token = response.body.token
 			window.localStorage.setItem('auth_token', token)
+			const authHeader = { Authorization: `Bearer ${token}` }
 			cy.request({
 				method: 'DELETE',
 				url: '/api/cart',
-				headers: {
-					Authorization: `Bearer ${token}`
-				}
+				headers: authHeader
+			})
+			// Outras specs (ex: account.cy.ts) deixam moradas guardadas nesta
+			// conta partilhada. Uma morada default poluída seria auto-aplicada
+			// ao formulário de checkout, pelo que a limpamos aqui.
+			cy.request({
+				method: 'GET',
+				url: '/api/addresses',
+				headers: authHeader
+			}).then((addressesResponse) => {
+				const addresses = addressesResponse.body.data ?? addressesResponse.body
+				addresses.forEach((address: { id: number }) => {
+					cy.request({
+						method: 'DELETE',
+						url: `/api/addresses/${address.id}`,
+						headers: authHeader
+					})
+				})
 			})
 		})
 

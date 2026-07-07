@@ -139,7 +139,7 @@ export const useAuthStore = defineStore('auth', () => {
 				return false
 			}
 			successMessage.value =
-				data.message ?? 'Se o e-mail existir, enviámos o link de recuperação.'
+				data.message ?? 'Se o e-mail existir, enviámos o código de recuperação.'
 			return true
 		} catch {
 			error.value = 'Sem ligação ao servidor. Tenta novamente.'

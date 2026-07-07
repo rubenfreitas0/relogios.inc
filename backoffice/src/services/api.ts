@@ -108,9 +108,7 @@ export const brandsApi = {
 export const categoriesApi = {
   list: (params?: Record<string, unknown>) => api.get('/admin/categories', { params }),
   show: (id: number) => api.get(`/admin/categories/${id}`),
-  create: (data: Record<string, unknown>) => api.post('/admin/categories', data),
   update: (id: number, data: Record<string, unknown>) => api.put(`/admin/categories/${id}`, data),
-  destroy: (id: number) => api.delete(`/admin/categories/${id}`),
 }
 
 export const shippingMethodsApi = {

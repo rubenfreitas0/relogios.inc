@@ -38,10 +38,15 @@ use App\Http\Controllers\Api\Admin\SiteSettingController;
 
 
 
-Route::post('/register',       [AuthController::class, 'register'])->middleware('throttle:5,1');
-Route::post('/login',          [AuthController::class, 'login'])->middleware('throttle:5,1');
-Route::post('/forgot-password', [ResetPasswordController::class, 'sendResetLink'])->middleware('throttle:3,1');
-Route::post('/reset-password',  [ResetPasswordController::class, 'reset'])->middleware('throttle:5,1');
+// Fora de produção (dev local, Cypress) o limite é bem mais alto para não
+// bloquear suites de testes que fazem login/registo real repetidamente.
+$authThrottle = app()->environment('production') ? '5,1' : '100,1';
+$resetThrottle = app()->environment('production') ? '3,1' : '100,1';
+
+Route::post('/register',       [AuthController::class, 'register'])->middleware("throttle:{$authThrottle}");
+Route::post('/login',          [AuthController::class, 'login'])->middleware("throttle:{$authThrottle}");
+Route::post('/forgot-password', [ResetPasswordController::class, 'sendResetLink'])->middleware("throttle:{$resetThrottle}");
+Route::post('/reset-password',  [ResetPasswordController::class, 'reset'])->middleware("throttle:{$authThrottle}");
 
 Route::get('/email/verify/{id}', [VerificationController::class, 'verify'])
     ->middleware('signed')
@@ -103,7 +108,7 @@ Route::middleware('auth:sanctum')->group(function () {
         Route::get('reports',          [ReportController::class, 'index']);
 
         Route::apiResource('brands', AdminBrandController::class);
-        Route::apiResource('categories', AdminCategoryController::class);
+        Route::apiResource('categories', AdminCategoryController::class)->only(['index', 'show', 'update']);
 
         Route::patch('products/{product}/stock', [AdminProductController::class, 'updateStock']);
         Route::post('products/{product}/restore', [AdminProductController::class, 'restore'])->withTrashed();

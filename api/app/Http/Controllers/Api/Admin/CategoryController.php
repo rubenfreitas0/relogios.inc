@@ -4,11 +4,9 @@ namespace App\Http\Controllers\Api\Admin;
 
 
 use App\Http\Controllers\Controller;
-use App\Http\Requests\Admin\StoreCategoryRequest;
 use App\Http\Requests\Admin\UpdateCategoryRequest;
 use App\Http\Resources\CategoryResource;
 use App\Models\Category;
-use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Http\Resources\Json\AnonymousResourceCollection;
 
@@ -36,18 +34,6 @@ class CategoryController extends Controller
     }
 
     /**
-     * Criar nova categoria.
-     */
-    public function store(StoreCategoryRequest $request): JsonResponse
-    {
-        $category = Category::create($request->validated());
-
-        return (new CategoryResource($category))
-            ->response()
-            ->setStatusCode(201);
-    }
-
-    /**
      * Detalhe de uma categoria por ID.
      */
     public function show(Category $category): CategoryResource
@@ -65,29 +51,5 @@ class CategoryController extends Controller
         $category->update($request->validated());
 
         return new CategoryResource($category);
-    }
-
-    /**
-     * Eliminar categoria.
-     */
-    public function destroy(Category $category): JsonResponse
-    {
-        $protectedSlugs = ['gama-de-preco', 'cor', 'sexo', 'genero'];
-        
-        if (in_array($category->slug, $protectedSlugs)) {
-            return response()->json([
-                'message' => 'Não é possível eliminar categorias de sistema (Gama de preço, Cor, Género, etc).',
-            ], 403);
-        }
-
-        if ($category->products()->exists()) {
-            return response()->json([
-                'message' => 'Não é possível eliminar esta categoria porque tem produtos associados.',
-            ], 409);
-        }
-
-        $category->delete();
-
-        return response()->json(null, 204);
     }
 }

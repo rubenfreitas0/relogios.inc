@@ -7,19 +7,25 @@ interface Props {
   add?: string
   to?: RouteLocationRaw
   size?: 'small' | 'big'
+  disabled?: boolean
 }
+
+defineOptions({ inheritAttrs: false })
 
 const props = withDefaults(defineProps<Props>(), {
   content: 'to product',
   to: '',
   size: 'big',
+  disabled: false,
 })
 </script>
 
 <template>
 	<Component :is="to ? 'router-link' : 'div'" class="w-fit" :to="props.to">
 		<button
-			class="rounded-sm border-2 uppercase tracking-wide text-k-black shadow-md transition duration-100 hover:translate-y-0.5 active:translate-y-1"
+			v-bind="$attrs"
+			:disabled="props.disabled"
+			class="rounded-sm border-2 uppercase tracking-wide text-k-black shadow-md transition duration-100 hover:translate-y-0.5 active:translate-y-1 disabled:cursor-not-allowed disabled:opacity-50 disabled:hover:translate-y-0"
 			:class="[
 				props.color === 'light'
 					? [

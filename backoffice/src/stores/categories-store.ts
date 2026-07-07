@@ -19,18 +19,12 @@ export interface PaginationMeta {
   total: number
 }
 
-const PROTECTED_SLUGS = ['gama-de-preco', 'cor', 'sexo', 'genero']
-
 export const useCategoriesStore = defineStore('categories', () => {
   const categories = ref<Category[]>([])
   const pagination = ref<PaginationMeta>({ current_page: 1, last_page: 1, per_page: 15, total: 0 })
   const loading = ref(false)
   const saving = ref(false)
   const error = ref<string | null>(null)
-
-  function isProtected(category: Category): boolean {
-    return PROTECTED_SLUGS.includes(category.slug)
-  }
 
   async function fetchCategories(params: Record<string, unknown> = {}) {
     loading.value = true
@@ -55,24 +49,6 @@ export const useCategoriesStore = defineStore('categories', () => {
     }
   }
 
-  async function createCategory(data: Record<string, unknown>): Promise<Category | null> {
-    saving.value = true
-    error.value = null
-    try {
-      const response = await categoriesApi.create(data)
-      return response.data.data
-    } catch (err: any) {
-      if (err.response?.status === 422) {
-        error.value = Object.values(err.response.data.errors).flat().join('\n')
-      } else {
-        error.value = err.response?.data?.message || 'Erro ao criar categoria.'
-      }
-      return null
-    } finally {
-      saving.value = false
-    }
-  }
-
   async function updateCategory(id: number, data: Record<string, unknown>): Promise<Category | null> {
     saving.value = true
     error.value = null
@@ -91,16 +67,6 @@ export const useCategoriesStore = defineStore('categories', () => {
     }
   }
 
-  async function deleteCategory(id: number): Promise<boolean> {
-    try {
-      await categoriesApi.destroy(id)
-      return true
-    } catch (err: any) {
-      error.value = err.response?.data?.message || 'Erro ao eliminar categoria.'
-      return false
-    }
-  }
-
   function setPage(page: number) {
     pagination.value.current_page = page
   }
@@ -111,11 +77,8 @@ export const useCategoriesStore = defineStore('categories', () => {
     loading,
     saving,
     error,
-    isProtected,
     fetchCategories,
-    createCategory,
     updateCategory,
-    deleteCategory,
     setPage,
   }
 })

@@ -58,6 +58,42 @@ const cartStore = useCartStore()
 				</button>
 			</div>
 		</Transition>
+
+		<!-- Global Error Toast (ex: stock insuficiente) -->
+		<Transition name="toast">
+			<div
+				v-if="cartStore.showErrorToast && cartStore.cartError"
+				data-test="cart-error-toast"
+				class="fixed bottom-6 right-6 z-[100] flex items-center gap-4 rounded-xl border border-red-100 bg-white p-4 shadow-[0_10px_40px_-10px_rgba(0,0,0,0.2)]"
+			>
+				<div class="flex flex-col pr-4">
+					<p class="text-xs font-bold uppercase tracking-widest text-red-500">
+						Não foi possível adicionar
+					</p>
+					<p class="text-sm font-semibold text-black">
+						{{ cartStore.cartError }}
+					</p>
+				</div>
+				<button
+					class="absolute right-2 top-2 text-gray-400 hover:text-black"
+					@click="cartStore.showErrorToast = false"
+				>
+					<svg
+						class="h-4 w-4"
+						fill="none"
+						viewBox="0 0 24 24"
+						stroke="currentColor"
+					>
+						<path
+							stroke-linecap="round"
+							stroke-linejoin="round"
+							stroke-width="2"
+							d="M6 18L18 6M6 6l12 12"
+						/>
+					</svg>
+				</button>
+			</div>
+		</Transition>
 	</div>
 </template>
 

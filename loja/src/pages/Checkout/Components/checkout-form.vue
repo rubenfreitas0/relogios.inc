@@ -17,11 +17,32 @@ onMounted(async () => {
   const token = localStorage.getItem('auth_token')
   if (token) {
     isLoggedIn.value = true
+
+    // O fetch é assíncrono, então o utilizador pode começar a preencher (ou
+    // limpar) o formulário antes de a resposta chegar. Guardamos aqui os
+    // valores para não sobrescrever entrada do utilizador feita entretanto.
+    const beforeFetch = {
+      name: formStore.name,
+      phone: formStore.phone,
+      address: formStore.address,
+      zip: formStore.zip,
+      city: formStore.city,
+      country: formStore.country,
+    }
+
     await accountStore.fetchAddresses()
+
+    const formUntouchedSinceFetch =
+      formStore.name === beforeFetch.name &&
+      formStore.phone === beforeFetch.phone &&
+      formStore.address === beforeFetch.address &&
+      formStore.zip === beforeFetch.zip &&
+      formStore.city === beforeFetch.city &&
+      formStore.country === beforeFetch.country
 
     // Auto-selecionar a morada default se existir
     const defaultAddr = accountStore.addresses.find((a) => a.is_default)
-    if (defaultAddr) {
+    if (defaultAddr && formUntouchedSinceFetch) {
       applyAddress(defaultAddr)
     }
   }

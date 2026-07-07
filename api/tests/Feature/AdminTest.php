@@ -187,21 +187,18 @@ class AdminTest extends TestCase
         $this->assertFalse($brand->fresh()->is_active);
     }
 
-    // ADMIN — CATEGORIES CRUD
+    // ADMIN — CATEGORIES (apenas leitura e edição; são fixas, não se criam nem eliminam)
 
-    public function test_admin_can_crud_categories(): void
+    public function test_admin_can_view_and_update_categories(): void
     {
         $this->authenticateAdmin();
 
-        // CREATE
-        $response = $this->postJson('/api/admin/categories', [
-            'name'      => 'Desportivo',
-            'is_active' => true,
-        ]);
+        $category = Category::factory()->create(['name' => 'Desportivo']);
 
-        $response->assertStatus(201);
-        $category = Category::first();
-        $this->assertEquals('Desportivo', $category->name);
+        // READ
+        $this->getJson('/api/admin/categories/' . $category->id)
+            ->assertStatus(200)
+            ->assertJsonPath('data.name', 'Desportivo');
 
         // UPDATE
         $this->putJson('/api/admin/categories/' . $category->id, [
@@ -209,12 +206,21 @@ class AdminTest extends TestCase
         ])->assertStatus(200);
 
         $this->assertEquals('Desportivo Premium', $category->fresh()->name);
+    }
 
-        // DELETE
+    public function test_admin_cannot_create_or_delete_categories(): void
+    {
+        $this->authenticateAdmin();
+
+        $category = Category::factory()->create();
+
+        $this->postJson('/api/admin/categories', ['name' => 'Nova Categoria'])
+            ->assertStatus(405);
+
         $this->deleteJson('/api/admin/categories/' . $category->id)
-            ->assertStatus(204);
+            ->assertStatus(405);
 
-        $this->assertDatabaseMissing('categories', ['id' => $category->id]);
+        $this->assertDatabaseHas('categories', ['id' => $category->id]);
     }
 
     // ADMIN — PRODUCTS CRUD

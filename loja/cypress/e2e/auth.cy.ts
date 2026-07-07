@@ -135,10 +135,9 @@ describe('Auth — Register', () => {
 })
 
 describe('Auth — Logout', () => {
-	it('logging out clears the token', () => {
+	beforeEach(() => {
 		cy.viewport('macbook-15')
 
-		// Login first
 		cy.request('POST', '/api/login', {
 			email: 'admin@relogios.inc',
 			password: 'password'
@@ -147,11 +146,59 @@ describe('Auth — Logout', () => {
 			window.localStorage.setItem('auth_token', token)
 		})
 
-		cy.visit('/conta/perfil')
+		cy.visit('/')
+	})
 
-		// Token should exist
+	it('token exists right after logging in', () => {
 		cy.window().then((win) => {
 			expect(win.localStorage.getItem('auth_token')).to.not.be.null
+		})
+	})
+
+	it('clicking logout in the user menu clears the token and redirects home', () => {
+		cy.get('[data-test="user-menu"] button').click()
+		cy.get('[data-test="nav-logout"]').click()
+
+		cy.url().should('eq', Cypress.config().baseUrl + '/')
+		// .should() (not .then()) so Cypress retries until clearAuth() has
+		// actually run — avoids a race right after the redirect.
+		cy.window().should((win) => {
+			expect(win.localStorage.getItem('auth_token')).to.be.null
+		})
+
+		// The nav should now offer to log in again instead of showing the user menu
+		cy.get('[data-test="user-menu"]').should('not.exist')
+	})
+
+	it('after logging out, protected pages redirect back to /login', () => {
+		cy.get('[data-test="user-menu"] button').click()
+		cy.get('[data-test="nav-logout"]').click()
+		cy.url().should('eq', Cypress.config().baseUrl + '/')
+
+		cy.visit('/conta')
+		cy.url().should('include', '/login')
+	})
+})
+
+describe('Auth — Logout Mobile', () => {
+	it('clicking logout in the mobile menu clears the token', () => {
+		cy.viewport('iphone-xr')
+
+		cy.request('POST', '/api/login', {
+			email: 'admin@relogios.inc',
+			password: 'password'
+		}).then((response) => {
+			const token = response.body.token
+			window.localStorage.setItem('auth_token', token)
+		})
+
+		cy.visit('/')
+		cy.get('[data-test="hamburger"]').click()
+		cy.get('[data-test="mobile-nav-logout"]').click()
+
+		cy.url().should('eq', Cypress.config().baseUrl + '/')
+		cy.window().should((win) => {
+			expect(win.localStorage.getItem('auth_token')).to.be.null
 		})
 	})
 })

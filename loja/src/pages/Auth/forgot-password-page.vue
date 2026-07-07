@@ -182,7 +182,7 @@ async function handleForgotPassword() {
 									Recuperar password
 								</h1>
 								<p class="mt-1 text-sm text-white/50">
-									Envia-te um link para redefires a tua password
+									Enviamos-te um código para redefinires a tua password
 								</p>
 							</div>
 
@@ -259,7 +259,7 @@ async function handleForgotPassword() {
 											? `Bloqueado (${cooldownSeconds}s)`
 											: auth.isLoading
 											? 'A enviar...'
-											: 'Enviar link'
+											: 'Enviar código'
 									}}
 								</button>
 							</form>
