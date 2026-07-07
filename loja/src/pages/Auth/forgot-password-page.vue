@@ -1,10 +1,12 @@
 <script setup lang="ts">
 import { ref, computed, onMounted, onUnmounted } from 'vue'
+import { useRouter } from 'vue-router'
 import { useAuthStore } from '../../pinia/authStore'
 import Navigation from '../../components/navigation-global.vue'
 import Footer from '../../components/footer-global.vue'
 
 const auth = useAuthStore()
+const router = useRouter()
 const email = ref('')
 const submitted = ref(false)
 
@@ -82,6 +84,9 @@ async function handleForgotPassword() {
   const ok = await auth.forgotPassword(email.value)
   if (ok) {
     submitted.value = true
+    setTimeout(() => {
+      router.push(`/reset-password?email=${encodeURIComponent(email.value)}`)
+    }, 2500)
   }
 }
 </script>

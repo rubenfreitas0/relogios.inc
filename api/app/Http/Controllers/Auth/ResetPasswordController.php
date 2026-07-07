@@ -33,12 +33,14 @@ class ResetPasswordController extends Controller
             ]);
         }
 
-        $token = Str::random(64);
+        // Código de 6 dígitos numérico
+        $token = (string) random_int(100000, 999999);
 
         DB::table('password_reset_tokens')->updateOrInsert(
             ['email' => $request->email],
             [
                 'token'      => Hash::make($token),
+                'attempts'   => 0,
                 'created_at' => Carbon::now(),
             ]
         );
@@ -66,15 +68,36 @@ class ResetPasswordController extends Controller
 
         $record = DB::table('password_reset_tokens')->where('email', $request->email)->first();
 
-        if (!$record || !Hash::check($request->token, $record->token)) {
+        if (!$record) {
             return response()->json([
-                'message' => 'Token inválido ou e-mail incorreto.'
+                'message' => 'Código de recuperação inválido ou e-mail incorreto.'
             ], 422);
         }
 
-        if (Carbon::parse($record->created_at)->addMinutes(60)->isPast()) {
+        // Expiração curta de 15 minutos
+        if (Carbon::parse($record->created_at)->addMinutes(15)->isPast()) {
             DB::table('password_reset_tokens')->where('email', $request->email)->delete();
-            return response()->json(['message' => 'O token expirou.'], 422);
+            return response()->json(['message' => 'O código expirou. Solicite um novo código.'], 422);
+        }
+
+        if (!Hash::check($request->token, $record->token)) {
+            // Incrementar tentativas
+            $newAttempts = ($record->attempts ?? 0) + 1;
+            
+            if ($newAttempts >= 3) {
+                DB::table('password_reset_tokens')->where('email', $request->email)->delete();
+                return response()->json([
+                    'message' => 'Excedeu o limite de tentativas. Solicite um novo código.'
+                ], 422);
+            }
+
+            DB::table('password_reset_tokens')->where('email', $request->email)->update([
+                'attempts' => $newAttempts
+            ]);
+
+            return response()->json([
+                'message' => 'Código de recuperação inválido.'
+            ], 422);
         }
 
         $user = User::where('email', $request->email)->first();

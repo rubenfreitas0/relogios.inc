@@ -26,9 +26,8 @@
         </template>
       </VaInput>
     </VaValue>
-
     <div class="flex justify-center mt-4">
-      <VaButton class="w-full" @click="submit"> Entrar</VaButton>
+      <VaButton type="submit" class="w-full"> Entrar</VaButton>
     </div>
   </VaForm>
 </template>

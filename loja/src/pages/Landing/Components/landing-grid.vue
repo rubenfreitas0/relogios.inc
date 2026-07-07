@@ -34,10 +34,6 @@ onMounted(async () => {
     console.error('Erro ao buscar definições do Grid Hero:', e)
   }
 })
-
-const formatText = (text: string) => {
-  return text.replace(/\n/g, '<br />')
-}
 </script>
 
 <template>
@@ -90,13 +86,15 @@ const formatText = (text: string) => {
 						class="relative z-10 col-span-3 flex h-full w-full flex-col justify-center bg-k-main md:pl-4 md:pr-20 lg:pl-6 lg:pr-24"
 					>
 						<h2
-							class="text-center text-5xl font-semibold uppercase md:text-start lg:text-6xl"
-							v-html="formatText(gridHeroData.grid_hero_title)"
-						></h2>
+							class="whitespace-pre-line text-center text-5xl font-semibold uppercase md:text-start lg:text-6xl"
+						>
+							{{ gridHeroData.grid_hero_title }}
+						</h2>
 						<p
-							class="mb-8 mt-4 line-clamp-3 text-center tracking-wide md:mb-10 md:text-start"
-							v-html="formatText(gridHeroData.grid_hero_description)"
-						></p>
+							class="whitespace-pre-line mb-8 mt-4 line-clamp-3 text-center tracking-wide md:mb-10 md:text-start"
+						>
+							{{ gridHeroData.grid_hero_description }}
+						</p>
 						<ButtonSolid
 							:to="gridHeroData.grid_hero_link"
 							content="VER RELÓGIO"

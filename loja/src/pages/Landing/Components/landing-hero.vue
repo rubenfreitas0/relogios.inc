@@ -35,10 +35,6 @@ onMounted(async () => {
     console.error('Erro ao buscar definições do Hero:', e)
   }
 })
-
-const formatText = (text: string) => {
-  return text.replace(/\n/g, '<br />')
-}
 </script>
 
 <template>
@@ -55,13 +51,15 @@ const formatText = (text: string) => {
 					{{ heroData.hero_subtitle }}
 				</p>
 				<h1
-					class="relative mt-4 text-5xl font-semibold uppercase text-white md:text-6xl"
-					v-html="formatText(heroData.hero_title)"
-				></h1>
+					class="whitespace-pre-line relative mt-4 text-5xl font-semibold uppercase text-white md:text-6xl"
+				>
+					{{ heroData.hero_title }}
+				</h1>
 				<p 
-					class="mb-10 mt-5 md:opacity-90"
-					v-html="formatText(heroData.hero_description)"
-				></p>
+					class="whitespace-pre-line mb-10 mt-5 md:opacity-90"
+				>
+					{{ heroData.hero_description }}
+				</p>
 				<ButtonSolid
 					:to="heroData.hero_link"
 					:content="heroData.hero_button_text"

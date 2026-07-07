@@ -35,6 +35,11 @@ class CheckoutService
     {
         return DB::transaction(function () use ($user, $validated) {
 
+            // ─── 0. Validar se o email está verificado ───
+            if (! $user->hasVerifiedEmail()) {
+                throw new CheckoutException('Por favor, verifica o teu email antes de efetuar a primeira compra.', 403);
+            }
+
             // ─── 1. Carregar carrinho com lock nos produtos ───
             $cartItems = $user->cartItems()
                 ->with([

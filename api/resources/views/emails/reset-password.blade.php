@@ -15,18 +15,15 @@
         </p>
         
         <p style="color: #555;">
-            Clique no botão abaixo para criar uma nova password:
+            Copie o código de 6 dígitos abaixo e insira-o na página de redefinição de password do site:
         </p>
         
-        <a href="{{ config('app.frontend_url') }}/reset-password?token={{ $token }}&email={{ $email }}" 
-           style="display: inline-block; background-color: #000; color: #fff; 
-                  padding: 14px 28px; text-decoration: none; border-radius: 6px; 
-                  margin: 20px 0; font-weight: bold;">
-            Redefinir Password
-        </a>
+        <div style="background-color: #f4f4f4; border: 1px solid #ddd; padding: 15px; text-align: center; font-size: 28px; font-weight: bold; letter-spacing: 6px; margin: 20px 0; border-radius: 6px; color: #000; font-family: monospace;">
+            {{ $token }}
+        </div>
         
         <p style="color: #999; font-size: 14px;">
-            Este link expira em 60 minutos.
+            Este código expira em 15 minutos.
         </p>
 
         

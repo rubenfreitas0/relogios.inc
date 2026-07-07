@@ -234,6 +234,66 @@ export const useAuthStore = defineStore('auth', () => {
 		}
 	}
 
+	async function updateProfile(payload: {
+		firstname?: string
+		lastname?: string
+		phone?: string | null
+	}): Promise<boolean> {
+		clearMessages()
+		isLoading.value = true
+		try {
+			const res = await fetch(`${API_BASE}/user/profile`, {
+				method: 'PATCH',
+				headers: {
+					'Content-Type': 'application/json',
+					Accept: 'application/json',
+					Authorization: `Bearer ${token.value}`,
+				},
+				body: JSON.stringify(payload),
+			})
+			const data = await res.json()
+			if (!res.ok) {
+				error.value = data.message ?? 'Erro ao atualizar perfil.'
+				return false
+			}
+			user.value = data.data ?? data.user
+			successMessage.value = data.message ?? 'Perfil atualizado com sucesso!'
+			return true
+		} catch {
+			error.value = 'Sem ligação ao servidor. Tenta novamente.'
+			return false
+		} finally {
+			isLoading.value = false
+		}
+	}
+
+	async function resendVerification(): Promise<boolean> {
+		clearMessages()
+		isLoading.value = true
+		try {
+			const res = await fetch(`${API_BASE}/email/resend`, {
+				method: 'POST',
+				headers: {
+					'Content-Type': 'application/json',
+					Accept: 'application/json',
+					Authorization: `Bearer ${token.value}`,
+				},
+			})
+			const data = await res.json()
+			if (!res.ok) {
+				error.value = data.message ?? 'Erro ao enviar email.'
+				return false
+			}
+			successMessage.value = data.message ?? 'Email de verificação reenviado.'
+			return true
+		} catch {
+			error.value = 'Sem ligação ao servidor. Tenta novamente.'
+			return false
+		} finally {
+			isLoading.value = false
+		}
+	}
+
 	return {
 		user,
 		token,
@@ -247,5 +307,7 @@ export const useAuthStore = defineStore('auth', () => {
 		resetPassword,
 		logout,
 		fetchUser,
+		updateProfile,
+		resendVerification,
 	}
 })

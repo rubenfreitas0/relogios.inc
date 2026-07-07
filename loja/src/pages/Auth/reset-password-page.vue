@@ -213,39 +213,7 @@ async function handleReset() {
 
 					<!-- Estado: formulário -->
 					<div v-else key="form">
-						<!-- Token em falta -->
-						<div v-if="!token" class="py-4 text-center">
-							<div
-								class="mx-auto mb-6 flex h-16 w-16 items-center justify-center rounded-full border border-red-500/30 bg-red-500/10"
-							>
-								<svg
-									class="h-8 w-8 text-red-400"
-									fill="none"
-									viewBox="0 0 24 24"
-									stroke="currentColor"
-								>
-									<path
-										stroke-linecap="round"
-										stroke-linejoin="round"
-										stroke-width="2"
-										d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"
-									/>
-								</svg>
-							</div>
-							<h2 class="mb-3 text-xl font-bold text-white">Link inválido</h2>
-							<p class="mb-8 text-sm text-white/50">
-								Este link de recuperação é inválido ou expirou.
-							</p>
-							<RouterLink
-								to="/forgot-password"
-								class="inline-flex items-center gap-2 rounded-xl bg-k-main px-6 py-2.5 text-sm font-bold text-k-black transition duration-200 hover:bg-yellow-400"
-							>
-								Pedir novo link
-							</RouterLink>
-						</div>
-
-						<!-- Formulário normal -->
-						<div v-else>
+						<div>
 							<div class="mb-8">
 								<div
 									class="mb-5 flex h-14 w-14 items-center justify-center rounded-2xl border border-k-main/20 bg-k-main/10"
@@ -313,6 +281,26 @@ async function handleReset() {
 										required
 										placeholder="o.teu@email.com"
 										class="w-full rounded-xl border border-white/10 bg-white/5 px-4 py-3 text-sm text-white/60 placeholder-white/20 transition duration-200 focus:border-k-main focus:outline-none"
+									/>
+								</div>
+
+								<!-- Código de Recuperação -->
+								<div>
+									<label
+										class="mb-2 block text-xs font-semibold uppercase tracking-wider text-white/60"
+										for="reset-token"
+									>
+										Código de Recuperação (6 dígitos)
+									</label>
+									<input
+										id="reset-token"
+										v-model="token"
+										name="token"
+										type="text"
+										required
+										maxlength="6"
+										placeholder="Ex: 123456"
+										class="w-full rounded-xl border border-white/10 bg-white/5 px-4 py-3 text-sm text-white placeholder-white/20 transition duration-200 focus:border-k-main focus:outline-none"
 									/>
 								</div>
 

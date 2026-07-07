@@ -34,6 +34,7 @@ describe('Gestão de Produtos', () => {
         stock: 10,
         is_active: true,
         is_featured: true,
+        gender: 'unisexo',
         brand: { id: 1, name: 'Casio', slug: 'casio', logo: '' },
         category: { id: 1, name: 'Clássicos', slug: 'classicos' },
         images: [{ id: 101, url: 'https://picsum.photos/200/300', is_primary: true }],
@@ -51,6 +52,7 @@ describe('Gestão de Produtos', () => {
         stock: 5,
         is_active: true,
         is_featured: false,
+        gender: 'masculino',
         brand: { id: 2, name: 'Seiko', slug: 'seiko', logo: '' },
         category: { id: 1, name: 'Clássicos', slug: 'classicos' },
         images: [],
@@ -107,7 +109,7 @@ describe('Gestão de Produtos', () => {
     }).as('filterCategory')
 
     cy.get('input[placeholder="Categorias"]').click({ force: true })
-    cy.contains('Clássicos').click()
+    cy.get('.va-select-option').contains('Clássicos').click({ force: true })
     cy.wait('@filterCategory').its('request.url').should('include', 'category_id=1')
 
     // Limpar filtro de categoria (usar o botão limpar do VaSelect)
@@ -121,7 +123,7 @@ describe('Gestão de Produtos', () => {
     // Filtrar por Estado "Ativos"
     cy.intercept('GET', '**/api/admin/products*', mockProductsList).as('filterActive')
     cy.get('input[placeholder="Estados"]').click({ force: true })
-    cy.contains('Ativos').click()
+    cy.get('.va-select-option').contains('Ativos').click({ force: true })
     cy.wait('@filterActive').its('request.url').should('include', 'is_active=true')
   })
 
@@ -179,14 +181,14 @@ describe('Gestão de Produtos', () => {
     )
 
     // Selecionar Classificações
-    cy.contains('.va-input-wrapper', 'Marca').click({ force: true })
-    cy.contains('Casio').click({ force: true })
+    cy.get('input[placeholder="Seleciona uma marca"]').click({ force: true })
+    cy.get('.va-select-option').contains('Casio').click({ force: true })
 
-    cy.contains('.va-input-wrapper', 'Categoria').click({ force: true })
-    cy.contains('Clássicos').click({ force: true })
+    cy.get('input[placeholder="Seleciona uma categoria"]').click({ force: true })
+    cy.get('.va-select-option').contains('Clássicos').click({ force: true })
 
-    cy.contains('.va-input-wrapper', 'Género').click({ force: true })
-    cy.contains('Masculino').click({ force: true })
+    cy.get('input[placeholder="Seleciona o género"]').click({ force: true })
+    cy.get('.va-select-option').contains('Masculino').click({ force: true })
 
     // Configurar Destaque e Ativar
     cy.contains('Produto em destaque').click({ force: true })
@@ -226,7 +228,7 @@ describe('Gestão de Produtos', () => {
     cy.wait(['@getBrands', '@getCategories', '@getProducts'])
 
     cy.get('table tbody tr').first().find('td').eq(5).find('.va-icon').should('have.text', 'star')
-    cy.get('table tbody tr').eq(1).find('td').eq(5).find('.va-icon').should('have.text', 'star_outline')
+    cy.get('table tbody tr').eq(1).find('td').eq(5).find('.va-icon').should('have.class', 'ion-md-star-outline')
 
     // 2. Clicar para editar o segundo produto (Seiko 5 Automatic)
     cy.intercept('GET', '**/api/admin/products/2', {
@@ -280,7 +282,7 @@ describe('Gestão de Produtos', () => {
     }).as('getProductDetailLoja')
 
     cy.origin('http://localhost:5173', () => {
-      cy.visit('/produtos/casio-vintage-gold')
+      cy.visit('/unisexo/casio-vintage-gold')
       cy.wait('@getProductDetailLoja')
 
       // Deve mostrar "Esgotado" e o aviso de indisponibilidade

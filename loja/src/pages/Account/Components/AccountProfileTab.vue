@@ -1,7 +1,49 @@
 <script setup lang="ts">
+import { ref, watch } from 'vue'
 import { useAuthStore } from '../../../pinia/authStore'
 
 const authStore = useAuthStore()
+const isEditing = ref(false)
+const phoneInput = ref(authStore.user?.phone || '')
+const successMsg = ref('')
+const errorMsg = ref('')
+const isSubmitting = ref(false)
+
+watch(
+	() => authStore.user,
+	(newUser) => {
+		if (newUser) {
+			phoneInput.value = newUser.phone || ''
+		}
+	},
+	{ immediate: true },
+)
+
+function cancelEdit() {
+	phoneInput.value = authStore.user?.phone || ''
+	isEditing.value = false
+	successMsg.value = ''
+	errorMsg.value = ''
+}
+
+async function saveProfile() {
+	isSubmitting.value = true
+	successMsg.value = ''
+	errorMsg.value = ''
+	
+	const ok = await authStore.updateProfile({
+		phone: phoneInput.value || null,
+	})
+	
+	isSubmitting.value = false
+	
+	if (ok) {
+		successMsg.value = 'Telemóvel atualizado com sucesso!'
+		isEditing.value = false
+	} else {
+		errorMsg.value = authStore.error || 'Erro ao atualizar telemóvel.'
+	}
+}
 </script>
 
 <template>
@@ -52,6 +94,14 @@ const authStore = useAuthStore()
 				</div>
 			</div>
 
+			<!-- Mensagens de Feedback -->
+			<div v-if="successMsg" class="mb-4 text-xs font-semibold text-green-400">
+				{{ successMsg }}
+			</div>
+			<div v-if="errorMsg" class="mb-4 text-xs font-semibold text-red-400">
+				{{ errorMsg }}
+			</div>
+
 			<!-- Info grid -->
 			<div class="grid gap-6 md:grid-cols-2">
 				<div>
@@ -96,18 +146,57 @@ const authStore = useAuthStore()
 					>
 						Telefone
 					</label>
+					<div v-if="isEditing">
+						<input
+							v-model="phoneInput"
+							type="text"
+							placeholder="Ex: 912345678"
+							class="w-full rounded-lg border border-white/10 bg-white/[0.03] px-4 py-3 text-sm text-white focus:border-[#FFC700] focus:outline-none"
+						/>
+					</div>
 					<p
+						v-else
 						class="rounded-lg border border-white/10 bg-white/[0.03] px-4 py-3 text-sm text-white/70"
 					>
 						{{ authStore.user?.phone || 'Não definido' }}
 					</p>
 				</div>
 			</div>
+
+			<!-- Botões de Ação -->
+			<div class="mt-6 flex justify-end gap-3 border-t border-white/5 pt-6">
+				<template v-if="isEditing">
+					<button
+						type="button"
+						:disabled="isSubmitting"
+						class="rounded-lg px-4 py-2 text-xs font-semibold text-white/60 hover:text-white disabled:opacity-50"
+						@click="cancelEdit"
+					>
+						Cancelar
+					</button>
+					<button
+						type="button"
+						:disabled="isSubmitting"
+						class="rounded-lg bg-[#FFC700] px-4 py-2 text-xs font-bold text-black hover:bg-yellow-400 disabled:opacity-50"
+						@click="saveProfile"
+					>
+						{{ isSubmitting ? 'A guardar...' : 'Guardar' }}
+					</button>
+				</template>
+				<button
+					v-else
+					type="button"
+					class="rounded-lg border border-white/20 px-4 py-2 text-xs font-semibold text-white hover:border-white hover:bg-white/5"
+					@click="isEditing = true"
+				>
+					Editar Telemóvel
+				</button>
+			</div>
 		</div>
 
 		<!-- Nota -->
 		<p class="mt-6 text-center text-xs text-white/25">
-			Para alterar os teus dados, contacta o suporte.
+			Para alterar os outros dados, contacta o suporte.
 		</p>
 	</div>
 </template>

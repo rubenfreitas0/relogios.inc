@@ -1,11 +1,31 @@
 <script setup lang="ts">
+import { ref } from 'vue'
 import { useCartStore } from '../../../pinia/cartStore.ts'
 import { useFormStore } from '../../../pinia/formStore.ts'
+import { useAuthStore } from '../../../pinia/authStore.ts'
 import SummaryItem from './checkout-summary-item.vue'
 import ButtonSolid from '../../../components/Buttons/button-solid.vue'
 
 const cartStore = useCartStore()
 const formStore = useFormStore()
+const authStore = useAuthStore()
+
+const resending = ref(false)
+const resendSuccess = ref(false)
+const resendError = ref('')
+
+async function handleResend() {
+	resending.value = true
+	resendSuccess.value = false
+	resendError.value = ''
+	const ok = await authStore.resendVerification()
+	resending.value = false
+	if (ok) {
+		resendSuccess.value = true
+	} else {
+		resendError.value = authStore.error || 'Erro ao enviar email.'
+	}
+}
 </script>
 
 <template>
@@ -64,9 +84,33 @@ const formStore = useFormStore()
 			content="Confirmar e Pagar"
 			color="light"
 			class="mt-8 self-center font-bold"
-			:disabled="formStore.isSubmitting || formStore.shippingLoading"
+			:disabled="formStore.isSubmitting || formStore.shippingLoading || (authStore.user && !authStore.user?.email_verified_at)"
 			data-test="checkout-button"
 			@click="formStore.submit()"
 		/>
+
+		<!-- Email não verificado -->
+		<div
+			v-if="authStore.user && !authStore.user.email_verified_at"
+			class="mt-6 flex flex-col gap-2 rounded border border-red-500/30 bg-red-500/10 p-4 text-center"
+		>
+			<p class="text-xs font-semibold text-red-500">
+				Deves verificar o teu email antes de efetuar a primeira compra.
+			</p>
+			<button
+				type="button"
+				:disabled="resending"
+				class="text-xs font-bold text-black underline hover:text-black/80 disabled:opacity-50"
+				@click="handleResend"
+			>
+				{{ resending ? 'A enviar...' : 'Reenviar email de verificação' }}
+			</button>
+			<p v-if="resendSuccess" class="text-[10px] font-semibold text-green-600">
+				Email de verificação enviado!
+			</p>
+			<p v-if="resendError" class="text-[10px] font-semibold text-red-500">
+				{{ resendError }}
+			</p>
+		</div>
 	</div>
 </template>

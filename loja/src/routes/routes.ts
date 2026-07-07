@@ -111,6 +111,11 @@ const routes = [
 		beforeEnter: () => handleRouteMeta(getResetPasswordPageMeta),
 	},
 	{
+		path: '/verificar-email/:id',
+		name: 'VerifyEmail',
+		component: () => import('../pages/Auth/verify-email-page.vue'),
+	},
+	{
 		path: '/404',
 		component: () => import('../pages/404/404-page.vue'),
 		beforeEnter: () => handleRouteMeta(get404PageMeta),

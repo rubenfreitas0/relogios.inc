@@ -33,10 +33,10 @@ export default {
       },
     },
     {
-      name: 'orders',
-      displayName: 'menu.orders',
+      name: 'vitrine',
+      displayName: 'menu.vitrine',
       meta: {
-        icon: 'shopping_cart',
+        icon: 'storefront',
       },
     },
     {
@@ -71,6 +71,13 @@ export default {
       ],
     },
     {
+      name: 'orders',
+      displayName: 'menu.orders',
+      meta: {
+        icon: 'shopping_cart',
+      },
+    },
+    {
       name: 'reports',
       displayName: 'menu.reports',
       meta: {
@@ -96,13 +103,6 @@ export default {
       displayName: 'menu.settings',
       meta: {
         icon: 'settings',
-      },
-    },
-    {
-      name: 'vitrine',
-      displayName: 'menu.vitrine',
-      meta: {
-        icon: 'storefront',
       },
     },
   ] as INavigationRoute[],
