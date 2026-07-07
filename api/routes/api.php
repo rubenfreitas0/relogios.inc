@@ -38,10 +38,10 @@ use App\Http\Controllers\Api\Admin\SiteSettingController;
 
 
 
-Route::post('/register',       [AuthController::class, 'register'])->middleware('throttle:100,1');
-Route::post('/login',          [AuthController::class, 'login'])->middleware('throttle:100,1');
-Route::post('/forgot-password', [ResetPasswordController::class, 'sendResetLink'])->middleware('throttle:100,1');
-Route::post('/reset-password',  [ResetPasswordController::class, 'reset'])->middleware('throttle:100,1');
+Route::post('/register',       [AuthController::class, 'register'])->middleware('throttle:5,1');
+Route::post('/login',          [AuthController::class, 'login'])->middleware('throttle:5,1');
+Route::post('/forgot-password', [ResetPasswordController::class, 'sendResetLink'])->middleware('throttle:3,1');
+Route::post('/reset-password',  [ResetPasswordController::class, 'reset'])->middleware('throttle:5,1');
 
 Route::get('/email/verify/{id}', [VerificationController::class, 'verify'])
     ->middleware('signed')
