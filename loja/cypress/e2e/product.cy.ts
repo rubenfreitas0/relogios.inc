@@ -48,10 +48,6 @@ describe('Product Detail Page — Desktop', () => {
 		})
 	})
 
-	it('shows price with IVA info', () => {
-		cy.contains('Inclui 23% IVA').should('be.visible')
-	})
-
 	it('has quantity selector and add to cart button', () => {
 		cy.get('select#quantity').should('be.visible')
 		cy.contains('adicionar ao carrinho', { matchCase: false }).should('be.visible')

@@ -76,7 +76,6 @@ return new class extends Migration
                 COUNT(o.id) AS total_orders,
                 COALESCE(SUM(o.subtotal), 0) AS total_subtotal,
                 COALESCE(SUM(o.shipping_cost), 0) AS total_shipping,
-                COALESCE(SUM(o.tax_amount), 0) AS total_tax,
                 COALESCE(SUM(o.total), 0) AS total_revenue
             FROM orders o
             WHERE o.payment_status = 'paid'

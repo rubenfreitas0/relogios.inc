@@ -125,14 +125,17 @@
             </template>
 
             <!-- Estado -->
-            <template #cell(is_active)="{ value }">
-              <VaBadge :text="value ? 'Ativo' : 'Inativo'" :color="value ? 'success' : 'secondary'" />
+            <template #cell(is_active)="{ rowData }">
+              <VaBadge
+                :text="rowData.is_active ? 'Ativo' : 'Inativo'"
+                :color="rowData.is_active ? 'success' : 'secondary'"
+              />
             </template>
 
             <!-- Destaque -->
             <template #cell(is_featured)="{ rowData }">
               <VaIcon
-                :name="rowData.is_featured ? 'star' : 'star_outline'"
+                :name="rowData.is_featured ? 'star' : 'star_border'"
                 :color="rowData.is_featured ? 'warning' : 'secondary'"
                 size="small"
               />

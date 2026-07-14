@@ -77,7 +77,6 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::post('/email/resend', [VerificationController::class, 'resend']);
     Route::get('/email/status',  [VerificationController::class, 'status']);
 
-    // Perfil do utilizador autenticado
     Route::get('/user', fn(\Illuminate\Http\Request $request) => new \App\Http\Resources\UserResource($request->user()));
     Route::patch('/user/profile', [\App\Http\Controllers\Api\ProfileController::class, 'update']);
     Route::post('/support', [SupportController::class, 'store']);
@@ -123,16 +122,13 @@ Route::middleware('auth:sanctum')->group(function () {
         Route::apiResource('shipping-zones', AdminShippingZoneController::class);
         Route::apiResource('users', AdminUserController::class);
 
-        // Encomendas — admin
         Route::patch('orders/{orderNumber}/status', [AdminOrderController::class, 'updateStatus']);
         Route::get('orders',              [AdminOrderController::class, 'index']);
         Route::get('orders/{orderNumber}', [AdminOrderController::class, 'show']);
 
-        // Tickets — admin
         Route::patch('tickets/{ticket}/status', [AdminTicketController::class, 'updateStatus']);
         Route::apiResource('tickets', AdminTicketController::class)->except(['store', 'update']);
 
-        // Definições do site (Vitrine) — admin
         Route::get('site-settings', [SiteSettingController::class, 'index']);
         Route::put('site-settings', [SiteSettingController::class, 'update']);
         Route::post('site-settings/image', [SiteSettingController::class, 'uploadImage']);

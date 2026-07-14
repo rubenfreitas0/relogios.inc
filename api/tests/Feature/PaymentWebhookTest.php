@@ -119,4 +119,54 @@ class PaymentWebhookTest extends TestCase
         $this->assertNotNull($payment->paid_at);
         $this->assertEquals('TXN-ABC123', $payment->transaction_id);
     }
+
+    // STOCK - decrement on payment, restore on cancel/refund
+
+    public function test_stock_is_restored_when_order_is_cancelled_after_payment(): void
+    {
+        ['order' => $order, 'payment' => $payment] = $this->createOrderWithPayment();
+        $product = $order->orderItems()->first()->product;
+        $stockBeforePayment = $product->fresh()->stock;
+
+        $this->postJson('/api/payments/webhook', [
+            'payment_id' => $payment->id,
+        ]);
+
+        // Stock deve ter sido deduzido após o pagamento
+        $this->assertEquals($stockBeforePayment - 1, $product->fresh()->stock);
+
+        $order->fresh()->update(['status' => OrderStatus::CANCELLED]);
+
+        // Stock deve ser restabelecido após o cancelamento
+        $this->assertEquals($stockBeforePayment, $product->fresh()->stock);
+    }
+
+    public function test_stock_is_restored_when_order_is_refunded_after_payment(): void
+    {
+        ['order' => $order, 'payment' => $payment] = $this->createOrderWithPayment();
+        $product = $order->orderItems()->first()->product;
+        $stockBeforePayment = $product->fresh()->stock;
+
+        $this->postJson('/api/payments/webhook', [
+            'payment_id' => $payment->id,
+        ]);
+
+        $this->assertEquals($stockBeforePayment - 1, $product->fresh()->stock);
+
+        $order->fresh()->update(['status' => OrderStatus::REFUNDED]);
+
+        $this->assertEquals($stockBeforePayment, $product->fresh()->stock);
+    }
+
+    public function test_stock_is_not_restored_when_cancelling_unpaid_order(): void
+    {
+        ['order' => $order] = $this->createOrderWithPayment();
+        $product = $order->orderItems()->first()->product;
+        $stockBeforePayment = $product->fresh()->stock;
+
+        // Encomenda continua PENDING, stock nunca foi deduzido
+        $order->fresh()->update(['status' => OrderStatus::CANCELLED]);
+
+        $this->assertEquals($stockBeforePayment, $product->fresh()->stock);
+    }
 }

@@ -77,7 +77,6 @@ const productImage = computed(() => {
 					<span v-else class="text-3xl font-bold text-white"
 						>€{{ Number(props.item.price).toFixed(2).replace('.', ',') }}</span
 					>
-					<span class="text-xs font-normal text-white/50">Inclui 23% IVA</span>
 				</div>
 				<div>
 					<span

@@ -5,7 +5,6 @@ namespace Tests\Feature;
 use App\Models\ShippingMethod;
 use App\Models\ShippingZone;
 use App\Models\ShippingZoneCountry;
-use App\Models\TaxRate;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Tests\TestCase;
 use Tests\Traits\TestHelpers;
@@ -47,14 +46,10 @@ class ShippingTest extends TestCase
             ->assertJsonStructure([
                 'subtotal',
                 'total_weight',
-                'tax_rate_name',
-                'tax_rate_percent',
-                'tax_amount',
                 'shipping_methods',
             ])
             ->assertJsonPath('subtotal', 200)
-            ->assertJsonPath('total_weight', 1)
-            ->assertJsonPath('tax_rate_percent', 23);
+            ->assertJsonPath('total_weight', 1);
     }
 
     public function test_calculate_with_empty_cart(): void
@@ -117,20 +112,5 @@ class ShippingTest extends TestCase
 
         $methodNames = collect($response->json('shipping_methods'))->pluck('name')->all();
         $this->assertContains('CTT Normal', $methodNames);
-    }
-
-    public function test_tax_rate_applied_correctly(): void
-    {
-        ['user' => $user, 'headers' => $headers] = $this->createUser();
-        $this->setupShipping(); // TaxRate 23%
-        $product = $this->createProduct(['price' => 100.00, 'weight' => 0.5]);
-        $this->addToCart($user, $product, 1);
-
-        $response = $this->getJson('/api/shipping/calculate?country=PT&postal_code=1000-001', $headers);
-
-        $response->assertStatus(200)
-            ->assertJsonPath('tax_rate_name', 'IVA PT')
-            ->assertJsonPath('tax_rate_percent', 23)
-            ->assertJsonPath('tax_amount', 23); // 100 * 23% = 23.00
     }
 }

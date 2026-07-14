@@ -18,3 +18,12 @@ import './commands'
 
 // Ignore uncaught exceptions from the application under test
 Cypress.on('uncaught:exception', () => false)
+
+// O Vite faz a otimização de dependências (pre-bundling) só na primeira vez
+// que o dev server recebe um pedido depois de arrancar, o que pode demorar
+// bastante mais do que o defaultCommandTimeout. Este "aquecimento" paga esse
+// custo uma única vez antes dos testes cronometrados começarem, em vez de
+// forçarmos um timeout enorme em todos os cy.get()/cy.wait() da suite.
+before(() => {
+  cy.visit('/auth/login', { timeout: 60000 })
+})

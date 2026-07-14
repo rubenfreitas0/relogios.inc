@@ -228,7 +228,7 @@ describe('Gestão de Produtos', () => {
     cy.wait(['@getBrands', '@getCategories', '@getProducts'])
 
     cy.get('table tbody tr').first().find('td').eq(5).find('.va-icon').should('have.text', 'star')
-    cy.get('table tbody tr').eq(1).find('td').eq(5).find('.va-icon').should('have.class', 'ion-md-star-outline')
+    cy.get('table tbody tr').eq(1).find('td').eq(5).find('.va-icon').should('have.text', 'star_border')
 
     // 2. Clicar para editar o segundo produto (Seiko 5 Automatic)
     cy.intercept('GET', '**/api/admin/products/2', {

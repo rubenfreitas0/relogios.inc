@@ -71,8 +71,11 @@
             </template>
 
             <!-- Estado -->
-            <template #cell(is_active)="{ value }">
-              <VaBadge :text="value ? 'Ativa' : 'Inativa'" :color="value ? 'success' : 'secondary'" />
+            <template #cell(is_active)="{ rowData }">
+              <VaBadge
+                :text="rowData.is_active ? 'Ativa' : 'Inativa'"
+                :color="rowData.is_active ? 'success' : 'secondary'"
+              />
             </template>
 
             <!-- Ações -->

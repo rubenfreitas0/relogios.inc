@@ -65,8 +65,30 @@ describe('Cart — Stock Limits', () => {
 			statusCode: 200,
 			body: { message: 'Produto adicionado ao carrinho com sucesso.' },
 		}).as('addToCartOk')
+		// A successful add triggers a follow-up GET /api/cart to resync state —
+		// stub it too, otherwise it hits the real (still empty) backend cart
+		// and wipes out the optimistic item we just "added".
+		cy.intercept('GET', '/api/cart', {
+			statusCode: 200,
+			body: {
+				items: [
+					{
+						id: 1,
+						quantity: 1,
+						product: {
+							id: 1,
+							name: 'Stub Product',
+							image: '',
+							price: 10,
+							discount_price: null,
+						},
+					},
+				],
+			},
+		}).as('getCartOk')
 		cy.get('[data-test="quick-add-homens-0"]').click()
 		cy.wait('@addToCartOk')
+		cy.wait('@getCartOk')
 		cy.get('[data-test="cart-bubble"]').should('be.visible').and('contain', '1')
 	})
 

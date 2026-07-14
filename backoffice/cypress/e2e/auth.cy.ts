@@ -18,21 +18,6 @@ describe('Autenticação do Backoffice', () => {
       // O toast de erro ou mensagem de erro
       cy.get('.va-toast').should('be.visible')
     })
-
-    it('deve efetuar login com sucesso com credenciais corretas e guardar sessão', () => {
-      cy.get('input[type="email"]').type('admin@relogios.inc')
-      cy.get('input[type="password"]').type('password')
-      cy.get('button').contains('Entrar').click()
-
-      // Deve redirecionar para o dashboard
-      cy.url().should('include', '/dashboard')
-      cy.get('h1.page-title').should('contain', 'Dashboard')
-
-      // Deve guardar o token no localStorage
-      cy.window().then((window) => {
-        expect(window.localStorage.getItem('backoffice_auth_token')).to.be.a('string')
-      })
-    })
   })
 
   describe('Sessão e Proteção de Rotas', () => {

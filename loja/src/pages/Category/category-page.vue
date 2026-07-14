@@ -28,17 +28,36 @@ interface CategoryFilterMeta {
 }
 
 // ── Static filter data (future: fetch from API) ──────────────────
+// Estes intervalos têm de corresponder aos definidos no mega menu
+// (navigation-global.vue) para cada género, para que os chips de filtro
+// e o URL fiquem consistentes entre a sidebar e o mega menu.
+const homensPriceRanges: PriceRange[] = [
+  { label: 'Até €100', min: 0, max: 100 },
+  { label: '€100 – €250', min: 100, max: 250 },
+  { label: '€250 – €500', min: 250, max: 500 },
+  { label: 'Acima de €500', min: 500, max: 999999 },
+]
+
+const mulheresPriceRanges: PriceRange[] = [
+  { label: 'Até €80', min: 0, max: 80 },
+  { label: '€80 – €200', min: 80, max: 200 },
+  { label: '€200 – €450', min: 200, max: 450 },
+  { label: 'Acima de €450', min: 450, max: 999999 },
+]
+
+const unisexoPriceRanges: PriceRange[] = [
+  { label: 'Até €80', min: 0, max: 80 },
+  { label: '€80 – €200', min: 80, max: 200 },
+  { label: '€200 – €500', min: 200, max: 500 },
+  { label: 'Acima de €500', min: 500, max: 999999 },
+]
+
 const filterData: Record<string, CategoryFilterMeta> = {
   homens: {
     label: 'Homens',
     subtitle: 'Elegância e precisão para ele.',
     brands: ['Rolex', 'Casio', 'Seiko', 'Omega', 'Tag Heuer'],
-    priceRanges: [
-      { label: 'Até €100', min: 0, max: 100 },
-      { label: '€100 – €250', min: 100, max: 250 },
-      { label: '€250 – €500', min: 250, max: 500 },
-      { label: 'Acima de €500', min: 500, max: 999999 },
-    ],
+    priceRanges: homensPriceRanges,
     categories: [
       { slug: 'classicos', name: 'Clássico' },
       { slug: 'desporto', name: 'Desportivo' },
@@ -61,12 +80,7 @@ const filterData: Record<string, CategoryFilterMeta> = {
     label: 'Mulheres',
     subtitle: 'Sofisticação em cada detalhe.',
     brands: ['Rolex', 'Casio', 'Seiko', 'Omega', 'Tag Heuer'],
-    priceRanges: [
-      { label: 'Até €80', min: 0, max: 80 },
-      { label: '€80 – €200', min: 80, max: 200 },
-      { label: '€200 – €450', min: 200, max: 450 },
-      { label: 'Acima de €450', min: 450, max: 999999 },
-    ],
+    priceRanges: mulheresPriceRanges,
     categories: [
       { slug: 'classicos', name: 'Clássico' },
       { slug: 'desporto', name: 'Desportivo' },
@@ -87,12 +101,7 @@ const filterData: Record<string, CategoryFilterMeta> = {
     label: 'Unisexo',
     subtitle: 'Para quem não segue regras.',
     brands: ['Rolex', 'Casio', 'Seiko', 'Omega', 'Tag Heuer'],
-    priceRanges: [
-      { label: 'Até €80', min: 0, max: 80 },
-      { label: '€80 – €200', min: 80, max: 200 },
-      { label: '€200 – €500', min: 200, max: 500 },
-      { label: 'Acima de €500', min: 500, max: 999999 },
-    ],
+    priceRanges: unisexoPriceRanges,
     categories: [
       { slug: 'classicos', name: 'Clássico' },
       { slug: 'desporto', name: 'Desportivo' },

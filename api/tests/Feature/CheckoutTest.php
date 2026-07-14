@@ -235,7 +235,7 @@ class CheckoutTest extends TestCase
     public function test_checkout_calculates_correct_totals(): void
     {
         ['user' => $user, 'headers' => $headers] = $this->createUser();
-        $shipping = $this->setupShipping(); // shipping = 5.00, IVA = 23%
+        $shipping = $this->setupShipping(); // shipping = 5.00
         $product = $this->createProduct(['price' => 100.00, 'stock' => 10, 'weight' => 0.5]);
         $this->addToCart($user, $product, 2);
 
@@ -247,10 +247,8 @@ class CheckoutTest extends TestCase
         $this->assertEquals('200.00', $order->subtotal);
         // shipping = 5.00
         $this->assertEquals('5.00', $order->shipping_cost);
-        // tax = 200 * 0.23 = 46.00
-        $this->assertEquals('46.00', $order->tax_amount);
-        // total = 200 + 5 + 46 = 251.00
-        $this->assertEquals('251.00', $order->total);
+        // total = 200 + 5 = 205.00
+        $this->assertEquals('205.00', $order->total);
     }
 
     public function test_checkout_creates_order_items_snapshot(): void

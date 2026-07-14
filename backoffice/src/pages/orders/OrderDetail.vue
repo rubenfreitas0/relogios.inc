@@ -142,10 +142,6 @@
                   <span class="text-[var(--va-secondary)]">Envio</span>
                   <span class="font-mono">{{ formatCurrency(order.shipping_cost) }}</span>
                 </div>
-                <div v-if="order.tax_amount > 0" class="flex justify-between text-sm">
-                  <span class="text-[var(--va-secondary)]">IVA ({{ order.tax_rate }}%)</span>
-                  <span class="font-mono">{{ formatCurrency(order.tax_amount) }}</span>
-                </div>
                 <VaDivider />
                 <div class="flex justify-between font-semibold text-lg">
                   <span>Total</span>

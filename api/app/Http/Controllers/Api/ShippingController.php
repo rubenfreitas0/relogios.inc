@@ -4,7 +4,6 @@ namespace App\Http\Controllers\Api;
 
 use App\Http\Controllers\Controller;
 use App\Models\ShippingMethod;
-use App\Models\TaxRate;
 use App\Services\ShippingZoneResolver;
 use Illuminate\Http\Request;
 
@@ -64,20 +63,9 @@ class ShippingController extends Controller
             ], 422);
         }
 
-        // Buscar a Taxa de IVA para o país destino
-        $taxRateModel = TaxRate::where('country_code', $countryCode)
-            ->where('is_active', true)
-            ->first();
-
-        $taxPercentage = $taxRateModel ? (float) $taxRateModel->rate : 0.0;
-        $taxAmount = round($subtotal * ($taxPercentage / 100), 2);
-
         return response()->json([
             'subtotal'        => round($subtotal, 2),
             'total_weight'    => round($totalWeight, 3),
-            'tax_rate_name'   => $taxRateModel ? $taxRateModel->name : 'N/A',
-            'tax_rate_percent' => $taxPercentage,
-            'tax_amount'      => $taxAmount,
             'shipping_methods' => $shippingMethods->map(fn($method) => [
                 'id'             => $method->id,
                 'name'           => $method->name,

@@ -8,7 +8,6 @@ use App\Enums\PaymentStatus;
 use App\Exceptions\CheckoutException;
 use App\Models\Order;
 use App\Models\ShippingMethod;
-use App\Models\TaxRate;
 use App\Models\User;
 use Illuminate\Support\Facades\DB;
 
@@ -101,16 +100,9 @@ class CheckoutService
                 );
             }
 
-            // ─── 7. Calcular IVA ───
+            // ─── 7. Calcular total ───
             $shippingCost = (float) $shippingMethod->price;
-
-            $taxRateModel = TaxRate::where('country_code', $countryCode)
-                ->where('is_active', true)
-                ->first();
-
-            $taxPercentage = $taxRateModel ? (float) $taxRateModel->rate : 0.0;
-            $taxAmount     = round($subtotal * ($taxPercentage / 100), 2);
-            $total         = $subtotal + $shippingCost + $taxAmount;
+            $total        = $subtotal + $shippingCost;
 
             // ─── 8. Decrementar stock com verificação atómica ───
             foreach ($cartItems as $item) {
@@ -154,8 +146,6 @@ class CheckoutService
                 'nif'           => $validated['nif'] ?? null,
                 'subtotal'      => round($subtotal, 2),
                 'shipping_cost' => round($shippingCost, 2),
-                'tax_amount'    => $taxAmount,
-                'tax_rate'      => $taxPercentage,
                 'total'         => round($total, 2),
                 'notes'         => $validated['notes'] ?? null,
             ]);

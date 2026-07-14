@@ -26,4 +26,9 @@ export default defineConfig({
       include: resolve(dirname(fileURLToPath(import.meta.url)), './src/i18n/locales/**'),
     }),
   ],
+  test: {
+    environment: 'jsdom',
+    globals: true,
+    include: ['src/**/*.spec.ts'],
+  },
 })

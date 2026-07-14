@@ -57,8 +57,11 @@
               </template>
 
               <!-- Estado -->
-              <template #cell(is_active)="{ value }">
-                <VaBadge :text="value ? 'Ativa' : 'Inativa'" :color="value ? 'success' : 'secondary'" />
+              <template #cell(is_active)="{ rowData }">
+                <VaBadge
+                  :text="rowData.is_active ? 'Ativa' : 'Inativa'"
+                  :color="rowData.is_active ? 'success' : 'secondary'"
+                />
               </template>
 
               <!-- Data -->
@@ -71,7 +74,7 @@
                 <div class="flex gap-1">
                   <VaButton
                     preset="plain"
-                    icon="list"
+                    icon="format_list_bulleted"
                     size="small"
                     color="info"
                     title="Gerir Itens"
@@ -172,8 +175,11 @@
             </template>
 
             <!-- Estado -->
-            <template #cell(is_active)="{ value }">
-              <VaBadge :text="value ? 'Ativo' : 'Inativo'" :color="value ? 'success' : 'secondary'" />
+            <template #cell(is_active)="{ rowData }">
+              <VaBadge
+                :text="rowData.is_active ? 'Ativo' : 'Inativo'"
+                :color="rowData.is_active ? 'success' : 'secondary'"
+              />
             </template>
 
             <!-- Ações -->
@@ -200,7 +206,7 @@
           </VaDataTable>
 
           <div v-if="subItems.length === 0" class="text-center py-8 text-[var(--va-secondary)]">
-            <VaIcon name="list" size="48px" class="mb-2" />
+            <VaIcon name="format_list_bulleted" size="48px" class="mb-2" />
             <p>Nenhum item configurado para esta categoria.</p>
           </div>
         </VaCardContent>

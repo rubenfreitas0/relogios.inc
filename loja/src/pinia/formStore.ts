@@ -12,9 +12,6 @@ interface ShippingMethod {
 interface ShippingData {
 	subtotal: number
 	total_weight: number
-	tax_rate_name: string
-	tax_rate_percent: number
-	tax_amount: number
 	shipping_methods: ShippingMethod[]
 }
 
@@ -319,15 +316,6 @@ export const useFormStore = defineStore('form', {
 				(m) => m.id === state.shipping_method_id,
 			)
 			return method ? Number(method.price) : 0
-		},
-		taxAmount(state: FormState): number {
-			return state.shippingData?.tax_amount ?? 0
-		},
-		taxRatePercent(state: FormState): number {
-			return state.shippingData?.tax_rate_percent ?? 0
-		},
-		taxRateName(state: FormState): string {
-			return state.shippingData?.tax_rate_name ?? 'IVA'
 		},
 	},
 })

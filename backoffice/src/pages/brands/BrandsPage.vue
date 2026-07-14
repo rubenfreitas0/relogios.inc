@@ -66,8 +66,11 @@
             </template>
 
             <!-- Estado -->
-            <template #cell(is_active)="{ value }">
-              <VaBadge :text="value ? 'Ativa' : 'Inativa'" :color="value ? 'success' : 'secondary'" />
+            <template #cell(is_active)="{ rowData }">
+              <VaBadge
+                :text="rowData.is_active ? 'Ativa' : 'Inativa'"
+                :color="rowData.is_active ? 'success' : 'secondary'"
+              />
             </template>
 
             <!-- Ações -->
@@ -133,7 +136,7 @@
           <div>
             <label class="text-sm font-semibold text-[var(--va-secondary)] mb-1 block">Logo</label>
             <VaFileUpload
-              v-model="modal.logoFile"
+              v-model="logoFileModel"
               type="single"
               file-types=".png,.jpg,.jpeg,.svg"
               upload-button-text="Escolher logo"
@@ -183,7 +186,7 @@
 </template>
 
 <script lang="ts" setup>
-import { reactive, onMounted, onBeforeUnmount } from 'vue'
+import { reactive, computed, onMounted, onBeforeUnmount } from 'vue'
 import { useForm, useToast } from 'vuestic-ui'
 import { useBrandsStore, type Brand } from '../../stores/brands-store'
 
@@ -235,6 +238,14 @@ const modal = reactive({
   name: '',
   is_active: true,
   logoFile: [] as File[],
+})
+
+// VaFileUpload com type="single" pode emitir um único File em vez de File[]
+const logoFileModel = computed({
+  get: () => modal.logoFile,
+  set: (val: File | File[] | null | undefined) => {
+    modal.logoFile = !val ? [] : Array.isArray(val) ? val : [val]
+  },
 })
 
 function openModal(brand?: Brand) {

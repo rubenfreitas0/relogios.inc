@@ -40,6 +40,15 @@ class OrderObserver
         if ($isPaidOrProcessing && !$wasPaidOrProcessing) {
             $this->decrementStock($order);
         }
+
+        // If stock had already been deducted (order was paid/processing) and the order
+        // is now being cancelled or refunded, restore the stock that was deducted.
+        $isCancelledOrRefunded = in_array($currentStatusStr, ['cancelled', 'refunded']);
+        $wasCancelledOrRefunded = in_array($originalStatusStr, ['cancelled', 'refunded']);
+
+        if ($wasPaidOrProcessing && $isCancelledOrRefunded && !$wasCancelledOrRefunded) {
+            $this->restockItems($order);
+        }
     }
  
     /**
@@ -75,6 +84,41 @@ class OrderObserver
                 }
  
                 $product->stock -= $item->quantity;
+                $product->save();
+            }
+        });
+    }
+
+    /**
+     * Restores product stock in a concurrency-safe manner when an order
+     * that had already been paid/processing is cancelled or refunded.
+     */
+    protected function restockItems(Order $order): void
+    {
+        $items = $order->orderItems()->whereNotNull('product_id')->get();
+
+        if ($items->isEmpty()) {
+            return;
+        }
+
+        // Deadlock Prevention: get unique product IDs and sort them ASCENDING
+        $productIds = $items->pluck('product_id')->unique()->sort()->values()->toArray();
+
+        DB::transaction(function () use ($items, $productIds) {
+            // Lock products in consistent ascending order
+            $products = Product::whereIn('id', $productIds)
+                ->lockForUpdate()
+                ->get()
+                ->keyBy('id');
+
+            foreach ($items as $item) {
+                $product = $products->get($item->product_id);
+
+                if (!$product) {
+                    continue;
+                }
+
+                $product->stock += $item->quantity;
                 $product->save();
             }
         });

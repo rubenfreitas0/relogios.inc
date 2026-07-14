@@ -37,8 +37,6 @@ export interface Order {
   } | null
   subtotal: number
   shipping_cost: number
-  tax_rate: number
-  tax_amount: number
   total: number
   tracking_number: string | null
   tracking_url: string | null

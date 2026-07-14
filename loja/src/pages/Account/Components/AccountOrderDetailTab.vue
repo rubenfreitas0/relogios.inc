@@ -273,13 +273,6 @@ function formatReference(ref: string | number): string {
 								>€{{ formatPrice(store.currentOrder.shipping_cost) }}</span
 							>
 						</div>
-						<div class="flex justify-between">
-							<span class="text-white/40"
-								>IVA ({{ store.currentOrder.tax_rate }}%)</span
-							><span class="text-white/70"
-								>€{{ formatPrice(store.currentOrder.tax_amount) }}</span
-							>
-						</div>
 						<div class="flex justify-between border-t border-white/10 pt-2">
 							<span class="font-bold text-white">Total</span
 							><span class="font-bold text-[#FFC700]"

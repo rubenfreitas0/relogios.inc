@@ -20,30 +20,26 @@ return new class extends Migration
             RETURNS VOID AS $$
             DECLARE
                 v_subtotal DECIMAL(10, 2);
-                v_tax_rate DECIMAL(5, 2);
                 v_shipping_cost DECIMAL(10, 2);
-                v_tax_amount DECIMAL(10, 2);
                 v_total DECIMAL(10, 2);
             BEGIN
                 -- Calculate subtotal from order_items
                 SELECT COALESCE(SUM(item_total), 0) INTO v_subtotal
                 FROM order_items
                 WHERE order_id = p_order_id;
- 
-                -- Get tax rate and shipping cost from order
-                SELECT COALESCE(tax_rate, 0), COALESCE(shipping_cost, 0) INTO v_tax_rate, v_shipping_cost
+
+                -- Get shipping cost from order
+                SELECT COALESCE(shipping_cost, 0) INTO v_shipping_cost
                 FROM orders
                 WHERE id = p_order_id;
- 
-                -- Calculate tax amount and total
-                v_tax_amount := ROUND(v_subtotal * (v_tax_rate / 100.0), 2);
-                v_total := v_subtotal + v_shipping_cost + v_tax_amount;
- 
+
+                -- Calculate total
+                v_total := v_subtotal + v_shipping_cost;
+
                 -- Update order table
                 UPDATE orders
-                SET 
+                SET
                     subtotal = v_subtotal,
-                    tax_amount = v_tax_amount,
                     total = v_total
                 WHERE id = p_order_id;
             END;

@@ -11,7 +11,6 @@ use App\Models\ProductImage;
 use App\Models\ShippingMethod;
 use App\Models\ShippingZone;
 use App\Models\ShippingZoneCountry;
-use App\Models\TaxRate;
 use App\Models\User;
 
 /**
@@ -72,9 +71,9 @@ trait TestHelpers
 
     /**
      * Configura a infraestrutura de envio:
-     * Zona "Portugal Continental" + País PT + Método ativo + TaxRate 23%.
+     * Zona "Portugal Continental" + País PT + Método ativo.
      *
-     * Devolve [zone, zoneCountry, shippingMethod, taxRate].
+     * Devolve [zone, zoneCountry, shippingMethod].
      */
     protected function setupShipping(array $methodOverrides = []): array
     {
@@ -99,14 +98,7 @@ trait TestHelpers
             'is_active'        => true,
         ], $methodOverrides));
 
-        $taxRate = TaxRate::factory()->create([
-            'country_code' => 'PT',
-            'name'         => 'IVA PT',
-            'rate'         => 23.00,
-            'is_active'    => true,
-        ]);
-
-        return compact('zone', 'zoneCountry', 'shippingMethod', 'taxRate');
+        return compact('zone', 'zoneCountry', 'shippingMethod');
     }
 
     /**

@@ -100,10 +100,8 @@ class DatabaseArchTest extends TestCase
         // 2. Test fn_calculate_order_totals
         $order = Order::factory()->create([
             'user_id' => $user->id,
-            'tax_rate' => 23.00,
             'shipping_cost' => 10.00,
             'subtotal' => 0.00,
-            'tax_amount' => 0.00,
             'total' => 0.00,
         ]);
  
@@ -128,8 +126,7 @@ class DatabaseArchTest extends TestCase
         $order->refresh();
  
         $this->assertEquals(160.00, $order->subtotal);
-        $this->assertEquals(36.80, $order->tax_amount);
-        $this->assertEquals(206.80, $order->total);
+        $this->assertEquals(170.00, $order->total);
     }
  
     /**
@@ -171,7 +168,6 @@ class DatabaseArchTest extends TestCase
             'total' => 250.00,
             'subtotal' => 200.00,
             'shipping_cost' => 10.00,
-            'tax_amount' => 40.00,
             'created_at' => now(),
         ]);
  
