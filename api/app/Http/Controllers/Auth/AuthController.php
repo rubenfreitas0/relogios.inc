@@ -22,7 +22,9 @@ class AuthController extends Controller
             'lastname'  => 'required|string|max:100',
             'email'     => 'required|email|unique:users,email',
             'password'  => 'required|string|min:8|confirmed',
-            'phone'     => 'nullable|string|max:20',
+            'phone'     => ['nullable', 'string', 'max:20', 'regex:/^\+\d{1,3}(?:\s?\d){6,12}$/'],
+        ], [
+            'phone.regex' => 'O telefone deve incluir o indicativo do país (ex.: +351 912345678).',
         ]);
 
         $user = User::create([

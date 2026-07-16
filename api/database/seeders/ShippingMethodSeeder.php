@@ -9,16 +9,16 @@ use Illuminate\Support\Facades\DB;
 class ShippingMethodSeeder extends Seeder
 {
     /**
-     * Seed dos métodos de envio por zona e faixa de peso.
+     * Métodos de envio por zona e faixa de peso.
+     * Zonas: Portugal Continental, Ilhas (Açores e Madeira), Europa.
      *
      * Depende de ShippingZoneSeeder ter sido executado primeiro.
      */
     public function run(): void
     {
-        // Buscar zonas pelo nome (criadas no ShippingZoneSeeder)
         $ptContinental = ShippingZone::where('name', 'Portugal Continental')->first();
-        $espanha       = ShippingZone::where('name', 'Espanha')->first();
-        $restoUe       = ShippingZone::where('name', 'Resto da UE')->first();
+        $ilhas         = ShippingZone::where('name', 'Ilhas (Açores e Madeira)')->first();
+        $europa        = ShippingZone::where('name', 'Europa')->first();
 
         $methods = [
             // ── Portugal Continental — CTT (pesos pequenos) ──
@@ -52,7 +52,6 @@ class ShippingMethodSeeder extends Seeder
                 'estimated_days'   => '3-5 dias úteis',
                 'is_active'        => true,
             ],
-
             // ── Portugal Continental — DPD (pesos maiores) ──
             [
                 'shipping_zone_id' => $ptContinental?->id,
@@ -75,61 +74,61 @@ class ShippingMethodSeeder extends Seeder
                 'is_active'        => true,
             ],
 
-            // ── Espanha — DPD ──
+            // ── Ilhas (Açores e Madeira) — CTT ──
             [
-                'shipping_zone_id' => $espanha?->id,
-                'name'             => 'DPD Classic',
-                'carrier'          => 'DPD',
-                'price'            => 8.00,
+                'shipping_zone_id' => $ilhas?->id,
+                'name'             => 'CTT Ilhas',
+                'carrier'          => 'CTT',
+                'price'            => 6.00,
                 'min_weight'       => 0.000,
                 'max_weight'       => 0.500,
-                'estimated_days'   => '3-5 dias úteis',
+                'estimated_days'   => '5-8 dias úteis',
                 'is_active'        => true,
             ],
             [
-                'shipping_zone_id' => $espanha?->id,
-                'name'             => 'DPD Classic',
-                'carrier'          => 'DPD',
-                'price'            => 10.00,
+                'shipping_zone_id' => $ilhas?->id,
+                'name'             => 'CTT Ilhas',
+                'carrier'          => 'CTT',
+                'price'            => 8.50,
                 'min_weight'       => 0.501,
                 'max_weight'       => 1.000,
-                'estimated_days'   => '3-5 dias úteis',
+                'estimated_days'   => '5-8 dias úteis',
                 'is_active'        => true,
             ],
             [
-                'shipping_zone_id' => $espanha?->id,
-                'name'             => 'DPD Classic',
-                'carrier'          => 'DPD',
+                'shipping_zone_id' => $ilhas?->id,
+                'name'             => 'CTT Ilhas',
+                'carrier'          => 'CTT',
                 'price'            => 12.00,
                 'min_weight'       => 1.001,
                 'max_weight'       => 2.000,
-                'estimated_days'   => '3-5 dias úteis',
+                'estimated_days'   => '5-8 dias úteis',
                 'is_active'        => true,
             ],
             [
-                'shipping_zone_id' => $espanha?->id,
-                'name'             => 'DPD Classic',
-                'carrier'          => 'DPD',
-                'price'            => 16.00,
+                'shipping_zone_id' => $ilhas?->id,
+                'name'             => 'CTT Ilhas Volumoso',
+                'carrier'          => 'CTT',
+                'price'            => 18.00,
                 'min_weight'       => 2.001,
                 'max_weight'       => 5.000,
-                'estimated_days'   => '3-5 dias úteis',
+                'estimated_days'   => '5-8 dias úteis',
                 'is_active'        => true,
             ],
             [
-                'shipping_zone_id' => $espanha?->id,
-                'name'             => 'DPD Classic',
-                'carrier'          => 'DPD',
-                'price'            => 22.00,
+                'shipping_zone_id' => $ilhas?->id,
+                'name'             => 'CTT Ilhas Volumoso',
+                'carrier'          => 'CTT',
+                'price'            => 26.00,
                 'min_weight'       => 5.001,
                 'max_weight'       => 10.000,
-                'estimated_days'   => '3-5 dias úteis',
+                'estimated_days'   => '5-8 dias úteis',
                 'is_active'        => true,
             ],
 
-            // ── Resto da UE — DHL ──
+            // ── Europa — DHL Standard ──
             [
-                'shipping_zone_id' => $restoUe?->id,
+                'shipping_zone_id' => $europa?->id,
                 'name'             => 'DHL Standard',
                 'carrier'          => 'DHL',
                 'price'            => 12.00,
@@ -139,7 +138,7 @@ class ShippingMethodSeeder extends Seeder
                 'is_active'        => true,
             ],
             [
-                'shipping_zone_id' => $restoUe?->id,
+                'shipping_zone_id' => $europa?->id,
                 'name'             => 'DHL Standard',
                 'carrier'          => 'DHL',
                 'price'            => 15.00,
@@ -149,7 +148,7 @@ class ShippingMethodSeeder extends Seeder
                 'is_active'        => true,
             ],
             [
-                'shipping_zone_id' => $restoUe?->id,
+                'shipping_zone_id' => $europa?->id,
                 'name'             => 'DHL Standard',
                 'carrier'          => 'DHL',
                 'price'            => 18.00,
@@ -159,7 +158,7 @@ class ShippingMethodSeeder extends Seeder
                 'is_active'        => true,
             ],
             [
-                'shipping_zone_id' => $restoUe?->id,
+                'shipping_zone_id' => $europa?->id,
                 'name'             => 'DHL Standard',
                 'carrier'          => 'DHL',
                 'price'            => 25.00,
@@ -169,25 +168,13 @@ class ShippingMethodSeeder extends Seeder
                 'is_active'        => true,
             ],
             [
-                'shipping_zone_id' => $restoUe?->id,
+                'shipping_zone_id' => $europa?->id,
                 'name'             => 'DHL Standard',
                 'carrier'          => 'DHL',
                 'price'            => 35.00,
                 'min_weight'       => 5.001,
                 'max_weight'       => 10.000,
                 'estimated_days'   => '5-7 dias úteis',
-                'is_active'        => true,
-            ],
-
-            // ── Global — DHL Expresso (qualquer zona, qualquer peso) ──
-            [
-                'shipping_zone_id' => null,
-                'name'             => 'DHL Expresso',
-                'carrier'          => 'DHL',
-                'price'            => 20.00,
-                'min_weight'       => 0.000,
-                'max_weight'       => 99.999,
-                'estimated_days'   => '1-2 dias úteis',
                 'is_active'        => true,
             ],
         ];

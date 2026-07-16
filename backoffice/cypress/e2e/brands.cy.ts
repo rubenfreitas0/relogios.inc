@@ -13,7 +13,6 @@ describe('Gestão de Marcas', () => {
         id: 1,
         name: 'Casio',
         slug: 'casio',
-        logo: 'https://picsum.photos/100',
         is_active: true,
         products_count: 12,
         created_at: '2026-01-01T12:00:00Z',
@@ -23,7 +22,6 @@ describe('Gestão de Marcas', () => {
         id: 2,
         name: 'Seiko',
         slug: 'seiko',
-        logo: null,
         is_active: false,
         products_count: 0,
         created_at: '2026-01-02T12:00:00Z',
@@ -82,7 +80,7 @@ describe('Gestão de Marcas', () => {
     cy.wait('@filterInactive').its('request.url').should('include', 'is_active=false')
   })
 
-  it('deve exigir logo ao criar uma nova marca e criar com sucesso após o upload', () => {
+  it('deve criar uma nova marca com sucesso', () => {
     cy.visit('/marcas', { onBeforeLoad: setupAdminSession })
     cy.wait('@getBrands')
 
@@ -90,28 +88,15 @@ describe('Gestão de Marcas', () => {
     cy.contains('.va-modal', 'Nova Marca').should('be.visible')
 
     cy.get('.va-modal input').first().type('Orient')
-    cy.get('.va-modal').contains('button', 'Criar').click({ force: true })
-    cy.contains('O logo é obrigatório para novas marcas.').should('be.visible')
-
-    const dummyImage =
-      'data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAADUlEQVR42mNk+M9QDwADhgGAWjR9awAAAABJRU5ErkJggg=='
-    cy.get('input[type="file"]').selectFile(
-      {
-        contents: Cypress.Buffer.from(dummyImage.split(',')[1], 'base64'),
-        fileName: 'orient.png',
-        mimeType: 'image/png',
-      },
-      { force: true },
-    )
 
     cy.intercept('POST', '**/api/admin/brands', {
       statusCode: 201,
       body: {
-        data: { id: 3, name: 'Orient', slug: 'orient', logo: 'https://picsum.photos/100', is_active: true },
+        data: { id: 3, name: 'Orient', slug: 'orient', is_active: true },
       },
     }).as('createBrand')
 
-    cy.contains('button', 'Criar').click({ force: true })
+    cy.get('.va-modal').contains('button', 'Criar').click({ force: true })
     cy.wait('@createBrand')
     cy.contains('Marca criada.').should('be.visible')
   })

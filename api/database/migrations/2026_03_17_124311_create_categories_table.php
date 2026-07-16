@@ -15,6 +15,12 @@ return new class extends Migration
             $table->id();
             $table->string('name', 100);
             $table->string('slug', 100)->unique();
+
+            // Grupo do filtro nas páginas de categoria:
+            // 'tipo' (clássico, mergulho...), 'mecanismo' (analógico, digital...)
+            // null = categoria de sistema, não aparece nos filtros
+            $table->enum('group', ['tipo', 'mecanismo'])->nullable()->index();
+
             $table->boolean('is_active')->default(true)->index();
             $table->timestamps();
         });

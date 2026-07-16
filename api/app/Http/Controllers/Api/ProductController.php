@@ -16,17 +16,26 @@ class ProductController extends Controller
     {
         // Filtro de produtos ativos e com stock
         $query = Product::query()
-            ->with(['brand', 'category', 'primaryImage'])
+            ->with(['brand', 'categories', 'primaryImage'])
             ->where('is_active', true);
 
         if ($request->filled('search')) {
             $query->whereRaw('LOWER(name) LIKE ?', ['%' . strtolower((string) $request->search) . '%']);
         }
 
+        // Aceita uma ou várias categorias (CSV ou array). Semântica AND: o
+        // produto tem de pertencer a TODAS as categorias indicadas — permite
+        // cruzar, por exemplo, um Tipo (clássicos) com um Mecanismo (analogico).
         if ($request->filled('category')) {
-            $query->whereHas('category', function ($q) use ($request) {
-                $q->where('slug', $request->category);
-            });
+            $slugs = is_array($request->category)
+                ? $request->category
+                : explode(',', (string) $request->category);
+
+            foreach (array_filter(array_map('trim', $slugs)) as $slug) {
+                $query->whereHas('categories', function ($q) use ($slug) {
+                    $q->where('slug', $slug);
+                });
+            }
         }
 
         if ($request->filled('brand')) {
@@ -46,12 +55,7 @@ class ProductController extends Controller
         }
 
         if ($request->filled('color')) {
-            $color = strtolower((string) $request->color);
-            $query->where(function ($q) use ($color) {
-                $q->whereRaw('LOWER(name) LIKE ?', ['%' . $color . '%'])
-                  ->orWhereRaw('LOWER(description) LIKE ?', ['%' . $color . '%'])
-                  ->orWhereRaw('LOWER(short_description) LIKE ?', ['%' . $color . '%']);
-            });
+            $query->where('color', strtolower((string) $request->color));
         }
 
         if ($request->filled('min_price')) {
@@ -100,7 +104,7 @@ class ProductController extends Controller
     {
         $products = Product::where('is_active', true)
             ->where('is_featured', true)
-            ->with(['brand', 'category', 'primaryImage'])
+            ->with(['brand', 'categories', 'primaryImage'])
             ->latest()
             ->take(8)
             ->get();
@@ -115,7 +119,7 @@ class ProductController extends Controller
     {
         $product = Product::where('slug', $slug)
             ->where('is_active', true)
-            ->with(['brand', 'category', 'images', 'primaryImage'])
+            ->with(['brand', 'categories', 'images', 'primaryImage'])
             ->firstOrFail();
 
         return new ProductResource($product);
@@ -128,13 +132,16 @@ class ProductController extends Controller
     {
         $product = Product::where('slug', $slug)
             ->where('is_active', true)
-            ->select('id', 'category_id')
             ->firstOrFail();
 
+        $categoryIds = $product->categories()->pluck('categories.id');
+
         $related = Product::where('is_active', true)
-            ->where('category_id', $product->category_id)
             ->where('id', '!=', $product->id)
-            ->with(['brand', 'category', 'primaryImage'])
+            ->whereHas('categories', function ($q) use ($categoryIds) {
+                $q->whereIn('categories.id', $categoryIds);
+            })
+            ->with(['brand', 'categories', 'primaryImage'])
             ->inRandomOrder()
             ->take(4)
             ->get();

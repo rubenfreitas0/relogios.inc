@@ -29,6 +29,10 @@ export interface DashboardStats {
   customers: {
     total: number
   }
+  sales_by_country: Array<{
+    country: string
+    count: number
+  }>
   latest_orders: Array<{
     order_number: string
     customer_name: string

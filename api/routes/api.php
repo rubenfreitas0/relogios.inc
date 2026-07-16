@@ -107,7 +107,7 @@ Route::middleware('auth:sanctum')->group(function () {
         Route::get('reports',          [ReportController::class, 'index']);
 
         Route::apiResource('brands', AdminBrandController::class);
-        Route::apiResource('categories', AdminCategoryController::class)->only(['index', 'show', 'update']);
+        Route::apiResource('categories', AdminCategoryController::class)->only(['index', 'show', 'store', 'update', 'destroy']);
 
         Route::patch('products/{product}/stock', [AdminProductController::class, 'updateStock']);
         Route::post('products/{product}/restore', [AdminProductController::class, 'restore'])->withTrashed();

@@ -20,7 +20,6 @@ class BrandFactory extends Factory
         return [
             'name' => fake()->words(3, true),
             'slug' => fake()->slug(),
-            'logo' => fake()->imageUrl(640, 480, 'watches'),
             'is_active' => true,
         ];
     }

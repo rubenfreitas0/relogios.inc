@@ -9,12 +9,11 @@ use Illuminate\Database\Seeder;
 class ShippingZoneSeeder extends Seeder
 {
     /**
-     * Seed das zonas de envio e respectivos países.
+     * Zonas de envio (simplificadas):
      *
      * Zona 1: Portugal Continental (PT)
      * Zona 2: Ilhas — Açores e Madeira (distinção por código postal — fase 2)
-     * Zona 3: Espanha (ES)
-     * Zona 4: Resto da UE
+     * Zona 3: Europa — todos os restantes países europeus, tratados como uma região
      */
     public function run(): void
     {
@@ -30,66 +29,33 @@ class ShippingZoneSeeder extends Seeder
         ]);
 
         // ── Zona 2: Ilhas (Açores + Madeira) ──
-        // Nota: Ainda sem country_code associado.
-        // A distinção Continente vs Ilhas será feita por código postal (9xxx) numa fase 2.
-        // Por agora, PT é tratado como Continental.
+        // Sem country_code: a distinção Continente vs Ilhas é feita por código
+        // postal (9xxx) numa fase 2. Por agora PT resolve para Continental.
         ShippingZone::create([
             'name'      => 'Ilhas (Açores e Madeira)',
             'is_active' => true,
         ]);
 
-        // ── Zona 3: Espanha ──
-        $espanha = ShippingZone::create([
-            'name'      => 'Espanha',
+        // ── Zona 3: Europa (região única) ──
+        $europa = ShippingZone::create([
+            'name'      => 'Europa',
             'is_active' => true,
         ]);
 
-        ShippingZoneCountry::create([
-            'shipping_zone_id' => $espanha->id,
-            'country_code'     => 'ES',
-        ]);
-
-        // ── Zona 4: Resto da UE ──
-        $restoUe = ShippingZone::create([
-            'name'      => 'Resto da UE',
-            'is_active' => true,
-        ]);
-
-        $euCountries = [
-            'DE', // Alemanha
-            'FR', // França
-            'IT', // Itália
-            'NL', // Países Baixos
-            'BE', // Bélgica
-            'AT', // Áustria
-            'IE', // Irlanda
-            'LU', // Luxemburgo
-            'FI', // Finlândia
-            'GR', // Grécia
-            'SK', // Eslováquia
-            'SI', // Eslovénia
-            'EE', // Estónia
-            'LV', // Letónia
-            'LT', // Lituânia
-            'CY', // Chipre
-            'MT', // Malta
-            'HR', // Croácia
-            'BG', // Bulgária
-            'RO', // Roménia
-            'CZ', // República Checa
-            'DK', // Dinamarca
-            'SE', // Suécia
-            'PL', // Polónia
-            'HU', // Hungria
+        $europaCountries = [
+            // UE
+            'ES', 'DE', 'FR', 'IT', 'NL', 'BE', 'AT', 'IE', 'LU', 'FI', 'GR',
+            'SK', 'SI', 'EE', 'LV', 'LT', 'CY', 'MT', 'HR', 'BG', 'RO', 'CZ',
+            'DK', 'SE', 'PL', 'HU',
+            // Europa fora da UE
+            'GB', 'CH', 'NO', 'IS', 'LI', 'AD', 'MC', 'SM',
         ];
 
-        $zoneCountries = array_map(fn(string $code) => [
-            'shipping_zone_id' => $restoUe->id,
+        ShippingZoneCountry::insert(array_map(fn(string $code) => [
+            'shipping_zone_id' => $europa->id,
             'country_code'     => $code,
             'created_at'       => now(),
             'updated_at'       => now(),
-        ], $euCountries);
-
-        ShippingZoneCountry::insert($zoneCountries);
+        ], $europaCountries));
     }
 }

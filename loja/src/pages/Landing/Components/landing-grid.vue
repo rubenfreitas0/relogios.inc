@@ -2,10 +2,10 @@
 import { ref, onMounted } from 'vue'
 import ButtonEmpty from '../../../components/Buttons/button-empty.vue'
 import ButtonSolid from '../../../components/Buttons/button-solid.vue'
-import defaultWatchFrontImage from '/products/categories/relogiocontainer1.png'
-import watchDetailImage from '/display/watch-detail.png'
-import watchBraceletsImage from '/display/about-movement.png'
-import watchBraceletsFlatImage from '/display/watch-hero.png'
+const defaultWatchFrontImage = '/products/categories/relogiocontainer1.png'
+const watchDetailImage = '/display/watch-detail.png'
+const watchBraceletsImage = '/display/about-movement.png'
+const watchBraceletsFlatImage = '/display/watch-hero.png'
 
 const gridHeroData = ref({
   grid_hero_title: 'Casio \nMTP-1274',

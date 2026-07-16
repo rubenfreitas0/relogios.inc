@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { ref, watch } from 'vue'
+import { computed, ref, watch } from 'vue'
 import { useAuthStore } from '../../../pinia/authStore'
 
 const authStore = useAuthStore()
@@ -30,17 +30,29 @@ function cancelEdit() {
 	errorMsg.value = ''
 }
 
+// Telefone tem de incluir o indicativo do país (+351, +34, ...)
+const phoneValid = computed(() => {
+	if (!phoneInput.value) return true
+	return /^\+\d{1,3}(?:\s?\d){6,12}$/.test(phoneInput.value.trim())
+})
+
 async function saveProfile() {
+	if (!phoneValid.value) {
+		errorMsg.value =
+			'O telefone deve incluir o indicativo do país (ex.: +351 912345678).'
+		return
+	}
+
 	isSubmitting.value = true
 	successMsg.value = ''
 	errorMsg.value = ''
-	
+
 	const ok = await authStore.updateProfile({
 		phone: phoneInput.value || null,
 	})
-	
+
 	isSubmitting.value = false
-	
+
 	if (ok) {
 		successMsg.value = 'Telemóvel atualizado com sucesso!'
 		isEditing.value = false
@@ -168,10 +180,16 @@ async function handleResendVerification() {
 					<div v-if="isEditing">
 						<input
 							v-model="phoneInput"
-							type="text"
-							placeholder="Ex: 912345678"
+							type="tel"
+							placeholder="Ex: +351 912345678"
 							class="w-full rounded-lg border border-white/10 bg-white/[0.03] px-4 py-3 text-sm text-white focus:border-[#FFC700] focus:outline-none"
 						/>
+						<p
+							v-if="phoneInput && !phoneValid"
+							class="mt-1 text-[0.65rem] text-red-400"
+						>
+							Inclui o indicativo do país (ex.: +351 912345678)
+						</p>
 					</div>
 					<p
 						v-else
@@ -183,10 +201,10 @@ async function handleResendVerification() {
 			</div>
 
 			<!-- Mensagens de Verificação -->
-			<div v-if="resendSuccess" class="mb-4 text-xs font-semibold text-green-400">
+			<div v-if="resendSuccess" class="mb-4 mt-4 text-xs font-semibold text-green-400">
 				Email de verificação enviado! Verifica a tua caixa de entrada.
 			</div>
-			<div v-if="resendError" class="mb-4 text-xs font-semibold text-red-400">
+			<div v-if="resendError" class="mb-4 mt-4 text-xs font-semibold text-red-400">
 				{{ resendError }}
 			</div>
 

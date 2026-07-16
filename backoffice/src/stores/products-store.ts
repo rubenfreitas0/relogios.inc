@@ -24,7 +24,9 @@ export interface Product {
   gender: string
   features: string | null
   in_the_box: string[] | null
-  brand: { id: number; name: string; slug: string; logo: string } | null
+  brand: { id: number; name: string; slug: string } | null
+  categories: { id: number; name: string; slug: string; group: string | null }[]
+  // Compatibilidade: primeira categoria (pode vir do backend)
   category: { id: number; name: string; slug: string } | null
   images: ProductImage[]
   created_at: string
@@ -42,6 +44,12 @@ export interface PaginationMeta {
 export interface SelectOption {
   value: number
   text: string
+  group?: string
+}
+
+const GROUP_LABELS: Record<string, string> = {
+  tipo: 'Tipo de Relógios',
+  mecanismo: 'Mecanismo',
 }
 
 export const useProductsStore = defineStore('products', () => {
@@ -184,6 +192,7 @@ export const useProductsStore = defineStore('products', () => {
       categoryOptions.value = response.data.data.map((c: any) => ({
         value: c.id,
         text: c.name,
+        group: c.group ? GROUP_LABELS[c.group] ?? c.group : 'Outras',
       }))
     } catch {
       categoryOptions.value = []

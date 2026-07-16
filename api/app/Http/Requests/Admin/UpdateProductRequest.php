@@ -26,7 +26,8 @@ class UpdateProductRequest extends FormRequest
     {
         return [
             'brand_id'          => ['sometimes', 'required', 'integer', 'exists:brands,id'],
-            'category_id'       => ['sometimes', 'required', 'integer', 'exists:categories,id'],
+            'categories'        => ['sometimes', 'required', 'array', 'min:1'],
+            'categories.*'      => ['integer', 'distinct', 'exists:categories,id'],
             'gender'            => ['sometimes', 'required', Rule::in(['masculino', 'feminino', 'unisexo'])],
             'name'              => [
                 'sometimes',
@@ -40,6 +41,7 @@ class UpdateProductRequest extends FormRequest
             'price'             => ['sometimes', 'required', 'numeric', 'min:0'],
             'discount_price'    => ['nullable', 'numeric', 'min:0', 'lt:price'],
             'stock'             => ['sometimes', 'required', 'integer', 'min:0'],
+            'color'             => ['nullable', 'string', 'in:preto,prata,dourado,azul,verde,branco,rosa-gold,rose,laranja'],
             'weight'            => ['nullable', 'numeric', 'min:0'],
             'features'          => ['nullable', 'string'],
             'in_the_box'        => ['nullable', 'array'],
@@ -47,7 +49,7 @@ class UpdateProductRequest extends FormRequest
             'is_active'         => ['sometimes', 'boolean'],
             'is_featured'       => ['sometimes', 'boolean'],
             'images'            => ['sometimes', 'array', 'max:10'],
-            'images.*'          => ['image', 'mimes:png,jpg,jpeg', 'max:2048'],
+            'images.*'          => ['image', 'mimes:png,jpg,jpeg', 'max:10240'],
             'remove_image_ids'  => ['sometimes', 'array'],
             'remove_image_ids.*' => ['integer', 'exists:product_images,id'],
             'image_order'       => ['sometimes', 'array'],
@@ -60,7 +62,8 @@ class UpdateProductRequest extends FormRequest
     {
         return [
             'brand_id.exists'      => 'A marca selecionada não existe.',
-            'category_id.exists'   => 'A categoria selecionada não existe.',
+            'categories.min'       => 'Selecione pelo menos uma categoria.',
+            'categories.*.exists'  => 'Uma das categorias selecionadas não existe.',
             'gender.in'            => 'O género deve ser: masculino, feminino ou unisexo.',
             'name.unique'          => 'Já existe um produto com este nome.',
             'name.max'             => 'O nome não pode ter mais de 255 caracteres.',
@@ -75,7 +78,7 @@ class UpdateProductRequest extends FormRequest
             'images.max'           => 'Só pode enviar no máximo 10 imagens.',
             'images.*.image'       => 'Cada ficheiro tem de ser uma imagem.',
             'images.*.mimes'       => 'Formatos aceites: PNG, JPG, JPEG.',
-            'images.*.max'         => 'Cada imagem não pode ter mais de 2 MB.',
+            'images.*.max'         => 'Cada imagem não pode ter mais de 10 MB.',
             'remove_image_ids.array' => 'O campo de remoção deve ser um array.',
             'remove_image_ids.*.exists' => 'Uma das imagens selecionadas para remover não existe.',
             'image_order.array'    => 'O campo de ordenação deve ser um array.',

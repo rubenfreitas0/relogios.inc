@@ -120,7 +120,14 @@ class AdminTest extends TestCase
 
         $this->assertEquals(OrderStatus::PENDING, $order->status);
 
-        // Mudar para shipped (requer tracking)
+        // pending -> processing
+        $this->patchJson(
+            '/api/admin/orders/' . $order->order_number . '/status',
+            ['status' => 'processing']
+        )->assertStatus(200);
+        $this->assertEquals(OrderStatus::PROCESSING, $order->fresh()->status);
+
+        // processing -> shipped (requer tracking)
         $response = $this->patchJson(
             '/api/admin/orders/' . $order->order_number . '/status',
             ['status' => 'shipped', 'tracking_number' => 'CTT123456']
@@ -129,6 +136,27 @@ class AdminTest extends TestCase
         $response->assertStatus(200);
         $this->assertEquals(OrderStatus::SHIPPED, $order->fresh()->status);
         $this->assertEquals('CTT123456', $order->fresh()->tracking_number);
+    }
+
+    public function test_order_status_cannot_skip_or_revert(): void
+    {
+        $order = $this->createOrderViaCheckout();
+        $this->authenticateAdmin();
+
+        // Salto: pending -> shipped (salta processing) deve falhar
+        $this->patchJson(
+            '/api/admin/orders/' . $order->order_number . '/status',
+            ['status' => 'shipped', 'tracking_number' => 'CTT999']
+        )->assertStatus(422);
+
+        // Reversão: shipped -> processing deve falhar
+        $order->update(['status' => OrderStatus::SHIPPED, 'tracking_number' => 'CTT111']);
+        $this->patchJson(
+            '/api/admin/orders/' . $order->order_number . '/status',
+            ['status' => 'processing']
+        )->assertStatus(422);
+
+        $this->assertEquals(OrderStatus::SHIPPED, $order->fresh()->status);
     }
 
     public function test_delivered_order_auto_marks_paid(): void
@@ -159,14 +187,12 @@ class AdminTest extends TestCase
 
     public function test_admin_can_crud_brands(): void
     {
-        Storage::fake('public');
         $this->authenticateAdmin();
 
         // CREATE
         $response = $this->postJson('/api/admin/brands', [
             'name'      => 'Omega',
             'is_active' => true,
-            'logo'      => UploadedFile::fake()->image('omega.png'),
         ]);
 
         $response->assertStatus(201);
@@ -208,19 +234,29 @@ class AdminTest extends TestCase
         $this->assertEquals('Desportivo Premium', $category->fresh()->name);
     }
 
-    public function test_admin_cannot_create_or_delete_categories(): void
+    public function test_admin_can_create_and_deactivate_categories(): void
     {
         $this->authenticateAdmin();
 
-        $category = Category::factory()->create();
-
+        // CREATE — exige nome e grupo
         $this->postJson('/api/admin/categories', ['name' => 'Nova Categoria'])
-            ->assertStatus(405);
+            ->assertStatus(422);
 
-        $this->deleteJson('/api/admin/categories/' . $category->id)
-            ->assertStatus(405);
+        $response = $this->postJson('/api/admin/categories', [
+            'name'  => 'Skeleton',
+            'group' => 'tipo',
+        ]);
+        $response->assertStatus(201)
+            ->assertJsonPath('data.name', 'Skeleton')
+            ->assertJsonPath('data.group', 'tipo');
 
-        $this->assertDatabaseHas('categories', ['id' => $category->id]);
+        $categoryId = $response->json('data.id');
+
+        // DEACTIVATE — não apaga, só desativa
+        $this->deleteJson('/api/admin/categories/' . $categoryId)
+            ->assertStatus(200);
+
+        $this->assertDatabaseHas('categories', ['id' => $categoryId, 'is_active' => false]);
     }
 
     // ADMIN — PRODUCTS CRUD
@@ -236,7 +272,7 @@ class AdminTest extends TestCase
         $response = $this->postJson('/api/admin/products', [
             'name'              => 'Rolex Submariner',
             'brand_id'          => $brand->id,
-            'category_id'       => $category->id,
+            'categories'        => [$category->id],
             'gender'            => 'masculino',
             'short_description' => 'Um relógio elegante e desportivo.',
             'description'       => 'Detalhes completos do relógio Rolex Submariner.',

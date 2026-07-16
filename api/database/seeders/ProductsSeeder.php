@@ -25,7 +25,7 @@ class ProductsSeeder extends Seeder
         $masculino = [
             [
                 'brand_slug' => 'rolex',
-                'category_slug' => 'mergulho',
+                'category_slugs' => ['mergulho', 'analogico'],
                 'name' => 'Rolex Submariner Date',
                 'short_description' => 'O relógio de mergulho de referência absoluta com mostrador preto.',
                 'description' => 'O design robusto e funcional do Rolex Submariner tornou-se rapidamente lendário. Com a sua caixa Oyster redesenhada, mostrador preto distintivo com grandes marcadores luminescentes e luneta rotativa unidirecional Cerachrom em preto.',
@@ -38,7 +38,7 @@ class ProductsSeeder extends Seeder
             ],
             [
                 'brand_slug' => 'omega',
-                'category_slug' => 'mergulho',
+                'category_slugs' => ['mergulho', 'analogico'],
                 'name' => 'Omega Seamaster Diver 300M',
                 'short_description' => 'O lendário relógio em azul usado pelo agente James Bond.',
                 'description' => 'Desde 1993, o Seamaster Professional Diver 300M goza de uma reputação lendária. Este modelo moderno em aço inoxidável inclui uma luneta de cerâmica azul com escala de mergulho em esmalte branco.',
@@ -51,7 +51,7 @@ class ProductsSeeder extends Seeder
             ],
             [
                 'brand_slug' => 'tag-heuer',
-                'category_slug' => 'cronografos',
+                'category_slugs' => ['cronografos', 'analogico'],
                 'name' => 'Tag Heuer Carrera Chronograph',
                 'short_description' => 'Nascido nas pistas de corrida mais exigentes do mundo em preto.',
                 'description' => 'Um cronógrafo desportivo elegante e moderno em tom preto, inspirado no design original do painel de instrumentos de corrida. Equipado com o movimento automático de manufatura Heuer 02.',
@@ -67,7 +67,7 @@ class ProductsSeeder extends Seeder
         $feminino = [
             [
                 'brand_slug' => 'rolex',
-                'category_slug' => 'classicos',
+                'category_slugs' => ['classicos', 'analogico'],
                 'name' => 'Rolex Datejust 31 Oyster',
                 'short_description' => 'O clássico feminino da Rolex em tom dourado e prata.',
                 'description' => 'O Datejust é o arquétipo do relógio clássico, graças a uma estética e a funções que transcendem as modas. A caixa Oyster de 31 mm em aço prata e ouro amarelo dourado com luneta canelada é uma joia intemporal.',
@@ -80,7 +80,7 @@ class ProductsSeeder extends Seeder
             ],
             [
                 'brand_slug' => 'omega',
-                'category_slug' => 'analogico',
+                'category_slugs' => ['classicos', 'analogico'],
                 'name' => 'Omega Constellation Quartz 28mm',
                 'short_description' => 'Sofisticação reconhecível em prata e mostrador em madrepérola branca.',
                 'description' => 'O design dramático e duradouro do Omega Constellation é caracterizado pelas suas famosas "garras" nas laterais da caixa em prata. Apresenta marcadores de horas em diamante e mostrador em madrepérola branca.',
@@ -93,7 +93,7 @@ class ProductsSeeder extends Seeder
             ],
             [
                 'brand_slug' => 'seiko',
-                'category_slug' => 'automaticos',
+                'category_slugs' => ['classicos', 'analogico'],
                 'name' => 'Seiko Presage Ladies Enamel',
                 'short_description' => 'Mostrador de esmalte branco feito à mão por mestres artesãos.',
                 'description' => 'A elegância e a cultura japonesas unem-se na coleção Presage. Este modelo feminino apresenta um requintado mostrador de esmalte branco cozido no forno por artesãos consagrados.',
@@ -109,7 +109,7 @@ class ProductsSeeder extends Seeder
         $unisexo = [
             [
                 'brand_slug' => 'casio',
-                'category_slug' => 'digital',
+                'category_slugs' => ['casual', 'digital'],
                 'name' => 'Casio Classic F-91W-1YER',
                 'short_description' => 'O clássico absoluto em resina preta e mostrador verde.',
                 'description' => 'Famoso pelo seu design minimalista preto, peso pluma, durabilidade indestrutível e excelente duração de bateria de até 7 anos. Um relógio versátil e unissexo com visor retroiluminado a verde.',
@@ -122,7 +122,7 @@ class ProductsSeeder extends Seeder
             ],
             [
                 'brand_slug' => 'rolex',
-                'category_slug' => 'automaticos',
+                'category_slugs' => ['classicos', 'analogico'],
                 'name' => 'Rolex Oyster Perpetual 36',
                 'short_description' => 'A essência do relógio de luxo Oyster em aço e azul.',
                 'description' => 'Estes modelos destacam-se pelos seus mostradores coloridos. A caixa de 36 mm Oystersteel em prata brilhante é perfeita para quem aprecia um mostrador azul-turquesa marcante.',
@@ -135,7 +135,7 @@ class ProductsSeeder extends Seeder
             ],
             [
                 'brand_slug' => 'casio',
-                'category_slug' => 'smartwatch',
+                'category_slugs' => ['desporto', 'smartwatch'],
                 'name' => 'Casio G-Shock GBD-200 Smart',
                 'short_description' => 'O Smartwatch desportivo e robusto em preto.',
                 'description' => 'Conectividade Bluetooth com o smartphone, monitor de ritmo cardíaco, contador de passos e todas as funções clássicas do G-Shock numa estrutura preta indestrutível.',
@@ -167,15 +167,19 @@ class ProductsSeeder extends Seeder
     private function createProduct(array $w, string $gender, Collection $brands, Collection $categories): void
     {
         $brand = $brands->get($w['brand_slug']);
-        $category = $categories->get($w['category_slug']);
 
-        if (!$brand || !$category) {
+        // Cada produto tem um Tipo + um Mecanismo (associação N:N via pivot)
+        $categoryIds = collect($w['category_slugs'])
+            ->map(fn($slug) => $categories->get($slug)?->id)
+            ->filter()
+            ->all();
+
+        if (!$brand || empty($categoryIds)) {
             return;
         }
 
-        Product::create([
+        $product = Product::create([
             'brand_id' => $brand->id,
-            'category_id' => $category->id,
             'gender' => $gender,
             'name' => $w['name'],
             'slug' => Str::slug($w['name']),
@@ -189,5 +193,7 @@ class ProductsSeeder extends Seeder
             'is_active' => true,
             'is_featured' => $w['is_featured'],
         ]);
+
+        $product->categories()->sync($categoryIds);
     }
 }

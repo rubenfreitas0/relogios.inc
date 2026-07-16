@@ -7,6 +7,7 @@ use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\SoftDeletes;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
+use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Support\Str;
 
@@ -16,7 +17,6 @@ class Product extends Model
 
     protected $fillable = [
         'brand_id',
-        'category_id',
         'gender',
         'name',
         'slug',
@@ -27,6 +27,7 @@ class Product extends Model
         'price',
         'discount_price',
         'stock',
+        'color',
         'weight',
         'is_active',
         'is_featured',
@@ -51,9 +52,9 @@ class Product extends Model
         return $this->belongsTo(Brand::class);
     }
 
-    public function category(): BelongsTo
+    public function categories(): BelongsToMany
     {
-        return $this->belongsTo(Category::class);
+        return $this->belongsToMany(Category::class);
     }
 
     public function images(): HasMany

@@ -28,7 +28,6 @@ class UpdateBrandRequest extends FormRequest
                 'sometimes', 'required', 'string', 'max:255',
                 Rule::unique('brands', 'name')->ignore($this->route('brand')),
             ],
-            'logo'      => ['sometimes', 'image', 'mimes:png,jpg,jpeg,webp,svg', 'max:2048'],
             'is_active' => ['sometimes', 'boolean'],
         ];
     }
@@ -38,9 +37,6 @@ class UpdateBrandRequest extends FormRequest
         return [
             'name.unique' => 'Já existe uma marca com este nome.',
             'name.max'    => 'O nome não pode ter mais de 255 caracteres.',
-            'logo.image'  => 'O ficheiro tem de ser uma imagem.',
-            'logo.mimes'  => 'Formatos aceites: PNG, JPG, JPEG, WEBP, SVG.',
-            'logo.max'    => 'O logótipo não pode ter mais de 2 MB.',
         ];
     }
 }

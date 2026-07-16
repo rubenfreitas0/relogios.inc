@@ -2,10 +2,13 @@ import { defineStore } from 'pinia'
 import { ref } from 'vue'
 import { categoriesApi } from '../services/api'
 
+export type CategoryGroup = 'tipo' | 'mecanismo' | null
+
 export interface Category {
   id: number
   name: string
   slug: string
+  group: CategoryGroup
   is_active: boolean
   products_count?: number
   created_at: string
@@ -49,6 +52,35 @@ export const useCategoriesStore = defineStore('categories', () => {
     }
   }
 
+  async function createCategory(data: Record<string, unknown>): Promise<Category | null> {
+    saving.value = true
+    error.value = null
+    try {
+      const response = await categoriesApi.create(data)
+      return response.data.data ?? response.data
+    } catch (err: any) {
+      if (err.response?.status === 422) {
+        error.value = Object.values(err.response.data.errors).flat().join('\n')
+      } else {
+        error.value = err.response?.data?.message || 'Erro ao criar categoria.'
+      }
+      return null
+    } finally {
+      saving.value = false
+    }
+  }
+
+  async function deactivateCategory(id: number): Promise<boolean> {
+    error.value = null
+    try {
+      await categoriesApi.destroy(id)
+      return true
+    } catch (err: any) {
+      error.value = err.response?.data?.message || 'Erro ao desativar categoria.'
+      return false
+    }
+  }
+
   async function updateCategory(id: number, data: Record<string, unknown>): Promise<Category | null> {
     saving.value = true
     error.value = null
@@ -78,6 +110,8 @@ export const useCategoriesStore = defineStore('categories', () => {
     saving,
     error,
     fetchCategories,
+    createCategory,
+    deactivateCategory,
     updateCategory,
     setPage,
   }

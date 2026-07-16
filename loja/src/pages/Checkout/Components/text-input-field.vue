@@ -6,7 +6,6 @@ const props = defineProps<{
   type: 'email' | 'number' | 'password' | 'search' | 'tel' | 'text' | 'url'
   validator: 'empty' | 'true' | 'false'
 
-  // as in html id tag - must correspond to data name in formStore storage
   id: string
 
   label: string

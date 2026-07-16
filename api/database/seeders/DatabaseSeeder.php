@@ -26,7 +26,8 @@ class DatabaseSeeder extends Seeder
             // AddressesSeeder::class,
             ShippingZoneSeeder::class,
             ShippingMethodSeeder::class,
-            HistoricalOrdersSeeder::class,
+            // Encomendas desativadas — os testes são feitos manualmente.
+            // HistoricalOrdersSeeder::class,
             // OrdersSeeder::class,
             // OrderItemsSeeder::class,
             // PaymentsSeeder::class,

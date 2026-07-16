@@ -13,14 +13,10 @@ const isLoggedIn = ref(false)
 onMounted(async () => {
   formStore.fetchShippingForCountry()
 
-  // Se o user está autenticado, buscar moradas guardadas
   const token = localStorage.getItem('auth_token')
   if (token) {
     isLoggedIn.value = true
 
-    // O fetch é assíncrono, então o utilizador pode começar a preencher (ou
-    // limpar) o formulário antes de a resposta chegar. Guardamos aqui os
-    // valores para não sobrescrever entrada do utilizador feita entretanto.
     const beforeFetch = {
       name: formStore.name,
       phone: formStore.phone,
@@ -40,7 +36,6 @@ onMounted(async () => {
       formStore.city === beforeFetch.city &&
       formStore.country === beforeFetch.country
 
-    // Auto-selecionar a morada default se existir
     const defaultAddr = accountStore.addresses.find((a) => a.is_default)
     if (defaultAddr && formUntouchedSinceFetch) {
       applyAddress(defaultAddr)
@@ -79,7 +74,6 @@ function onSelectAddress(event: Event) {
   if (addr) applyAddress(addr)
 }
 
-// Recalcular shipping quando o país ou código postal mudam
 let debounceTimer: ReturnType<typeof setTimeout> | null = null
 
 watch(
@@ -166,7 +160,6 @@ onBeforeUnmount(() => {
 				</p>
 			</div>
 
-			<!-- Seletor de moradas guardadas -->
 			<div
 				v-if="isLoggedIn && accountStore.addresses.length > 0"
 				class="mb-5 rounded-lg border-2 border-dashed border-k-main/30 bg-k-main/5 p-4"
@@ -318,7 +311,6 @@ onBeforeUnmount(() => {
 			</p>
 			<p class="mb-1 font-bold text-black">Método de Pagamento</p>
 			<div class="flex w-full flex-col gap-4 lg:grid lg:grid-cols-2">
-				<!-- Cartão de Crédito -->
 				<button
 					type="button"
 					class="group flex w-full cursor-pointer flex-row items-center gap-4 rounded border border-black border-opacity-60 p-3 transition-all active:translate-y-0.5"
@@ -333,7 +325,6 @@ onBeforeUnmount(() => {
 					<span class="font-semibold text-black"> Cartão de Crédito </span>
 				</button>
 
-				<!-- Multibanco -->
 				<button
 					type="button"
 					class="group flex w-full cursor-pointer flex-row items-center gap-4 rounded border border-black border-opacity-60 p-3 transition-all active:translate-y-0.5"
@@ -348,7 +339,6 @@ onBeforeUnmount(() => {
 					<span class="font-semibold text-black"> Multibanco </span>
 				</button>
 
-				<!-- MB Way -->
 				<button
 					type="button"
 					class="group flex w-full cursor-pointer flex-row items-center gap-4 rounded border border-black border-opacity-60 p-3 transition-all active:translate-y-0.5"
@@ -363,7 +353,6 @@ onBeforeUnmount(() => {
 					<span class="font-semibold text-black"> MB Way </span>
 				</button>
 
-				<!-- Apple Pay -->
 				<button
 					type="button"
 					class="group flex w-full cursor-pointer flex-row items-center gap-4 rounded border border-black border-opacity-60 p-3 transition-all active:translate-y-0.5"
@@ -378,7 +367,6 @@ onBeforeUnmount(() => {
 					<span class="font-semibold text-black"> Apple Pay </span>
 				</button>
 
-				<!-- Google Pay -->
 				<button
 					type="button"
 					class="group flex w-full cursor-pointer flex-row items-center gap-4 rounded border border-black border-opacity-60 p-3 transition-all active:translate-y-0.5 lg:col-span-2"
@@ -393,7 +381,6 @@ onBeforeUnmount(() => {
 					<span class="font-semibold text-black"> Google Pay </span>
 				</button>
 
-				<!-- Dynamic MB Way Phone field -->
 				<div v-if="formStore.payment === 'mbway'" class="col-span-2 mt-2">
 					<TextInputField
 						id="paymentPhone"

@@ -5,7 +5,6 @@ namespace Database\Factories;
 use App\Models\Product;
 use Illuminate\Database\Eloquent\Factories\Factory;
 use App\Models\Brand;
-use App\Models\Category;
 
 /**
  * @extends Factory<Product>
@@ -21,7 +20,6 @@ class ProductFactory extends Factory
     {
         return [
             'brand_id' => Brand::factory(),
-            'category_id' => Category::factory(),
             'gender' => fake()->randomElement(['masculino', 'feminino', 'unisexo']),
             'name' => fake()->words(3, true),
             'slug' => fake()->slug(),
@@ -40,5 +38,17 @@ class ProductFactory extends Factory
             'is_active' => true,
             'is_featured' => false,
         ];
+    }
+
+    /**
+     * Associa categorias ao produto (pivot category_product) após a criação.
+     *
+     * @param array<int> $categoryIds
+     */
+    public function withCategories(array $categoryIds): static
+    {
+        return $this->afterCreating(function (Product $product) use ($categoryIds) {
+            $product->categories()->sync($categoryIds);
+        });
     }
 }

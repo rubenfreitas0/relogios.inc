@@ -272,11 +272,12 @@ async function loadReports() {
       selectedMonthlyYear.value = Math.max(...mYears)
     }
 
+    // Desligar o loading ANTES de desenhar, para que os <canvas> já existam no DOM
+    loading.value = false
     await nextTick()
     renderAllCharts()
   } catch (err: any) {
     error.value = err.response?.data?.message || 'Erro ao obter dados de relatórios.'
-  } finally {
     loading.value = false
   }
 }
@@ -330,6 +331,8 @@ function renderRevenueChart() {
       scales: {
         x: { grid: { display: false } },
         y: {
+          beginAtZero: true,
+          suggestedMax: 100000,
           ticks: {
             callback: (val) => formatMoney(Number(val)),
           },
@@ -416,6 +419,8 @@ function renderMonthlyChart() {
       scales: {
         x: { grid: { display: false } },
         y: {
+          beginAtZero: true,
+          suggestedMax: 100000,
           ticks: {
             callback: (val) => formatMoney(Number(val)),
           },

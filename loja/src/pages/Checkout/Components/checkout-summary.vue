@@ -80,7 +80,6 @@ async function handleResend() {
 			@click="formStore.submit()"
 		/>
 
-		<!-- Email não verificado -->
 		<div
 			v-if="authStore.user && !authStore.user.email_verified_at"
 			class="mt-6 flex flex-col gap-2 rounded border border-red-500/30 bg-red-500/10 p-4 text-center"

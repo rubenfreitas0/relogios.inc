@@ -1,25 +1,29 @@
 <script setup lang="ts">
 import CategoryBox from './category-box.vue'
 
-import watchMenImage from '/products/categories/relogiocontainer1.png'
-import watchWomenImage from '/products/premium/watch3.png'
-import watchUnisexImage from '/products/premium/watch2.png'
+const watchMenImage = '/products/premium/watch1.png'
+const watchWomenImage = '/products/premium/watch2.png'
+const watchUnisexImage = '/products/categories/relogiocontainer1.png'
+
+const sharedImgClass = ['scale-[58%]', 'object-contain', '-translate-y-8']
 
 const categories = [
   {
     src: watchMenImage,
     category: 'homens',
-    imgClass: ['scale-75', 'object-contain', '-mb-4'],
+    imgClass: sharedImgClass,
   },
   {
     src: watchWomenImage,
     category: 'mulheres',
-    imgClass: ['scale-[58%]', 'object-contain', '-translate-y-8'],
+    imgClass: sharedImgClass,
   },
   {
     src: watchUnisexImage,
     category: 'unisexo',
-    imgClass: ['scale-[58%]', 'object-contain', '-translate-y-8'],
+    // foto ligeiramente inclinada — rotação CSS para endireitar e escala maior
+    // porque o relógio ocupa menos espaço no enquadramento
+    imgClass: ['scale-[80%]', 'object-contain', '-translate-y-8', 'rotate-6'],
   },
 ]
 </script>

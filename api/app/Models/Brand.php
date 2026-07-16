@@ -6,7 +6,6 @@ use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Support\Str;
-use Illuminate\Support\Facades\Storage;
 
 
 class Brand extends Model
@@ -16,7 +15,6 @@ class Brand extends Model
     protected $fillable = [
         'name',
         'slug',
-        'logo',
         'is_active',
     ];
 
@@ -35,19 +33,6 @@ class Brand extends Model
     public function scopeActive(Builder $query): Builder
     {
         return $query->where('is_active', true);
-    }
-
-    /* ----- Accessors ----- */
-
-    public function getLogoUrlAttribute(): ?string
-    {
-        if (! $this->logo) {
-            return null;
-        }
-
-        /** @var \Illuminate\Filesystem\FilesystemAdapter $disk */
-        $disk = Storage::disk('public');
-        return $disk->url($this->logo);
     }
 
     protected static function boot(): void

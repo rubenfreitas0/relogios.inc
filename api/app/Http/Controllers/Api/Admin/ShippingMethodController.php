@@ -21,8 +21,14 @@ class ShippingMethodController extends Controller
         $methods = ShippingMethod::with('shippingZone')
             ->when(
                 $request->filled('search'),
-                fn($q) => $q->where('name', 'LIKE', '%' . $request->search . '%')
-                    ->orWhere('carrier', 'LIKE', '%' . $request->search . '%')
+                fn($q) => $q->where(function ($sub) use ($request) {
+                    $sub->where('name', 'LIKE', '%' . $request->search . '%')
+                        ->orWhere('carrier', 'LIKE', '%' . $request->search . '%');
+                })
+            )
+            ->when(
+                $request->filled('shipping_zone_id'),
+                fn($q) => $q->where('shipping_zone_id', $request->integer('shipping_zone_id'))
             )
             ->when(
                 $request->has('is_active'),

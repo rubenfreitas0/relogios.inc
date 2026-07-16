@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import watchHeroImage from '/display/about-craft.png'
+const watchHeroImage = '/display/about-craft.png'
 </script>
 
 <template>

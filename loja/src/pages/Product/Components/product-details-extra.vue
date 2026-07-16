@@ -12,6 +12,14 @@ const props = defineProps<{
 
 const activeIndex = ref(0)
 
+const categoryNames = computed(() => {
+  const list = props.item.categories
+  if (list && list.length > 0) {
+    return list.map((c) => c.name).join(', ')
+  }
+  return props.item.category?.name || 'Geral'
+})
+
 const allImages = computed(() => {
   const imgs: string[] = []
   if (props.item.images && props.item.images.length > 0) {
@@ -163,9 +171,9 @@ function selectImage(index: number) {
 				<div
 					class="flex flex-row justify-between border-b border-white/5 px-4 py-3"
 				>
-					<span class="font-bold text-white/50">Coleção / Categoria</span>
+					<span class="font-bold text-white/50">Coleção / Categorias</span>
 					<span class="font-semibold capitalize text-white">{{
-						props.item.category?.name || 'Geral'
+						categoryNames
 					}}</span>
 				</div>
 				<div

@@ -3,12 +3,14 @@ import Navigation from '../../components/navigation-global.vue'
 import Footer from '../../components/footer-global.vue'
 import ProductCard from './Components/product-card.vue'
 import { useCatalogStore } from '../../pinia/catalogStore'
+import { useFiltersStore } from '../../pinia/filtersStore'
 import type { Product } from '../../data/product-types'
 import { computed, ref, watch, onMounted, nextTick } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
 
 const props = defineProps<{ category: string }>()
 const catalogStore = useCatalogStore()
+const filtersStore = useFiltersStore()
 const route = useRoute()
 const router = useRouter()
 
@@ -18,45 +20,69 @@ interface PriceRange {
   max: number
 }
 
+interface CategoryOption {
+  slug: string
+  name: string
+}
+
 interface CategoryFilterMeta {
   label: string
   subtitle: string
   brands: string[]
   priceRanges: PriceRange[]
-  categories: { slug: string; name: string }[]
+  // Subcategorias separadas pela categoria-pai (group) da tabela `categories`
+  types: CategoryOption[]
+  mechanisms: CategoryOption[]
   colors: { name: string; hex: string }[]
 }
+
+// Slugs que pertencem ao grupo "mecanismo" (usado apenas no fallback estático)
+const MECHANISM_SLUGS = new Set([
+  'analogico',
+  'digital',
+  'analogico-digital',
+  'smartwatch',
+])
 
 // ── Static filter data (future: fetch from API) ──────────────────
 // Estes intervalos têm de corresponder aos definidos no mega menu
 // (navigation-global.vue) para cada género, para que os chips de filtro
 // e o URL fiquem consistentes entre a sidebar e o mega menu.
-const homensPriceRanges: PriceRange[] = [
-  { label: 'Até €100', min: 0, max: 100 },
-  { label: '€100 – €250', min: 100, max: 250 },
-  { label: '€250 – €500', min: 250, max: 500 },
-  { label: 'Acima de €500', min: 500, max: 999999 },
+const sharedPriceRanges: PriceRange[] = [
+  { label: 'Até €500', min: 0, max: 500 },
+  { label: '€500 – €1000', min: 500, max: 1000 },
+  { label: '€1000 – €1500', min: 1000, max: 1500 },
+  { label: '€1500 – €2500', min: 1500, max: 2500 },
+  { label: '€2500 – €5000', min: 2500, max: 5000 },
+  { label: 'Acima de €5000', min: 5000, max: 999999 },
 ]
 
-const mulheresPriceRanges: PriceRange[] = [
-  { label: 'Até €80', min: 0, max: 80 },
-  { label: '€80 – €200', min: 80, max: 200 },
-  { label: '€200 – €450', min: 200, max: 450 },
-  { label: 'Acima de €450', min: 450, max: 999999 },
-]
+const homensPriceRanges = sharedPriceRanges
+const mulheresPriceRanges = sharedPriceRanges
+const unisexoPriceRanges = sharedPriceRanges
 
-const unisexoPriceRanges: PriceRange[] = [
-  { label: 'Até €80', min: 0, max: 80 },
-  { label: '€80 – €200', min: 80, max: 200 },
-  { label: '€200 – €500', min: 200, max: 500 },
-  { label: 'Acima de €500', min: 500, max: 999999 },
-]
+interface FallbackMeta {
+  label: string
+  subtitle: string
+  brands: string[]
+  priceRanges: PriceRange[]
+  categories: CategoryOption[]
+  colors: { name: string; hex: string }[]
+}
 
-const filterData: Record<string, CategoryFilterMeta> = {
+const filterData: Record<string, FallbackMeta> = {
   homens: {
     label: 'Homens',
     subtitle: 'Elegância e precisão para ele.',
-    brands: ['Rolex', 'Casio', 'Seiko', 'Omega', 'Tag Heuer'],
+    brands: [
+      'Rolex',
+      'Patek Philippe',
+      'Audemars Piguet',
+      'Omega',
+      'Cartier',
+      'Seiko',
+      'Casio',
+    ],
     priceRanges: homensPriceRanges,
     categories: [
       { slug: 'classicos', name: 'Clássico' },
@@ -79,7 +105,15 @@ const filterData: Record<string, CategoryFilterMeta> = {
   mulheres: {
     label: 'Mulheres',
     subtitle: 'Sofisticação em cada detalhe.',
-    brands: ['Rolex', 'Casio', 'Seiko', 'Omega', 'Tag Heuer'],
+    brands: [
+      'Cartier',
+      'Rolex',
+      'Omega',
+      'Chopard',
+      'Bulgari',
+      'Longines',
+      'Seiko',
+    ],
     priceRanges: mulheresPriceRanges,
     categories: [
       { slug: 'classicos', name: 'Clássico' },
@@ -100,7 +134,15 @@ const filterData: Record<string, CategoryFilterMeta> = {
   unisexo: {
     label: 'Unisexo',
     subtitle: 'Para quem não segue regras.',
-    brands: ['Rolex', 'Casio', 'Seiko', 'Omega', 'Tag Heuer'],
+    brands: [
+      'Rolex',
+      'Omega',
+      'Cartier',
+      'TAG Heuer',
+      'Tudor',
+      'Seiko',
+      'Casio',
+    ],
     priceRanges: unisexoPriceRanges,
     categories: [
       { slug: 'classicos', name: 'Clássico' },
@@ -120,7 +162,40 @@ const filterData: Record<string, CategoryFilterMeta> = {
   },
 }
 
-const meta = computed(() => filterData[props.category] ?? filterData.homens)
+// Marcas e categorias (tipo/mecanismo) vêm da base de dados; gama de
+// preço e cores são estáticas. Fallback para os valores estáticos
+// enquanto a API não responde ou se as tabelas estiverem vazias.
+const meta = computed<CategoryFilterMeta>(() => {
+  const fallback = filterData[props.category] ?? filterData.homens
+
+  const dbBrands = filtersStore.brands
+  const dbTypes = filtersStore.byGroup('tipo')
+  const dbMechanisms = filtersStore.byGroup('mecanismo')
+
+  // Se a BD trouxer categorias, usa-as; senão separa o fallback pelos slugs
+  const fallbackTypes = fallback.categories.filter(
+    (c) => !MECHANISM_SLUGS.has(c.slug),
+  )
+  const fallbackMechanisms = fallback.categories.filter((c) =>
+    MECHANISM_SLUGS.has(c.slug),
+  )
+
+  return {
+    label: fallback.label,
+    subtitle: fallback.subtitle,
+    brands: dbBrands.length > 0 ? dbBrands.map((b) => b.name) : fallback.brands,
+    priceRanges: fallback.priceRanges,
+    types:
+      dbTypes.length > 0
+        ? dbTypes.map((c) => ({ slug: c.slug, name: c.name }))
+        : fallbackTypes,
+    mechanisms:
+      dbMechanisms.length > 0
+        ? dbMechanisms.map((c) => ({ slug: c.slug, name: c.name }))
+        : fallbackMechanisms,
+    colors: fallback.colors,
+  }
+})
 
 // ── Active filters ────────────────────────────────────────────────
 const selectedBrands = ref<string[]>([])
@@ -155,10 +230,12 @@ function syncFiltersFromQuery() {
   syncing = true
   const q = route.query
 
-  // Brand: query has slug (lowercase), sidebar has display name
+  // Brand: query has slug (lowercase, spaces as dashes), sidebar has display name
   if (q.brand && typeof q.brand === 'string') {
     const brandSlug = q.brand.toLowerCase()
-    const matched = meta.value.brands.find((b) => b.toLowerCase() === brandSlug)
+    const matched = meta.value.brands.find(
+      (b) => b.toLowerCase().replace(/\s+/g, '-') === brandSlug,
+    )
     selectedBrands.value = matched ? [matched] : []
   } else {
     selectedBrands.value = []
@@ -206,7 +283,7 @@ function syncQueryFromFilters() {
   const query: Record<string, string> = {}
 
   if (selectedBrands.value.length > 0) {
-    query.brand = selectedBrands.value[0].toLowerCase()
+    query.brand = selectedBrands.value[0].toLowerCase().replace(/\s+/g, '-')
   }
 
   if (selectedPriceRange.value) {
@@ -240,7 +317,7 @@ const loadProducts = async () => {
   }
 
   if (selectedBrands.value.length > 0) {
-    params.brand = selectedBrands.value[0].toLowerCase()
+    params.brand = selectedBrands.value[0].toLowerCase().replace(/\s+/g, '-')
   }
 
   if (selectedPriceRange.value) {
@@ -269,7 +346,10 @@ const loadProducts = async () => {
 }
 
 // ── Init: read URL query params on mount ──────────────────────────
-onMounted(() => {
+onMounted(async () => {
+  // Carrega as opções de filtro da BD antes de sincronizar (o match da
+  // marca do URL depende da lista de marcas estar disponível)
+  await filtersStore.fetchFilters()
   syncFiltersFromQuery()
   nextTick(() => loadProducts())
 })
@@ -496,18 +576,75 @@ const hasActiveFilters = computed(
 					</ul>
 				</div>
 
-				<!-- Tipo / Mecanismo -->
+				<!-- Tipo de Relógio -->
 				<div
-					v-if="meta.categories && meta.categories.length > 0"
+					v-if="meta.types && meta.types.length > 0"
 					class="border-t border-white/10 pt-5"
 				>
 					<p
 						class="mb-3 text-[0.6rem] font-bold uppercase tracking-[0.18em] text-[#FFC700]"
 					>
-						Categoria
+						Tipo de Relógio
 					</p>
 					<ul class="space-y-2">
-						<li v-for="cat in meta.categories" :key="cat.slug">
+						<li v-for="cat in meta.types" :key="cat.slug">
+							<button
+								class="group flex w-full items-center gap-2.5 text-left"
+								@click="
+									selectedCategory =
+										selectedCategory === cat.slug ? null : cat.slug
+								"
+							>
+								<span
+									class="flex h-4 w-4 flex-shrink-0 items-center justify-center rounded border transition-all duration-300"
+									:class="
+										selectedCategory === cat.slug
+											? 'border-[#FFC700] bg-[#FFC700]'
+											: 'border-white/20 group-hover:border-[#FFC700]'
+									"
+								>
+									<svg
+										v-if="selectedCategory === cat.slug"
+										class="h-2.5 w-2.5 text-black"
+										fill="none"
+										viewBox="0 0 24 24"
+										stroke="currentColor"
+										stroke-width="3"
+									>
+										<path
+											stroke-linecap="round"
+											stroke-linejoin="round"
+											d="M5 13l4 4L19 7"
+										/>
+									</svg>
+								</span>
+								<span
+									class="text-sm transition-colors duration-300"
+									:class="
+										selectedCategory === cat.slug
+											? 'font-semibold text-white'
+											: 'text-white/60 group-hover:text-[#FFC700]'
+									"
+								>
+									{{ cat.name }}
+								</span>
+							</button>
+						</li>
+					</ul>
+				</div>
+
+				<!-- Mecanismo -->
+				<div
+					v-if="meta.mechanisms && meta.mechanisms.length > 0"
+					class="border-t border-white/10 pt-5"
+				>
+					<p
+						class="mb-3 text-[0.6rem] font-bold uppercase tracking-[0.18em] text-[#FFC700]"
+					>
+						Mecanismo
+					</p>
+					<ul class="space-y-2">
+						<li v-for="cat in meta.mechanisms" :key="cat.slug">
 							<button
 								class="group flex w-full items-center gap-2.5 text-left"
 								@click="

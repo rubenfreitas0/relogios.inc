@@ -145,10 +145,6 @@ const productImage = computed(() => {
 			>
 				<div class="flex flex-row items-center gap-3 text-white/80">
 					<span class="text-base font-bold text-k-main">✓</span>
-					<span>Entrega grátis em relógios acima de 500€</span>
-				</div>
-				<div class="flex flex-row items-center gap-3 text-white/80">
-					<span class="text-base font-bold text-k-main">✓</span>
 					<span>Prazo de devolução de 30 dias</span>
 				</div>
 				<div class="flex flex-row items-center gap-3 text-white/80">

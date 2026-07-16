@@ -16,15 +16,22 @@ class BrandsSeeder extends Seeder
     public function run(): void
     {
         $brands = [
-            ['name' => 'Rolex', 'slug' => 'rolex', 'logo' => 'brands/rolex.png', 'is_active' => true],
-            ['name' => 'Casio', 'slug' => 'casio', 'logo' => 'brands/casio.png', 'is_active' => true],
-            ['name' => 'Seiko', 'slug' => 'seiko', 'logo' => 'brands/seiko.png', 'is_active' => true],
-            ['name' => 'Omega', 'slug' => 'omega', 'logo' => 'brands/omega.png', 'is_active' => true],
-            ['name' => 'Tag Heuer', 'slug' => 'tag-heuer', 'logo' => 'brands/tag-heuer.png', 'is_active' => true],
+            ['name' => 'Rolex', 'slug' => 'rolex', 'is_active' => true],
+            ['name' => 'Patek Philippe', 'slug' => 'patek-philippe', 'is_active' => true],
+            ['name' => 'Audemars Piguet', 'slug' => 'audemars-piguet', 'is_active' => true],
+            ['name' => 'Omega', 'slug' => 'omega', 'is_active' => true],
+            ['name' => 'Cartier', 'slug' => 'cartier', 'is_active' => true],
+            ['name' => 'Seiko', 'slug' => 'seiko', 'is_active' => true],
+            ['name' => 'Casio', 'slug' => 'casio', 'is_active' => true],
+            ['name' => 'Chopard', 'slug' => 'chopard', 'is_active' => true],
+            ['name' => 'Bulgari', 'slug' => 'bulgari', 'is_active' => true],
+            ['name' => 'Longines', 'slug' => 'longines', 'is_active' => true],
+            ['name' => 'Tag Heuer', 'slug' => 'tag-heuer', 'is_active' => true],
+            ['name' => 'Tudor', 'slug' => 'tudor', 'is_active' => true],
         ];
 
         foreach ($brands as $brand) {
-            Brand::create($brand);
+            Brand::firstOrCreate(['slug' => $brand['slug']], $brand);
         }
     }
 }

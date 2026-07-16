@@ -95,6 +95,14 @@
             </VaCardContent>
           </VaCard>
 
+          <!-- Comentário do cliente -->
+          <VaCard v-if="order.notes">
+            <VaCardTitle class="font-semibold">Comentário do Cliente</VaCardTitle>
+            <VaCardContent>
+              <p class="whitespace-pre-line text-sm text-[var(--va-secondary)]">{{ order.notes }}</p>
+            </VaCardContent>
+          </VaCard>
+
           <!-- Itens da encomenda -->
           <VaCard>
             <VaCardTitle class="font-semibold">Itens ({{ order.items?.length ?? 0 }})</VaCardTitle>
@@ -263,14 +271,34 @@ const loading = ref(true)
 const order = ref<Order | null>(null)
 
 // — Status options e helpers —
-const statusOptions = [
-  { value: 'pending', text: 'A Aguardar Confirmação' },
-  { value: 'processing', text: 'Em Processamento' },
-  { value: 'shipped', text: 'Enviado' },
-  { value: 'delivered', text: 'Entregue' },
-  { value: 'cancelled', text: 'Cancelado' },
-  { value: 'refunded', text: 'Reembolsado' },
-]
+const STATUS_LABELS: Record<string, string> = {
+  pending: 'A Aguardar Confirmação',
+  processing: 'Em Processamento',
+  shipped: 'Enviado',
+  delivered: 'Entregue',
+  cancelled: 'Cancelado',
+  refunded: 'Reembolsado',
+}
+
+// Máquina de estados só-para-a-frente (igual ao backend): não permite
+// reverter nem saltar fases.
+const ALLOWED_TRANSITIONS: Record<string, string[]> = {
+  pending: ['processing', 'cancelled'],
+  processing: ['shipped', 'cancelled'],
+  shipped: ['delivered'],
+  delivered: ['refunded'],
+  cancelled: [],
+  refunded: [],
+}
+
+// Só os próximos estados válidos a partir do estado atual da encomenda
+const statusOptions = computed(() => {
+  const current = order.value?.status.value ?? ''
+  return (ALLOWED_TRANSITIONS[current] ?? []).map((value) => ({
+    value,
+    text: STATUS_LABELS[value],
+  }))
+})
 
 const statusFlow = ['pending', 'processing', 'shipped', 'delivered']
 

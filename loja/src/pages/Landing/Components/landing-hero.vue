@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import { ref, onMounted } from 'vue'
 import ButtonSolid from '../../../components/Buttons/button-solid.vue'
-import defaultWatchImage from '/products/keyboards/relogio2.png'
+const defaultWatchImage = '/products/keyboards/relogio2.png'
 
 const heroData = ref({
   hero_subtitle: 'nova coleção',

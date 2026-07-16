@@ -16,24 +16,25 @@ class CategoriesSeeder extends Seeder
     public function run(): void
     {
         $categories = [
-            ['name' => 'Automáticos', 'slug' => 'automaticos', 'is_active' => true],
-            ['name' => 'Cronógrafos', 'slug' => 'cronografos', 'is_active' => true],
-            ['name' => 'Mergulho', 'slug' => 'mergulho', 'is_active' => true],
-            ['name' => 'Desporto', 'slug' => 'desporto', 'is_active' => true],
-            ['name' => 'Clássicos', 'slug' => 'classicos', 'is_active' => true],
-            ['name' => 'Analógico', 'slug' => 'analogico', 'is_active' => true],
-            ['name' => 'Digital', 'slug' => 'digital', 'is_active' => true],
-            ['name' => 'Smartwatch', 'slug' => 'smartwatch', 'is_active' => true],
-            
-            // Categorias especiais de sistema (protegidas no CategoryController)
-            ['name' => 'Gama de preço', 'slug' => 'gama-de-preco', 'is_active' => true],
-            ['name' => 'Cor', 'slug' => 'cor', 'is_active' => true],
-            ['name' => 'Sexo', 'slug' => 'sexo', 'is_active' => true],
-            ['name' => 'Género', 'slug' => 'genero', 'is_active' => true],
+            // Tipo de relógio
+            ['name' => 'Clássicos', 'slug' => 'classicos', 'group' => 'tipo', 'is_active' => true],
+            ['name' => 'Desporto', 'slug' => 'desporto', 'group' => 'tipo', 'is_active' => true],
+            ['name' => 'Casual', 'slug' => 'casual', 'group' => 'tipo', 'is_active' => true],
+            ['name' => 'Mergulho', 'slug' => 'mergulho', 'group' => 'tipo', 'is_active' => true],
+            ['name' => 'Aviador', 'slug' => 'aviador', 'group' => 'tipo', 'is_active' => true],
+            ['name' => 'Cronógrafos', 'slug' => 'cronografos', 'group' => 'tipo', 'is_active' => true],
+            ['name' => 'Militar', 'slug' => 'militar', 'group' => 'tipo', 'is_active' => true],
+            ['name' => 'Automáticos', 'slug' => 'automaticos', 'group' => 'tipo', 'is_active' => true],
+
+            // Mecanismo
+            ['name' => 'Analógico', 'slug' => 'analogico', 'group' => 'mecanismo', 'is_active' => true],
+            ['name' => 'Digital', 'slug' => 'digital', 'group' => 'mecanismo', 'is_active' => true],
+            ['name' => 'Analógico-Digital', 'slug' => 'analogico-digital', 'group' => 'mecanismo', 'is_active' => true],
+            ['name' => 'Smartwatch', 'slug' => 'smartwatch', 'group' => 'mecanismo', 'is_active' => true],
         ];
 
         foreach ($categories as $category) {
-            Category::create($category);
+            Category::firstOrCreate(['slug' => $category['slug']], $category);
         }
     }
 }

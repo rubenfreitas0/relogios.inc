@@ -41,7 +41,7 @@ onMounted(async () => {
 			}
 			// Redirecionar após 3 segundos
 			setTimeout(() => {
-				router.push('/checkout')
+				router.push('/conta/perfil')
 			}, 3000)
 		} else {
 			status.value = 'error'
@@ -86,7 +86,7 @@ onMounted(async () => {
 						</div>
 						<h2 class="mb-3 text-xl font-bold text-white">Email verificado!</h2>
 						<p class="mb-8 text-sm leading-relaxed text-white/50">{{ message }}</p>
-						<p class="text-xs text-white/30">A redirecionar para o checkout...</p>
+						<p class="text-xs text-white/30">A redirecionar para o teu perfil...</p>
 					</div>
 
 					<div v-else>

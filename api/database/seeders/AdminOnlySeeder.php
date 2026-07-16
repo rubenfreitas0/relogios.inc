@@ -13,6 +13,13 @@ class AdminOnlySeeder extends Seeder
 {
     public function run(): void
     {
+        // Categorias (tipo/mecanismo) — fixas, editáveis no admin, usadas nos filtros
+        $this->call(CategoriesSeeder::class);
+
+        // Zonas e métodos de envio (Europa)
+        $this->call(ShippingZoneSeeder::class);
+        $this->call(ShippingMethodSeeder::class);
+
         User::firstOrCreate(
             ['email' => 'admin@relogios.inc'],
             [
@@ -20,7 +27,6 @@ class AdminOnlySeeder extends Seeder
                 'lastname'          => 'RELOGIOS',
                 'email_verified_at' => now(),
                 'password'          => bcrypt('password'),
-                'phone'             => '912345678',
                 'role'              => 'admin',
                 'is_active'         => true,
             ]

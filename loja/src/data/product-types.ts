@@ -38,6 +38,7 @@ export interface Product {
 
 	brand?: Brand
 	category?: Category
+	categories?: Category[]
 	images?: ProductImage[]
 	primary_image?: ProductImage
 	weight?: number | string

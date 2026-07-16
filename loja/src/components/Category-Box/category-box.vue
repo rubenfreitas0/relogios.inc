@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import arrowIcon from '/icons/right-arrow.svg'
+const arrowIcon = '/icons/right-arrow.svg'
 
 const props = defineProps<{
   src: string

@@ -1,7 +1,7 @@
-import bannerImage from '/display/watch-hero.png'
-import menCategoryMetaImage from '/products/categories/relogiocontainer1.png'
-import womenCategoryMetaImage from '/products/categories/relogiocontainer2.png'
-import unisexCategoryMetaImage from '/products/categories/relogiocontainer3.png'
+const bannerImage = '/display/watch-hero.png'
+const menCategoryMetaImage = '/products/categories/relogiocontainer1.png'
+const womenCategoryMetaImage = '/products/categories/relogiocontainer2.png'
+const unisexCategoryMetaImage = '/products/categories/relogiocontainer3.png'
 import { meta, metaContainer } from './meta-types.ts'
 
 export const landingPageMeta: meta = {

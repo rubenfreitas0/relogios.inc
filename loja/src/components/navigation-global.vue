@@ -1,9 +1,10 @@
 <script setup lang="ts">
-import cartIcon from '/icons/cart-icon.svg'
+const cartIcon = '/icons/cart-icon.svg'
 import Cart from './Cart/cart-modal.vue'
 import { computed, ref, onMounted } from 'vue'
 import { useCartStore } from '../pinia/cartStore.ts'
 import { useAuthStore } from '../pinia/authStore.ts'
+import { useFiltersStore } from '../pinia/filtersStore.ts'
 import { useRouter, useRoute } from 'vue-router'
 
 interface Props {
@@ -16,6 +17,7 @@ const props = withDefaults(defineProps<Props>(), {
 
 const cartStore = useCartStore()
 const authStore = useAuthStore()
+const filtersStore = useFiltersStore()
 const router = useRouter()
 const route = useRoute()
 
@@ -70,26 +72,34 @@ interface MegaPrice {
   max: number
 }
 
-const megaMenus: Record<
-  string,
-  {
-    brands: string[]
-    types: string[]
-    kind: string[]
-    prices: MegaPrice[]
-    colors: { name: string; hex: string }[]
-  }
-> = {
+const sharedMegaPrices: MegaPrice[] = [
+  { label: 'Até €500', min: 0, max: 500 },
+  { label: '€500 – €1000', min: 500, max: 1000 },
+  { label: '€1000 – €1500', min: 1000, max: 1500 },
+  { label: '€1500 – €2500', min: 1500, max: 2500 },
+  { label: '€2500 – €5000', min: 2500, max: 5000 },
+  { label: 'Acima de €5000', min: 5000, max: 999999 },
+]
+
+interface MegaMenuData {
+  brands: string[]
+  types: string[]
+  kind: string[]
+  prices: MegaPrice[]
+  colors: { name: string; hex: string }[]
+}
+
+// Fallback estático — usado enquanto os filtros da BD não carregam
+const staticMegaMenus: Record<string, MegaMenuData> = {
   homens: {
     brands: [
-      'Casio',
+      'Rolex',
+      'Patek Philippe',
+      'Audemars Piguet',
+      'Omega',
+      'Cartier',
       'Seiko',
-      'Citizen',
-      'Orient',
-      'Tissot',
-      'Festina',
-      'G-Shock',
-      'Hugo Boss',
+      'Casio',
     ],
     types: [
       'Clássico',
@@ -101,12 +111,7 @@ const megaMenus: Record<
       'Militar',
     ],
     kind: ['Analógico', 'Digital', 'Analógico-Digital', 'Smartwatch'],
-    prices: [
-      { label: 'Até €100', min: 0, max: 100 },
-      { label: '€100 – €250', min: 100, max: 250 },
-      { label: '€250 – €500', min: 250, max: 500 },
-      { label: 'Acima de €500', min: 500, max: 999999 },
-    ],
+    prices: sharedMegaPrices,
     colors: [
       { name: 'Preto', hex: '#1a1a1a' },
       { name: 'Prata', hex: '#c0c0c0' },
@@ -118,14 +123,13 @@ const megaMenus: Record<
   },
   mulheres: {
     brands: [
-      'Casio',
-      'Citizen',
-      'Michael Kors',
-      'Anne Klein',
-      'Festina',
-      'Tissot',
-      'Cluse',
-      'Fossil',
+      'Cartier',
+      'Rolex',
+      'Omega',
+      'Chopard',
+      'Bulgari',
+      'Longines',
+      'Seiko',
     ],
     types: [
       'Clássico',
@@ -136,12 +140,7 @@ const megaMenus: Record<
       'Cronógrafo',
     ],
     kind: ['Analógico', 'Digital', 'Smartwatch'],
-    prices: [
-      { label: 'Até €80', min: 0, max: 80 },
-      { label: '€80 – €200', min: 80, max: 200 },
-      { label: '€200 – €450', min: 200, max: 450 },
-      { label: 'Acima de €450', min: 450, max: 999999 },
-    ],
+    prices: sharedMegaPrices,
     colors: [
       { name: 'Dourado', hex: '#c8a44a' },
       { name: 'Rosa Gold', hex: '#b76e79' },
@@ -153,14 +152,13 @@ const megaMenus: Record<
   },
   unisexo: {
     brands: [
-      'Casio',
-      'Swatch',
-      'Timex',
-      'Orient',
+      'Rolex',
+      'Omega',
+      'Cartier',
+      'TAG Heuer',
+      'Tudor',
       'Seiko',
-      'Garmin',
-      'Apple',
-      'Samsung',
+      'Casio',
     ],
     types: [
       'Casual',
@@ -171,12 +169,7 @@ const megaMenus: Record<
       'Outdoor',
     ],
     kind: ['Analógico', 'Digital', 'Smartwatch', 'Híbrido'],
-    prices: [
-      { label: 'Até €80', min: 0, max: 80 },
-      { label: '€80 – €200', min: 80, max: 200 },
-      { label: '€200 – €500', min: 200, max: 500 },
-      { label: 'Acima de €500', min: 500, max: 999999 },
-    ],
+    prices: sharedMegaPrices,
     colors: [
       { name: 'Preto', hex: '#1a1a1a' },
       { name: 'Branco', hex: '#f0f0f0' },
@@ -188,7 +181,39 @@ const megaMenus: Record<
   },
 }
 
+// Mega menu dinâmico: marcas ← tabela brands, tipos/mecanismos ← tabela
+// categories (campo group). Preços e cores mantêm-se estáticos.
+// Fallback para os valores estáticos enquanto a BD não tem dados.
+const megaMenus = computed<Record<string, MegaMenuData>>(() => {
+  const dbBrands = filtersStore.brands.map((b) => b.name)
+  const dbTypes = filtersStore.byGroup('tipo').map((c) => c.name)
+  const dbKinds = filtersStore.byGroup('mecanismo').map((c) => c.name)
+
+  const result: Record<string, MegaMenuData> = {}
+  for (const gender of Object.keys(staticMegaMenus)) {
+    const fallback = staticMegaMenus[gender]
+    result[gender] = {
+      brands: dbBrands.length > 0 ? dbBrands : fallback.brands,
+      types: dbTypes.length > 0 ? dbTypes : fallback.types,
+      kind: dbKinds.length > 0 ? dbKinds : fallback.kind,
+      prices: fallback.prices,
+      colors: fallback.colors,
+    }
+  }
+  return result
+})
+
+// Mapa nome → slug construído a partir das categorias da BD
+const dbSlugMap = computed<Record<string, string>>(() => {
+  const map: Record<string, string> = {}
+  for (const c of filtersStore.categories) {
+    map[c.name] = c.slug
+  }
+  return map
+})
+
 onMounted(async () => {
+  filtersStore.fetchFilters()
   if (authStore.token && !authStore.user) {
     await authStore.fetchUser()
   }
@@ -213,8 +238,14 @@ const categorySlugMap: Record<string, string> = {
   Elegante: 'classicos',
 }
 
+function getBrandSlug(name: string): string {
+  const dbBrand = filtersStore.brands.find((b) => b.name === name)
+  return dbBrand?.slug ?? name.toLowerCase().replace(/\s+/g, '-')
+}
+
 function getCategorySlug(name: string): string {
   return (
+    dbSlugMap.value[name] ||
     categorySlugMap[name] ||
     name
       .toLowerCase()
@@ -581,7 +612,7 @@ function getCategorySlug(name: string): string {
 						<ul class="space-y-2">
 							<li v-for="brand in megaMenus[activeMega!].brands" :key="brand">
 								<RouterLink
-									:to="`/${activeMega}?brand=${brand.toLowerCase()}`"
+									:to="`/${activeMega}?brand=${getBrandSlug(brand)}`"
 									class="block text-sm text-white/60 transition-all duration-150 hover:translate-x-1 hover:text-white"
 									@click="activeMega = null"
 								>

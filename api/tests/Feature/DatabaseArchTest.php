@@ -35,7 +35,6 @@ class DatabaseArchTest extends TestCase
         
         $product = Product::factory()->create([
             'brand_id' => $brand->id,
-            'category_id' => $category->id,
             'price' => 100.00,
             'discount_price' => null,
         ]);
@@ -80,15 +79,17 @@ class DatabaseArchTest extends TestCase
         
         $product1 = Product::factory()->create([
             'brand_id' => $brand->id,
-            'category_id' => $category->id,
             'price' => 100.00,
         ]);
         $product2 = Product::factory()->create([
             'brand_id' => $brand->id,
-            'category_id' => $category->id,
             'price' => 50.00,
         ]);
- 
+
+        // Associar ambos os produtos à categoria (pivot) para o desconto em lote
+        $product1->categories()->sync([$category->id]);
+        $product2->categories()->sync([$category->id]);
+
         // 1. Test fn_apply_batch_discount function
         // Apply 20% discount to category products
         $updatedCount = DB::selectOne("SELECT fn_apply_batch_discount(?, ?)", [$category->id, 20]);
@@ -144,7 +145,6 @@ class DatabaseArchTest extends TestCase
         
         $product = Product::factory()->create([
             'brand_id' => $brand->id,
-            'category_id' => $category->id,
             'stock' => 0,
             'price' => 100.00,
             'discount_price' => 80.00,
@@ -199,7 +199,6 @@ class DatabaseArchTest extends TestCase
         
         $product = Product::factory()->create([
             'brand_id' => $brand->id,
-            'category_id' => $category->id,
             'stock' => 10,
         ]);
  
@@ -243,7 +242,6 @@ class DatabaseArchTest extends TestCase
         
         $product = Product::factory()->create([
             'brand_id' => $brand->id,
-            'category_id' => $category->id,
             'stock' => 2,
         ]);
  
@@ -277,12 +275,10 @@ class DatabaseArchTest extends TestCase
         
         $product1 = Product::factory()->create([
             'brand_id' => $brand->id,
-            'category_id' => $category->id,
             'weight' => 1.500, // 1.5 kg
         ]);
         $product2 = Product::factory()->create([
             'brand_id' => $brand->id,
-            'category_id' => $category->id,
             'weight' => 0.250, // 250 g
         ]);
  

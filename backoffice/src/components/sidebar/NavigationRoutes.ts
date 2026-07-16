@@ -91,19 +91,5 @@ export default {
         icon: 'forum',
       },
     },
-    {
-      name: 'preferences',
-      displayName: 'menu.preferences',
-      meta: {
-        icon: 'manage_accounts',
-      },
-    },
-    {
-      name: 'settings',
-      displayName: 'menu.settings',
-      meta: {
-        icon: 'settings',
-      },
-    },
   ] as INavigationRoute[],
 }

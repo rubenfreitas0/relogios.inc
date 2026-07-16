@@ -44,7 +44,7 @@ class HistoricalOrdersSeeder extends Seeder
         }
     }
 
-    private function createHistoricalOrder($customers, $products, $shippingMethods, \Carbon\Carbon $createdAt): void
+    private function createHistoricalOrder(\Illuminate\Support\Collection $customers, \Illuminate\Support\Collection $products, \Illuminate\Support\Collection $shippingMethods, \Carbon\Carbon $createdAt): void
     {
         // 75% das encomendas antigas ficam pagas e entregues; as restantes
         // simulam falhas/cancelamentos, para dar variedade aos estados.

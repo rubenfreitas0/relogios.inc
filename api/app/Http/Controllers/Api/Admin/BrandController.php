@@ -10,7 +10,6 @@ use App\Models\Brand;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Http\Resources\Json\AnonymousResourceCollection;
-use Illuminate\Support\Facades\Storage;
 
 class BrandController extends Controller
 {
@@ -42,8 +41,6 @@ class BrandController extends Controller
     {
         $validated = $request->validated();
 
-        $validated['logo'] = $request->file('logo')->store('brands', 'public');
-
         $brand = Brand::create($validated);
 
         return (new BrandResource($brand))
@@ -67,11 +64,6 @@ class BrandController extends Controller
     public function update(UpdateBrandRequest $request, Brand $brand): BrandResource
     {
         $validated = $request->validated();
-
-        if ($request->hasFile('logo')) {
-            Storage::disk('public')->delete($brand->logo);
-            $validated['logo'] = $request->file('logo')->store('brands', 'public');
-        }
 
         $brand->update($validated);
 

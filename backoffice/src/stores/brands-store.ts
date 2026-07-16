@@ -6,7 +6,6 @@ export interface Brand {
   id: number
   name: string
   slug: string
-  logo: string | null
   is_active: boolean
   products_count?: number
   created_at: string

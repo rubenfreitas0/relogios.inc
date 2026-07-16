@@ -19,7 +19,7 @@ class ProductController extends Controller
     public function index(Request $request)
     {
         $products = Product::query()
-            ->with(['brand', 'category', 'images'])
+            ->with(['brand', 'categories', 'images'])
             ->when(
                 $request->filled('search'),
                 fn($q) => $q->whereRaw('LOWER(name) LIKE ?', ['%' . strtolower((string) $request->search) . '%'])
@@ -30,7 +30,7 @@ class ProductController extends Controller
             )
             ->when(
                 $request->filled('category_id'),
-                fn($q) => $q->where('category_id', $request->category_id)
+                fn($q) => $q->whereHas('categories', fn($c) => $c->where('categories.id', $request->category_id))
             )
             ->when(
                 $request->filled('stock_status'),
@@ -74,7 +74,10 @@ class ProductController extends Controller
             DB::beginTransaction();
 
             $validated = $request->validated();
-            $product = Product::create(\Illuminate\Support\Arr::except($validated, ['images', 'primary_image']));
+            $product = Product::create(\Illuminate\Support\Arr::except($validated, ['images', 'primary_image', 'categories']));
+
+            // Associar categorias (pivot category_product)
+            $product->categories()->sync($validated['categories'] ?? []);
 
             if ($request->hasFile('images')) {
                 foreach ($request->file('images') as $index => $image) {
@@ -93,7 +96,7 @@ class ProductController extends Controller
 
             return response()->json([
                 'message' => 'Produto criado com sucesso.',
-                'data' => new ProductResource($product->load(['brand', 'category', 'images']))
+                'data' => new ProductResource($product->load(['brand', 'categories', 'images']))
             ], 201);
         } catch (\Exception $e) {
             DB::rollBack();
@@ -109,7 +112,7 @@ class ProductController extends Controller
      */
     public function show(Product $product)
     {
-        return new ProductResource($product->load(['brand', 'category', 'images']));
+        return new ProductResource($product->load(['brand', 'categories', 'images']));
     }
 
     /**
@@ -121,7 +124,12 @@ class ProductController extends Controller
             DB::beginTransaction();
 
             $validated = $request->validated();
-            $product->update(\Illuminate\Support\Arr::except($validated, ['images', 'remove_image_ids', 'image_order', 'primary_image_id']));
+            $product->update(\Illuminate\Support\Arr::except($validated, ['images', 'remove_image_ids', 'image_order', 'primary_image_id', 'categories']));
+
+            // Sincronizar categorias apenas se vierem no pedido
+            if (array_key_exists('categories', $validated)) {
+                $product->categories()->sync($validated['categories']);
+            }
 
             // Remoção de imagens
             if ($request->filled('remove_image_ids')) {
@@ -180,7 +188,7 @@ class ProductController extends Controller
 
             return response()->json([
                 'message' => 'Produto atualizado com sucesso.',
-                'data' => new ProductResource($product->load(['brand', 'category', 'images']))
+                'data' => new ProductResource($product->load(['brand', 'categories', 'images']))
             ]);
         } catch (\Exception $e) {
             DB::rollBack();
@@ -219,7 +227,7 @@ class ProductController extends Controller
 
         return response()->json([
             'message' => 'Stock atualizado com sucesso.',
-            'data' => new ProductResource($product->load(['brand', 'category', 'images']))
+            'data' => new ProductResource($product->load(['brand', 'categories', 'images']))
         ]);
     }
 
@@ -233,7 +241,7 @@ class ProductController extends Controller
 
         return response()->json([
             'message' => 'Produto restaurado com sucesso.',
-            'data' => new ProductResource($product->load(['brand', 'category', 'images']))
+            'data' => new ProductResource($product->load(['brand', 'categories', 'images']))
         ]);
     }
 }

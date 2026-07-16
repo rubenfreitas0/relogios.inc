@@ -2,9 +2,9 @@
 import Navigation from '../../components/navigation-global.vue'
 import Footer from '../../components/footer-global.vue'
 import ButtonSolid from '../../components/Buttons/button-solid.vue'
-import watchHeroImage from '/display/watch-hero.png'
-import watchDetailImage from '/display/watch-detail.png'
-import watchBraceletsImage from '/display/watch-bracelets.png'
+const watchHeroImage = '/display/watch-hero.png'
+const watchDetailImage = '/display/watch-detail.png'
+const watchBraceletsImage = '/display/watch-bracelets.png'
 
 const principles = [
   {

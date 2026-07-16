@@ -206,10 +206,10 @@
                   type="gallery"
                   file-types=".png,.jpg,.jpeg"
                   upload-button-text="Escolher imagens"
-                  :limitations="{ maxFiles: 10, maxFileSize: 2 * 1024 * 1024 }"
+                  :limitations="{ maxFiles: 10, maxFileSize: 10 * 1024 * 1024 }"
                 />
                 <p class="text-xs text-[var(--va-secondary)] mt-1">
-                  PNG, JPG ou JPEG. Máx. 2 MB por imagem. Máx. 10 imagens no total.
+                  PNG, JPG ou JPEG. Máx. 10 MB por imagem. Máx. 10 imagens no total.
                 </p>
               </div>
             </VaCardContent>
@@ -235,15 +235,20 @@
                 />
 
                 <VaSelect
-                  v-model="form.category_id"
+                  v-model="form.categories"
                   :options="store.categoryOptions"
-                  label="Categoria"
-                  placeholder="Seleciona uma categoria"
+                  label="Categorias"
+                  placeholder="Seleciona uma ou mais categorias"
                   text-by="text"
                   value-by="value"
-                  :rules="[required]"
+                  group-by="group"
+                  :rules="[atLeastOneCategory]"
+                  multiple
                   searchable
                 />
+                <p class="text-xs text-[var(--va-secondary)] -mt-2">
+                  Escolhe pelo menos uma. Idealmente um Tipo e um Mecanismo.
+                </p>
 
                 <VaSelect
                   v-model="form.gender"
@@ -331,7 +336,7 @@ const form = reactive({
   stock: 0,
   weight: '',
   brand_id: null as number | null,
-  category_id: null as number | null,
+  categories: [] as number[],
   gender: '' as string,
   is_active: true,
   is_featured: false,
@@ -354,6 +359,7 @@ const genderOptions = [
 
 // — Validators —
 const required = (v: any) => !!v || v === 0 || 'Este campo é obrigatório'
+const atLeastOneCategory = (v: any) => (Array.isArray(v) && v.length > 0) || 'Seleciona pelo menos uma categoria'
 const minZero = (v: any) => Number(v) >= 0 || 'O valor não pode ser negativo'
 const lessThanPrice = (v: any) =>
   !v || !form.price || Number(v) < Number(form.price) || 'O desconto deve ser menor que o preço original'
@@ -397,7 +403,11 @@ function populateForm(product: Product) {
   form.stock = product.stock
   form.weight = product.weight ? String(product.weight) : ''
   form.brand_id = product.brand?.id ?? null
-  form.category_id = product.category?.id ?? null
+  form.categories = Array.isArray(product.categories)
+    ? product.categories.map((c) => c.id)
+    : product.category
+      ? [product.category.id]
+      : []
   form.gender = product.gender || ''
   form.is_active = product.is_active
   form.is_featured = product.is_featured
@@ -432,7 +442,7 @@ function buildFormData(): FormData {
   fd.append('stock', String(form.stock))
   if (form.weight) fd.append('weight', form.weight)
   if (form.brand_id) fd.append('brand_id', String(form.brand_id))
-  if (form.category_id) fd.append('category_id', String(form.category_id))
+  form.categories.forEach((id) => fd.append('categories[]', String(id)))
   fd.append('gender', form.gender)
   fd.append('is_active', form.is_active ? '1' : '0')
   fd.append('is_featured', form.is_featured ? '1' : '0')
@@ -441,13 +451,13 @@ function buildFormData(): FormData {
     fd.append('features', form.features)
   }
 
-  // in_the_box: converter linhas para JSON array
+  // in_the_box: enviar cada item como in_the_box[] para o Laravel receber um array
   if (form.in_the_box.trim()) {
     const items = form.in_the_box
       .split('\n')
       .map((s) => s.trim())
       .filter(Boolean)
-    fd.append('in_the_box', JSON.stringify(items))
+    items.forEach((item) => fd.append('in_the_box[]', item))
   }
 
   // Novas imagens

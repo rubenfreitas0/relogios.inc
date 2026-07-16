@@ -36,9 +36,8 @@ class ProductImage extends Model
 
     public function getFullUrlAttribute(): string
     {
-        /** @var \Illuminate\Filesystem\FilesystemAdapter $disk */
-        $disk = Storage::disk('public');
-        return $disk->url($this->url);
+        // Servido pela rota /media (não depende do symlink storage:link)
+        return url('/media/' . ltrim($this->url, '/'));
     }
 
     public function deleteImage(): void

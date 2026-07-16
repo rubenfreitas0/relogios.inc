@@ -42,16 +42,6 @@
 
         <template v-else>
           <VaDataTable :items="store.brands" :columns="columns" hoverable>
-            <!-- Logo -->
-            <template #cell(logo)="{ value }">
-              <div
-                class="w-10 h-10 rounded-lg overflow-hidden bg-[var(--va-background-element)] flex items-center justify-center"
-              >
-                <img v-if="value" :src="value" alt="Logo" class="w-full h-full object-contain p-1" />
-                <VaIcon v-else name="image" size="small" color="secondary" />
-              </div>
-            </template>
-
             <!-- Nome -->
             <template #cell(name)="{ value, rowData }">
               <div>
@@ -133,25 +123,6 @@
         <div class="flex flex-col gap-4">
           <VaInput v-model="modal.name" label="Nome" placeholder="Ex: Casio" :rules="[required]" />
 
-          <div>
-            <label class="text-sm font-semibold text-[var(--va-secondary)] mb-1 block">Logo</label>
-            <VaFileUpload
-              v-model="logoFileModel"
-              type="single"
-              file-types=".png,.jpg,.jpeg,.svg"
-              upload-button-text="Escolher logo"
-              :limitations="{ maxFileSize: 2 * 1024 * 1024 }"
-            />
-            <div v-if="modal.brand?.logo && !modal.logoFile?.length" class="mt-2">
-              <img
-                :src="modal.brand.logo"
-                alt="Logo atual"
-                class="w-16 h-16 object-contain rounded-lg bg-[var(--va-background-element)] p-1"
-              />
-              <span class="text-xs text-[var(--va-secondary)] ml-2">Logo atual</span>
-            </div>
-          </div>
-
           <VaSwitch v-model="modal.is_active" label="Marca ativa" size="small" color="success" />
         </div>
       </VaForm>
@@ -182,11 +153,12 @@
         A marca ficará inativa mas os produtos associados não serão afetados.
       </p>
     </VaModal>
+
   </div>
 </template>
 
 <script lang="ts" setup>
-import { reactive, computed, onMounted, onBeforeUnmount } from 'vue'
+import { reactive, onMounted, onBeforeUnmount } from 'vue'
 import { useForm, useToast } from 'vuestic-ui'
 import { useBrandsStore, type Brand } from '../../stores/brands-store'
 
@@ -195,7 +167,6 @@ const { validate } = useForm('brandForm')
 const { init: toast } = useToast()
 
 const columns = [
-  { key: 'logo', label: '', width: '60px', sortable: false },
   { key: 'name', label: 'Nome', sortable: true },
   { key: 'products_count', label: 'Produtos', width: '100px' },
   { key: 'is_active', label: 'Estado', width: '100px' },
@@ -237,15 +208,6 @@ const modal = reactive({
   brand: null as Brand | null,
   name: '',
   is_active: true,
-  logoFile: [] as File[],
-})
-
-// VaFileUpload com type="single" pode emitir um único File em vez de File[]
-const logoFileModel = computed({
-  get: () => modal.logoFile,
-  set: (val: File | File[] | null | undefined) => {
-    modal.logoFile = !val ? [] : Array.isArray(val) ? val : [val]
-  },
 })
 
 function openModal(brand?: Brand) {
@@ -253,7 +215,6 @@ function openModal(brand?: Brand) {
   modal.brand = brand ?? null
   modal.name = brand?.name ?? ''
   modal.is_active = brand?.is_active ?? true
-  modal.logoFile = []
   modal.show = true
 }
 
@@ -263,9 +224,6 @@ async function handleSave() {
   const fd = new FormData()
   fd.append('name', modal.name)
   fd.append('is_active', modal.is_active ? '1' : '0')
-  if (modal.logoFile.length > 0) {
-    fd.append('logo', modal.logoFile[0])
-  }
 
   if (modal.brand) {
     const result = await store.updateBrand(modal.brand.id, fd)
@@ -275,10 +233,6 @@ async function handleSave() {
       applyFilters()
     }
   } else {
-    if (!modal.logoFile.length) {
-      store.error = 'O logo é obrigatório para novas marcas.'
-      return
-    }
     const result = await store.createBrand(fd)
     if (result) {
       toast({ message: 'Marca criada.', color: 'success' })

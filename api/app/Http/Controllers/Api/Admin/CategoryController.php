@@ -4,9 +4,11 @@ namespace App\Http\Controllers\Api\Admin;
 
 
 use App\Http\Controllers\Controller;
+use App\Http\Requests\Admin\StoreCategoryRequest;
 use App\Http\Requests\Admin\UpdateCategoryRequest;
 use App\Http\Resources\CategoryResource;
 use App\Models\Category;
+use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Http\Resources\Json\AnonymousResourceCollection;
 
@@ -34,6 +36,18 @@ class CategoryController extends Controller
     }
 
     /**
+     * Criar nova categoria (subcategoria de um grupo tipo/mecanismo).
+     */
+    public function store(StoreCategoryRequest $request): JsonResponse
+    {
+        $category = Category::create($request->validated());
+
+        return (new CategoryResource($category))
+            ->response()
+            ->setStatusCode(201);
+    }
+
+    /**
      * Detalhe de uma categoria por ID.
      */
     public function show(Category $category): CategoryResource
@@ -51,5 +65,17 @@ class CategoryController extends Controller
         $category->update($request->validated());
 
         return new CategoryResource($category);
+    }
+
+    /**
+     * Desativar categoria (soft: is_active = false, não apaga).
+     */
+    public function destroy(Category $category): JsonResponse
+    {
+        $category->update(['is_active' => false]);
+
+        return response()->json([
+            'message' => 'Categoria desativada com sucesso.'
+        ], 200);
     }
 }

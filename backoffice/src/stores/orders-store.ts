@@ -40,6 +40,7 @@ export interface Order {
   total: number
   tracking_number: string | null
   tracking_url: string | null
+  notes: string | null
   paid_at: string | null
   created_at: string
   updated_at: string

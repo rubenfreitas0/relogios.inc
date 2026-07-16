@@ -87,7 +87,6 @@ onBeforeUnmount(() => {
 					You will receive an email confirmation shortly.
 				</p>
 
-				<!-- MB Way payment info -->
 				<div
 					v-if="payment?.method?.value === 'mbway'"
 					class="mt-4 rounded-md border border-dashed border-k-main bg-k-main/10 p-4 text-sm text-black"
@@ -104,7 +103,6 @@ onBeforeUnmount(() => {
 					</p>
 				</div>
 
-				<!-- Multibanco payment info -->
 				<div
 					v-if="payment?.method?.value === 'multibanco' && payment.payment_data"
 					class="mt-4 rounded-md border border-black/10 bg-k-grey p-4 text-sm text-black"

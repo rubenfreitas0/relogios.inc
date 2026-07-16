@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import cartIcon from '/icons/cart-icon.svg'
+const cartIcon = '/icons/cart-icon.svg'
 </script>
 
 <template>

@@ -1,5 +1,11 @@
 <template>
-  <VaDropdown :offset="[13, 0]" class="notification-dropdown" stick-to-edges :close-on-content-click="false">
+  <VaDropdown
+    v-model="isOpen"
+    :offset="[13, 0]"
+    class="notification-dropdown"
+    stick-to-edges
+    :close-on-content-click="false"
+  >
     <template #anchor>
       <VaButton preset="secondary" color="textPrimary" class="notification-dropdown__trigger">
         <span class="notification-dropdown__bell-wrapper">
@@ -15,31 +21,25 @@
       <div class="notification-dropdown__header">
         <div class="notification-dropdown__header-left">
           <VaIcon name="forum" size="18px" color="#fff" />
-          <span class="notification-dropdown__header-title">Tickets Pendentes</span>
+          <span class="notification-dropdown__header-title">Tickets Abertos</span>
         </div>
-        <span v-if="openTicketsCount > 0" class="notification-dropdown__header-count">
+        <span class="notification-dropdown__header-count">
           {{ openTicketsCount }}
         </span>
       </div>
 
-      <!-- Tickets List -->
+      <!-- Resumo: só o número de tickets em aberto -->
       <div class="notification-dropdown__body">
-        <div v-if="openTickets.length > 0" class="notification-dropdown__list">
-          <a v-for="item in openTickets" :key="item.id" class="notification-dropdown__ticket" @click="goToTicket">
-            <div class="notification-dropdown__ticket-dot"></div>
-            <div class="notification-dropdown__ticket-info">
-              <div class="notification-dropdown__ticket-subject">{{ item.subject }}</div>
-              <div class="notification-dropdown__ticket-meta">
-                {{ item.user ? item.user.firstname + ' ' + item.user.lastname : 'Cliente' }}
-                <span class="notification-dropdown__ticket-time">· {{ formatRelativeTime(item.created_at) }}</span>
-              </div>
-            </div>
-          </a>
+        <div v-if="openTicketsCount > 0" class="notification-dropdown__summary">
+          <span class="notification-dropdown__summary-number">{{ openTicketsCount }}</span>
+          <span class="notification-dropdown__summary-label">
+            {{ openTicketsCount === 1 ? 'ticket em aberto' : 'tickets em aberto' }}
+          </span>
         </div>
 
         <div v-else class="notification-dropdown__empty">
           <VaIcon name="check_circle" size="28px" color="#a3e635" />
-          <span>Sem tickets pendentes</span>
+          <span>Sem tickets abertos</span>
         </div>
       </div>
 
@@ -55,61 +55,36 @@
 </template>
 
 <script setup lang="ts">
-import { ref, onMounted } from 'vue'
-import { useI18n } from 'vue-i18n'
+import { ref, watch, onMounted } from 'vue'
 import { useRouter } from 'vue-router'
 import VaIconNotification from '../../../icons/VaIconNotification.vue'
 import { ticketsApi } from '../../../../services/api'
 
-const { locale } = useI18n()
 const router = useRouter()
 
-const rtf = new Intl.RelativeTimeFormat(locale.value, { style: 'short' })
-
 const openTicketsCount = ref(0)
-const openTickets = ref<any[]>([])
+const isOpen = ref(false)
 
 onMounted(async () => {
   await fetchOpenTickets()
 })
 
+// Atualiza a contagem sempre que o dropdown é aberto
+watch(isOpen, (open) => {
+  if (open) fetchOpenTickets()
+})
+
 const fetchOpenTickets = async () => {
   try {
-    const res = await ticketsApi.list({ status: 'open', per_page: 5 })
+    const res = await ticketsApi.list({ status: 'open', per_page: 1 })
     openTicketsCount.value = res.data.meta.total
-    openTickets.value = res.data.data
   } catch (e) {
-    console.error('Erro ao buscar tickets pendentes:', e)
+    console.error('Erro ao buscar tickets abertos:', e)
   }
 }
 
 const goToTicket = () => {
   router.push({ name: 'tickets' })
-}
-
-const TIME_NAMES = {
-  second: 1000,
-  minute: 1000 * 60,
-  hour: 1000 * 60 * 60,
-  day: 1000 * 60 * 60 * 24,
-  week: 1000 * 60 * 60 * 24 * 7,
-  month: 1000 * 60 * 60 * 24 * 30,
-  year: 1000 * 60 * 60 * 24 * 365,
-}
-
-const getTimeName = (differenceTime: number) => {
-  return Object.keys(TIME_NAMES).reduce(
-    (acc, key) => (TIME_NAMES[key as keyof typeof TIME_NAMES] < differenceTime ? key : acc),
-    'month',
-  ) as keyof typeof TIME_NAMES
-}
-
-const formatRelativeTime = (dateString: string) => {
-  const date = new Date(dateString)
-  const timeDifference = Math.round(new Date().getTime() - date.getTime())
-  const timeName = getTimeName(timeDifference)
-  const value = Math.round(timeDifference / TIME_NAMES[timeName])
-  return rtf.format(-1 * (value || 1), timeName)
 }
 </script>
 
@@ -266,6 +241,27 @@ const formatRelativeTime = (dateString: string) => {
     color: #999;
     font-size: 13px;
     font-weight: 500;
+  }
+
+  &__summary {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 2px;
+    padding: 28px 18px;
+  }
+
+  &__summary-number {
+    font-size: 34px;
+    font-weight: 800;
+    line-height: 1;
+    color: #e53e3e;
+  }
+
+  &__summary-label {
+    font-size: 13px;
+    font-weight: 600;
+    color: #666;
   }
 
   &__footer {

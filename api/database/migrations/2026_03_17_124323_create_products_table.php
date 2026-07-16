@@ -25,6 +25,9 @@ return new class extends Migration
 
             $table->decimal('price', 10, 2)->unsigned();
             $table->integer('stock')->unsigned()->default(0);
+
+            // Cor principal do relógio (usada nos filtros da loja)
+            $table->string('color', 30)->nullable()->index();
             
             $table->boolean('is_active')->default(true)->index();
             $table->boolean('is_featured')->default(false)->index();

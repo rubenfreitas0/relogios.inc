@@ -18,6 +18,7 @@ class ProductResource extends JsonResource
             'price'             => $this->price,
             'discount_price'    => $this->discount_price,
             'stock'             => $this->stock,
+            'color'             => $this->color,
             'weight'            => $this->weight,
             'is_active'         => $this->is_active,
             'is_featured'       => $this->is_featured,
@@ -25,8 +26,12 @@ class ProductResource extends JsonResource
             'features'          => $this->features,
             'in_the_box'        => $this->in_the_box,
 
-            'brand'    => new BrandResource($this->whenLoaded('brand')),
-            'category' => new CategoryResource($this->whenLoaded('category')),
+            'brand'      => new BrandResource($this->whenLoaded('brand')),
+            'categories' => CategoryResource::collection($this->whenLoaded('categories')),
+            // Compatibilidade: primeira categoria (ou null) quando a relação está carregada
+            'category'   => $this->whenLoaded('categories', fn () => $this->categories->first()
+                ? new CategoryResource($this->categories->first())
+                : null),
             'images'   => ProductImageResource::collection($this->whenLoaded('images')),
             'primary_image' => new ProductImageResource($this->whenLoaded('primaryImage')),
 

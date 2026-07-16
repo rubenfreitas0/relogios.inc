@@ -86,6 +86,18 @@ class DashboardController extends Controller
         $revenueThisMonth = $revenueRaw->has($thisMonthKey) ? (float) $revenueRaw->get($thisMonthKey)->revenue : 0.0;
         $revenueLastMonth = $revenueRaw->has($lastMonthKey) ? (float) $revenueRaw->get($lastMonthKey)->revenue : 0.0;
 
+        // — Vendas por país (nº de encomendas pagas) —
+        $salesByCountry = Order::query()
+            ->where('payment_status', PaymentStatus::PAID)
+            ->select('shipping_country', DB::raw('COUNT(*) as count'))
+            ->groupBy('shipping_country')
+            ->orderByDesc('count')
+            ->get()
+            ->map(fn($row) => [
+                'country' => $row->shipping_country,
+                'count'   => (int) $row->count,
+            ]);
+
         // — Clientes —
         $totalCustomers = User::where('role', '!=', 'admin')->count();
 
@@ -132,6 +144,7 @@ class DashboardController extends Controller
             'customers' => [
                 'total' => $totalCustomers,
             ],
+            'sales_by_country' => $salesByCountry,
             'latest_orders' => $latestOrders,
         ]);
     }

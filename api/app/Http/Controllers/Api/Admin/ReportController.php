@@ -2,114 +2,102 @@
 
 namespace App\Http\Controllers\Api\Admin;
 
+use App\Enums\PaymentStatus;
 use App\Http\Controllers\Controller;
+use App\Models\Order;
 use Illuminate\Http\JsonResponse;
-use Illuminate\Http\Request;
 
 class ReportController extends Controller
 {
     /**
-     * Obter dados de relatórios estatísticos desde 2013.
+     * Relatório de vendas: agregação anual e mensal das encomendas pagas.
+     * GET /api/admin/reports
      */
-    public function index(Request $request): JsonResponse
+    public function index(): JsonResponse
     {
-        $startYear = 2013;
-        $currentYear = (int) date('Y');
-        
-        // Dados base para 2013
-        $baseRevenue = 45000.00;
-        $baseOrders = 250;
-        
-        $yearlyData = [];
-        $lastRevenue = $baseRevenue;
-        $lastOrders = $baseOrders;
-        
-        // Semente de aleatoriedade fixa para consistência
-        srand(42);
+        $orders = Order::where('payment_status', PaymentStatus::PAID)
+            ->get(['total', 'created_at']);
 
-        for ($year = $startYear; $year <= $currentYear; $year++) {
-            if ($year === $startYear) {
-                $revenue = $baseRevenue;
-                $orders = $baseOrders;
-                $growth = 0.0;
-            } else {
-                // Crescimento de ~15% com uma pequena variação de +/- 3%
-                $growthFactor = 0.15 + (rand(-30, 30) / 1000.0);
-                $revenue = $lastRevenue * (1 + $growthFactor);
-                $orders = (int) round($lastOrders * (1 + $growthFactor));
-                $growth = $growthFactor * 100;
-            }
-            
-            $yearlyData[$year] = [
-                'year' => $year,
-                'revenue' => round($revenue, 2),
-                'orders' => $orders,
-                'growth' => round($growth, 1),
-                'average_ticket' => round($revenue / $orders, 2)
-            ];
-            
-            $lastRevenue = $revenue;
-            $lastOrders = $orders;
-        }
-
-        // Dados mensais para os últimos 3 anos (detalhamento)
-        $monthlyData = [];
-        $months = [
-            1 => ['name' => 'Janeiro', 'factor' => 0.75],
-            2 => ['name' => 'Fevereiro', 'factor' => 0.80],
-            3 => ['name' => 'Março', 'factor' => 0.95],
-            4 => ['name' => 'Abril', 'factor' => 0.90],
-            5 => ['name' => 'Maio', 'factor' => 1.05],
-            6 => ['name' => 'Junho', 'factor' => 1.00],
-            7 => ['name' => 'Julho', 'factor' => 0.85],
-            8 => ['name' => 'Agosto', 'factor' => 0.70],
-            9 => ['name' => 'Setembro', 'factor' => 0.95],
-            10 => ['name' => 'Outubro', 'factor' => 1.05],
-            11 => ['name' => 'Novembro', 'factor' => 1.45], // Black Friday
-            12 => ['name' => 'Dezembro', 'factor' => 1.60], // Natal
+        $monthNames = [
+            1 => 'Jan', 2 => 'Fev', 3 => 'Mar', 4 => 'Abr', 5 => 'Mai', 6 => 'Jun',
+            7 => 'Jul', 8 => 'Ago', 9 => 'Set', 10 => 'Out', 11 => 'Nov', 12 => 'Dez',
         ];
 
-        // Gerar histórico mensal dos últimos 3 anos
-        for ($year = $currentYear - 2; $year <= $currentYear; $year++) {
-            $yearTotalRevenue = $yearlyData[$year]['revenue'];
-            $yearTotalOrders = $yearlyData[$year]['orders'];
-            
-            // Distribuir com base no fator de sazonalidade
-            $totalFactors = array_sum(array_column($months, 'factor'));
-            
-            foreach ($months as $mNum => $mInfo) {
-                // Se for o ano atual, parar no mês corrente
-                if ($year === $currentYear && $mNum > (int) date('n')) {
-                    break;
-                }
-                
-                $monthShare = $mInfo['factor'] / $totalFactors;
-                // Pequena variação mensal aleatória (+/- 5%)
-                $variance = 1.0 + (rand(-50, 50) / 1000.0);
-                
-                $mRevenue = $yearTotalRevenue * $monthShare * $variance;
-                $mOrders = (int) round($yearTotalOrders * $monthShare * $variance);
-                
-                $monthlyData[] = [
-                    'year' => $year,
-                    'month' => $mNum,
-                    'month_name' => $mInfo['name'],
-                    'label' => "{$mInfo['name']} {$year}",
-                    'revenue' => round($mRevenue, 2),
-                    'orders' => $mOrders,
-                    'average_ticket' => $mOrders > 0 ? round($mRevenue / $mOrders, 2) : 0.0
-                ];
-            }
+        // Agregação anual e mensal
+        $byYear = [];
+        $byMonth = [];
+
+        foreach ($orders as $order) {
+            $date = $order->created_at;
+            $year = (int) $date->format('Y');
+            $month = (int) $date->format('n');
+            $total = (float) $order->total;
+
+            $byYear[$year] ??= ['revenue' => 0.0, 'orders' => 0];
+            $byYear[$year]['revenue'] += $total;
+            $byYear[$year]['orders']++;
+
+            $key = $year . '-' . $month;
+            $byMonth[$key] ??= ['year' => $year, 'month' => $month, 'revenue' => 0.0, 'orders' => 0];
+            $byMonth[$key]['revenue'] += $total;
+            $byMonth[$key]['orders']++;
         }
 
+        ksort($byYear);
+
+        // Série anual (com crescimento face ao ano anterior)
+        $yearly = [];
+        $prevRevenue = null;
+        foreach ($byYear as $year => $data) {
+            $revenue = round($data['revenue'], 2);
+            $count = $data['orders'];
+            $growth = 0.0;
+            if ($prevRevenue !== null && $prevRevenue > 0) {
+                $growth = round((($revenue - $prevRevenue) / $prevRevenue) * 100, 1);
+            }
+            $yearly[] = [
+                'year'           => $year,
+                'revenue'        => $revenue,
+                'orders'         => $count,
+                'growth'         => $growth,
+                'average_ticket' => $count > 0 ? round($revenue / $count, 2) : 0,
+            ];
+            $prevRevenue = $revenue;
+        }
+
+        // Série mensal (ordenada por ano/mês)
+        $monthly = [];
+        foreach ($byMonth as $data) {
+            $revenue = round($data['revenue'], 2);
+            $count = $data['orders'];
+            $monthly[] = [
+                'year'           => $data['year'],
+                'month'          => $data['month'],
+                'month_name'     => $monthNames[$data['month']],
+                'label'          => $monthNames[$data['month']] . ' ' . $data['year'],
+                'revenue'        => $revenue,
+                'orders'         => $count,
+                'average_ticket' => $count > 0 ? round($revenue / $count, 2) : 0,
+            ];
+        }
+        usort($monthly, fn($a, $b) => [$a['year'], $a['month']] <=> [$b['year'], $b['month']]);
+
+        // Resumo global
+        $totalRevenue = round(array_sum(array_column($yearly, 'revenue')), 2);
+        $totalOrders  = array_sum(array_column($yearly, 'orders'));
+        $growthValues = array_map(fn($y) => $y['growth'], array_slice($yearly, 1));
+        $avgGrowth = count($growthValues) > 0
+            ? round(array_sum($growthValues) / count($growthValues), 1)
+            : 0;
+
         return response()->json([
-            'yearly' => array_values($yearlyData),
-            'monthly' => $monthlyData,
+            'yearly'  => $yearly,
+            'monthly' => $monthly,
             'summary' => [
-                'total_revenue_since_start' => round(array_sum(array_column($yearlyData, 'revenue')), 2),
-                'total_orders_since_start' => array_sum(array_column($yearlyData, 'orders')),
-                'average_annual_growth' => round(array_sum(array_column($yearlyData, 'growth')) / (count($yearlyData) - 1), 1)
-            ]
+                'total_revenue_since_start' => $totalRevenue,
+                'total_orders_since_start'  => $totalOrders,
+                'average_annual_growth'     => $avgGrowth,
+            ],
         ]);
     }
 }

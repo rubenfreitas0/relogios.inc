@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { ref, computed, onMounted, onUnmounted } from 'vue'
+import { ref, computed, onUnmounted } from 'vue'
 import { useRouter } from 'vue-router'
 import { useAuthStore } from '../../pinia/authStore'
 import Navigation from '../../components/navigation-global.vue'
@@ -16,8 +16,6 @@ const password = ref('')
 const passwordConfirmation = ref('')
 const showPassword = ref(false)
 const showConfirmPassword = ref(false)
-
-const isDev = import.meta.env.DEV
 
 // Rate limiting state
 const attempts = ref<number[]>([])
@@ -56,29 +54,14 @@ function checkRateLimit(): boolean {
   return false
 }
 
-function injectTestData() {
-  firstname.value = 'Cliente'
-  lastname.value = 'Teste'
-  email.value = `cliente.${Math.floor(Math.random() * 10000)}@relogios.inc`
-  phone.value = '912345678'
-  password.value = 'password123'
-  passwordConfirmation.value = 'password123'
-}
-
-function handleKeyDown(e: KeyboardEvent) {
-  if (e.ctrlKey && e.shiftKey && e.key.toLowerCase() === 'y') {
-    e.preventDefault()
-    injectTestData()
-  }
-}
-
-onMounted(() => {
-  window.addEventListener('keydown', handleKeyDown)
+onUnmounted(() => {
+  if (cooldownTimer) clearInterval(cooldownTimer)
 })
 
-onUnmounted(() => {
-  window.removeEventListener('keydown', handleKeyDown)
-  if (cooldownTimer) clearInterval(cooldownTimer)
+// Telefone tem de incluir o indicativo do país (+351, +34, ...)
+const phoneValid = computed(() => {
+  if (!phone.value) return true
+  return /^\+\d{1,3}(?:\s?\d){6,12}$/.test(phone.value.trim())
 })
 
 const passwordsMatch = computed(() => {
@@ -134,7 +117,7 @@ async function handleRegister() {
 
   if (checkRateLimit()) return
 
-  if (!passwordsMatch.value) return
+  if (!passwordsMatch.value || !phoneValid.value) return
   const ok = await auth.register({
     firstname: firstname.value,
     lastname: lastname.value,
@@ -392,6 +375,12 @@ async function handleRegister() {
 										placeholder="+351 9XX XXX XXX"
 										class="input-field"
 									/>
+									<p
+										v-if="phone && !phoneValid"
+										class="mt-1 text-[0.65rem] text-red-400"
+									>
+										Inclui o indicativo do país (ex.: +351 912345678)
+									</p>
 								</div>
 							</div>
 
@@ -583,35 +572,6 @@ async function handleRegister() {
 							</button>
 						</form>
 
-						<!-- Dev Helper -->
-						<div
-							v-if="isDev"
-							class="mt-6 flex justify-center border-t border-white/5 pt-4"
-						>
-							<button
-								type="button"
-								class="flex items-center gap-1.5 rounded-lg bg-white/5 px-3 py-1.5 text-xs text-k-main/60 transition duration-200 hover:bg-white/10 hover:text-k-main"
-								@click="injectTestData"
-							>
-								<svg
-									class="h-3.5 w-3.5"
-									fill="none"
-									viewBox="0 0 24 24"
-									stroke="currentColor"
-								>
-									<path
-										stroke-linecap="round"
-										stroke-linejoin="round"
-										stroke-width="2"
-										d="M13 10V3L4 14h7v7l9-11h-7z"
-									/>
-								</svg>
-								Preencher dados de teste
-								<span class="ml-1 font-mono text-[10px] text-white/30"
-									>(Ctrl+Shift+Y)</span
-								>
-							</button>
-						</div>
 					</div>
 				</div>
 			</div>

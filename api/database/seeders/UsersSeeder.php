@@ -14,6 +14,7 @@ class UsersSeeder extends Seeder
      */
     public function run(): void
     {
+        // Apenas a conta de administrador (sem utilizadores de teste).
         User::firstOrCreate(
             ['email' => 'admin@relogios.inc'],
             [
@@ -21,14 +22,9 @@ class UsersSeeder extends Seeder
                 'lastname'  => 'RELOGIOS',
                 'email_verified_at' => now(),
                 'password'  => bcrypt('password'),
-                'phone'     => '912345678',
                 'role'      => 'admin',
                 'is_active' => true,
             ]
         );
-
-        User::factory()->count(5)->create();
-
-        // User::factory()->count(10)->create();
     }
 }

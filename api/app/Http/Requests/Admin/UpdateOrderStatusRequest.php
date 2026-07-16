@@ -40,21 +40,16 @@ class UpdateOrderStatusRequest extends FormRequest
             $from = $order->status;
             $to   = OrderStatus::from($this->input('status'));
 
-            $invalidTransitions = [
-                OrderStatus::DELIVERED->value => [OrderStatus::PENDING, OrderStatus::PROCESSING],
-                OrderStatus::CANCELLED->value => [OrderStatus::SHIPPED, OrderStatus::DELIVERED],
-            ];
-
-            foreach ($invalidTransitions as $targetStatus => $forbiddenOrigins) {
-                if ($to->value === $targetStatus && in_array($from, $forbiddenOrigins)) {
-                    $validator->errors()->add(
-                        'status',
-                        "Não é possível mover a encomenda de '{$from->value}' para '{$to->value}'."
-                    );
-                }
+            // Máquina de estados só-para-a-frente: proíbe reverter e saltar fases.
+            if (! $from->canTransitionTo($to)) {
+                $validator->errors()->add(
+                    'status',
+                    "Transição inválida: não é possível mudar de '{$from->label()}' para '{$to->label()}'."
+                );
             }
 
-            if ($to === OrderStatus::SHIPPED && empty($this->input('tracking_number')) && empty($order->tracking_number)) {
+            if ($to === OrderStatus::SHIPPED && $from !== $to
+                && empty($this->input('tracking_number')) && empty($order->tracking_number)) {
                 $validator->errors()->add(
                     'tracking_number',
                     'O número de rastreio é obrigatório ao marcar a encomenda como enviada.'

@@ -17,7 +17,9 @@ class ProfileController extends Controller
         $validated = $request->validate([
             'firstname' => 'sometimes|required|string|max:100',
             'lastname'  => 'sometimes|required|string|max:100',
-            'phone'     => 'nullable|string|max:20',
+            'phone'     => ['nullable', 'string', 'max:20', 'regex:/^\+\d{1,3}(?:\s?\d){6,12}$/'],
+        ], [
+            'phone.regex' => 'O telefone deve incluir o indicativo do país (ex.: +351 912345678).',
         ]);
 
         $user = $request->user();

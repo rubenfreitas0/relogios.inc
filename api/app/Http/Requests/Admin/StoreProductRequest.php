@@ -16,7 +16,8 @@ class StoreProductRequest extends FormRequest
     {
         return [
             'brand_id'          => ['required', 'integer', 'exists:brands,id'],
-            'category_id'       => ['required', 'integer', 'exists:categories,id'],
+            'categories'        => ['required', 'array', 'min:1'],
+            'categories.*'      => ['integer', 'distinct', 'exists:categories,id'],
             'gender'            => ['required', Rule::in(['masculino', 'feminino', 'unisexo'])],
             'name'              => ['required', 'string', 'max:255', 'unique:products,name'],
             'short_description' => ['nullable', 'string', 'max:255'],
@@ -24,6 +25,7 @@ class StoreProductRequest extends FormRequest
             'price'             => ['required', 'numeric', 'min:0'],
             'discount_price'    => ['nullable', 'numeric', 'min:0', 'lt:price'],
             'stock'             => ['required', 'integer', 'min:0'],
+            'color'             => ['nullable', 'string', 'in:preto,prata,dourado,azul,verde,branco,rosa-gold,rose,laranja'],
             'weight'            => ['nullable', 'numeric', 'min:0'],
             'features'          => ['nullable', 'string'],
             'in_the_box'        => ['nullable', 'array'],
@@ -31,7 +33,7 @@ class StoreProductRequest extends FormRequest
             'is_active'         => ['sometimes', 'boolean'],
             'is_featured'       => ['sometimes', 'boolean'],
             'images'            => ['sometimes', 'array', 'max:10'],
-            'images.*'          => ['image', 'mimes:png,jpg,jpeg', 'max:2048'],
+            'images.*'          => ['image', 'mimes:png,jpg,jpeg', 'max:10240'],
             'primary_image'     => ['sometimes', 'integer', 'min:0'],
         ];
     }
@@ -41,8 +43,9 @@ class StoreProductRequest extends FormRequest
         return [
             'brand_id.required'    => 'A marca é obrigatória.',
             'brand_id.exists'      => 'A marca selecionada não existe.',
-            'category_id.required' => 'A categoria é obrigatória.',
-            'category_id.exists'   => 'A categoria selecionada não existe.',
+            'categories.required'  => 'Selecione pelo menos uma categoria.',
+            'categories.min'       => 'Selecione pelo menos uma categoria.',
+            'categories.*.exists'  => 'Uma das categorias selecionadas não existe.',
             'gender.required'      => 'O género é obrigatório.',
             'gender.in'            => 'O género deve ser: masculino, feminino ou unisexo.',
             'name.required'        => 'O nome do produto é obrigatório.',
@@ -61,7 +64,7 @@ class StoreProductRequest extends FormRequest
             'images.max'           => 'Só pode enviar no máximo 10 imagens.',
             'images.*.image'       => 'Cada ficheiro tem de ser uma imagem.',
             'images.*.mimes'       => 'Formatos aceites: PNG, JPG, JPEG, WebP.',
-            'images.*.max'         => 'Cada imagem não pode ter mais de 2 MB.',
+            'images.*.max'         => 'Cada imagem não pode ter mais de 10 MB.',
         ];
     }
 }

@@ -67,6 +67,7 @@ class OrderItem extends Model
             return $this->product_image;
         }
 
-        return asset('storage/' . $this->product_image);
+        // Servido pela rota /media (não depende do symlink storage:link)
+        return url('/media/' . ltrim($this->product_image, '/'));
     }
 }

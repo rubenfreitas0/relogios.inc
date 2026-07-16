@@ -54,12 +54,27 @@ trait TestHelpers
      */
     protected function createProduct(array $overrides = []): Product
     {
+        // Categorias podem ser passadas via 'categories' (array de ids/models)
+        // ou 'category_id' (compatibilidade) — ambos são associados via pivot.
+        $categories = $overrides['categories'] ?? null;
+        if (isset($overrides['category_id'])) {
+            $categories = array_merge((array) ($categories ?? []), [$overrides['category_id']]);
+        }
+        unset($overrides['categories'], $overrides['category_id']);
+
         $product = Product::factory()->create(array_merge([
             'is_active' => true,
             'stock'     => 10,
             'price'     => 199.99,
             'weight'    => 0.5,
         ], $overrides));
+
+        if (!empty($categories)) {
+            $ids = collect($categories)->map(
+                fn($c) => is_object($c) ? $c->id : $c
+            )->all();
+            $product->categories()->sync($ids);
+        }
 
         ProductImage::factory()->create([
             'product_id' => $product->id,
